@@ -1,0 +1,530 @@
+{
+  "projectName": "mizora-kzn",
+  "version": "1.0.0",
+  "generatedAt": "2026-06-03T03:53:34.911Z",
+  "totalFiles": 96,
+  "totalSizeBytes": 4289471,
+  "totalSizeMB": "4.09",
+  "deployTargets": [
+    "github",
+    "vercel",
+    "netlify",
+    "railway",
+    "render",
+    "google-ai-studio"
+  ],
+  "rebuildInstructions": {
+    "steps": [
+      "1. Extract this ZIP file to a folder",
+      "2. Copy .env.example to .env and configure",
+      "3. Run: bun install",
+      "4. Run: bun run db:push",
+      "5. Run: bun run dev",
+      "6. Open http://localhost:3000"
+    ],
+    "alternativeSteps": {
+      "npm": [
+        "npm install",
+        "npx prisma db push",
+        "npm run dev"
+      ],
+      "yarn": [
+        "yarn install",
+        "yarn db:push",
+        "yarn dev"
+      ],
+      "pnpm": [
+        "pnpm install",
+        "pnpm db:push",
+        "pnpm dev"
+      ]
+    },
+    "requirements": [
+      "Bun runtime (v1.0+) OR Node.js 18+",
+      "Next.js 16 auto-installed via package.json"
+    ]
+  },
+  "warnings": [],
+  "files": [
+    {
+      "path": "src/app/api/backup/route.ts",
+      "sizeBytes": 13875,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/app/api/inquiries/route.ts",
+      "sizeBytes": 1473,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/app/api/route.ts",
+      "sizeBytes": 134,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/app/globals.css",
+      "sizeBytes": 32662,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "sizeBytes": 1699,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "sizeBytes": 9355,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/AboutSection.tsx",
+      "sizeBytes": 8164,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/ContactSection.tsx",
+      "sizeBytes": 19354,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/EcosystemSection.tsx",
+      "sizeBytes": 28926,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/FaqSection.tsx",
+      "sizeBytes": 4783,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/Footer.tsx",
+      "sizeBytes": 24260,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/Header.tsx",
+      "sizeBytes": 19114,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/HeroSection.tsx",
+      "sizeBytes": 44475,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/LoadingScreen.tsx",
+      "sizeBytes": 13556,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/PortfolioSection.tsx",
+      "sizeBytes": 13699,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/RatecardSection.tsx",
+      "sizeBytes": 28026,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/ScrollReveal.tsx",
+      "sizeBytes": 814,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/ScrollToTopButton.tsx",
+      "sizeBytes": 1540,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/ServicesSection.tsx",
+      "sizeBytes": 6961,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/mizora/WorkflowSection.tsx",
+      "sizeBytes": 8429,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/accordion.tsx",
+      "sizeBytes": 2053,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/alert-dialog.tsx",
+      "sizeBytes": 3864,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/alert.tsx",
+      "sizeBytes": 1614,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/aspect-ratio.tsx",
+      "sizeBytes": 280,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/avatar.tsx",
+      "sizeBytes": 1097,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/badge.tsx",
+      "sizeBytes": 1631,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/breadcrumb.tsx",
+      "sizeBytes": 2357,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/button.tsx",
+      "sizeBytes": 2123,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/calendar.tsx",
+      "sizeBytes": 7660,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/card.tsx",
+      "sizeBytes": 1989,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/carousel.tsx",
+      "sizeBytes": 5556,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/chart.tsx",
+      "sizeBytes": 9781,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/checkbox.tsx",
+      "sizeBytes": 1226,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/collapsible.tsx",
+      "sizeBytes": 800,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/command.tsx",
+      "sizeBytes": 4818,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/context-menu.tsx",
+      "sizeBytes": 8222,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/dialog.tsx",
+      "sizeBytes": 3982,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/drawer.tsx",
+      "sizeBytes": 4255,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/dropdown-menu.tsx",
+      "sizeBytes": 8284,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/form.tsx",
+      "sizeBytes": 3759,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/hover-card.tsx",
+      "sizeBytes": 1532,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/input-otp.tsx",
+      "sizeBytes": 2254,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/input.tsx",
+      "sizeBytes": 967,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/label.tsx",
+      "sizeBytes": 611,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/menubar.tsx",
+      "sizeBytes": 8394,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/navigation-menu.tsx",
+      "sizeBytes": 6664,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/pagination.tsx",
+      "sizeBytes": 2712,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/popover.tsx",
+      "sizeBytes": 1635,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/progress.tsx",
+      "sizeBytes": 740,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/radio-group.tsx",
+      "sizeBytes": 1466,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/resizable.tsx",
+      "sizeBytes": 2028,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/scroll-area.tsx",
+      "sizeBytes": 1645,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/select.tsx",
+      "sizeBytes": 6253,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/separator.tsx",
+      "sizeBytes": 699,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/sheet.tsx",
+      "sizeBytes": 4090,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/sidebar.tsx",
+      "sizeBytes": 21633,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/skeleton.tsx",
+      "sizeBytes": 276,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/slider.tsx",
+      "sizeBytes": 2001,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/sonner.tsx",
+      "sizeBytes": 564,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/switch.tsx",
+      "sizeBytes": 1177,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/table.tsx",
+      "sizeBytes": 2448,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/tabs.tsx",
+      "sizeBytes": 1969,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/textarea.tsx",
+      "sizeBytes": 759,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/toast.tsx",
+      "sizeBytes": 4829,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/toaster.tsx",
+      "sizeBytes": 785,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/toggle-group.tsx",
+      "sizeBytes": 1925,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/toggle.tsx",
+      "sizeBytes": 1570,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/components/ui/tooltip.tsx",
+      "sizeBytes": 1891,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/hooks/use-mobile.ts",
+      "sizeBytes": 565,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/hooks/use-toast.ts",
+      "sizeBytes": 3917,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/lib/db.ts",
+      "sizeBytes": 299,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/lib/mizora-translations.ts",
+      "sizeBytes": 50612,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/lib/mizora-types.ts",
+      "sizeBytes": 3391,
+      "status": "✅ OK"
+    },
+    {
+      "path": "src/lib/utils.ts",
+      "sizeBytes": 166,
+      "status": "✅ OK"
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "sizeBytes": 1056,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/fui-assets/fui-01-hud-frames-uhd.png",
+      "sizeBytes": 98081,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/fui-assets/sample-01-hud-frames.png",
+      "sizeBytes": 151649,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/fui-assets/sample-02-holo-panel.png",
+      "sizeBytes": 137495,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/fui-assets/sample-03-energy-core.png",
+      "sizeBytes": 103876,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/fui-assets/sample-04-hex-network.png",
+      "sizeBytes": 188718,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/mizora-logo.png",
+      "sizeBytes": 798974,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/mizora_hero_android_1780342977076.png",
+      "sizeBytes": 646860,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/mizora_sci_core_1780343020404.png",
+      "sizeBytes": 562015,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/images/mizora_sculpture_black_1780342998792.png",
+      "sizeBytes": 634355,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/index.html",
+      "sizeBytes": 113850,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/logo.svg",
+      "sizeBytes": 1065,
+      "status": "✅ OK"
+    },
+    {
+      "path": "public/robots.txt",
+      "sizeBytes": 160,
+      "status": "✅ OK"
+    },
+    {
+      "path": "package.json",
+      "sizeBytes": 3248,
+      "status": "✅ OK"
+    },
+    {
+      "path": "bun.lock",
+      "sizeBytes": 343899,
+      "status": "✅ OK"
+    },
+    {
+      "path": "tsconfig.json",
+      "sizeBytes": 730,
+      "status": "✅ OK"
+    },
+    {
+      "path": "next.config.ts",
+      "sizeBytes": 233,
+      "status": "✅ OK"
+    },
+    {
+      "path": "tailwind.config.ts",
+      "sizeBytes": 1696,
+      "status": "✅ OK"
+    },
+    {
+      "path": "postcss.config.mjs",
+      "sizeBytes": 81,
+      "status": "✅ OK"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sizeBytes": 1632,
+      "status": "✅ OK"
+    },
+    {
+      "path": "components.json",
+      "sizeBytes": 430,
+      "status": "✅ OK"
+    },
+    {
+      "path": "next-env.d.ts",
+      "sizeBytes": 251,
+      "status": "✅ OK"
+    }
+  ]
+}

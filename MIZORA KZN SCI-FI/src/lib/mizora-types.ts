@@ -1,0 +1,170 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+export type Language = 'id' | 'en';
+
+export interface EcosystemItem {
+  id: string;
+  abbrev: string;
+  name: string;
+  tagline: string;
+  description: string;
+  architecture: string[];
+  modules: string[];
+  status: 'operational' | 'optimized' | 'active';
+}
+
+export interface ServiceItem {
+  id: string;
+  iconName: string;
+  name: string;
+  benefit: string;
+  scope: string[];
+  features: string[];
+  targetMetric: string;
+}
+
+export interface PricingPackage {
+  id: string;
+  name: string;
+  price: string;
+  focus: string;
+  deliverables: string[];
+  revisions: string;
+  timeline: string;
+  addons: string[];
+  badge?: string;
+}
+
+export interface CaseStudy {
+  id: string;
+  title: string;
+  category: string;
+  coverImg: string;
+  client: string;
+  story: string;
+  objective: string;
+  process: string[];
+  result: string;
+  impact: string[];
+  metadata: {
+    year: string;
+    role: string;
+    tech: string;
+  };
+}
+
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface TranslationSet {
+  nav: {
+    home: string;
+    about: string;
+    ecosystem: string;
+    services: string;
+    workflow: string;
+    ratecard: string;
+    portfolio: string;
+    faq: string;
+    contact: string;
+    consultation: string;
+  };
+  hero: {
+    tagline: string;
+    accentWord: string;
+    headlinePart1: string;
+    headlinePart2: string;
+    subheadline: string;
+    ctaConsultText: string;
+    ctaRatecardText: string;
+    systemStatus: string;
+    statusBadge: string;
+    trustedBy: string;
+    clientTicker: string;
+    imageLabelTop: string;
+    imageLabelBottom: string;
+  };
+  about: {
+    sectionTitle: string;
+    subtitle: string;
+    storyParagraph1: string;
+    storyParagraph2: string;
+    philosophyTitle: string;
+    philosophyText: string;
+    founderName: string;
+    founderRole: string;
+    founderQuote: string;
+  };
+  ecosystem: {
+    sectionTitle: string;
+    subtitle: string;
+    systems: EcosystemItem[];
+    viewSpecs: string;
+    hideSpecs: string;
+  };
+  services: {
+    sectionTitle: string;
+    subtitle: string;
+    servicesList: ServiceItem[];
+    getQuote: string;
+  };
+  workflow: {
+    sectionTitle: string;
+    subtitle: string;
+    steps: {
+      id: string;
+      title: string;
+      duration: string;
+      description: string;
+      deliverables: string[];
+    }[];
+  };
+  ratecard: {
+    sectionTitle: string;
+    subtitle: string;
+    packages: PricingPackage[];
+    getStarted: string;
+    currency: string;
+    addonsTitle: string;
+    billingSubtitle: string;
+  };
+  portfolio: {
+    sectionTitle: string;
+    subtitle: string;
+    viewCaseStudy: string;
+    closeCaseStudy: string;
+    projects: CaseStudy[];
+  };
+  faq: {
+    sectionTitle: string;
+    subtitle: string;
+    faqsList: FaqItem[];
+  };
+  contact: {
+    sectionTitle: string;
+    subtitle: string;
+    formName: string;
+    formEmail: string;
+    formWhatsApp: string;
+    formService: string;
+    formMessage: string;
+    formSubmit: string;
+    formSubmitting: string;
+    formSuccess: string;
+    formPlaceholderName: string;
+    formPlaceholderEmail: string;
+    formPlaceholderWhatsApp: string;
+    formPlaceholderMessage: string;
+    contactInfoTitle: string;
+    availability: string;
+    availableStatus: string;
+    responseGuarantee: string;
+    location: string;
+  };
+}

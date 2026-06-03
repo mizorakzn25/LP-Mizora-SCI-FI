@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mizora KZN | AI Workflow &amp; System Builder</title>
+<meta name="description" content="Premium AI Workflow & System Builder. Mizora KZN delivers elite cybernetic orchestration, visual direction, and enterprise-grade digital production.">
+<link rel="icon" href="/images/mizora-logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   MIZORA KZN — STANDALONE STYLESHEET
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #FFFFFF;
+  color: #0A0A0A;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+.font-display { font-family: 'Orbitron', sans-serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+.font-body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* Root wrapper for sticky footer */
+.root-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
+.root-wrapper main { flex: 1; }
+
+/* ─── Animations ─── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+@keyframes scanline {
+  0% { top: -2px; }
+  100% { top: 100%; }
+}
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes ticker-scroll-slow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes typewriter-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes chevron-wave {
+  0%, 100% { opacity: 0.2; transform: translateX(0); }
+  50% { opacity: 0.8; transform: translateX(2px); }
+}
+
+.sci-fi-pulse { animation: pulse-dot 2s ease-in-out infinite; }
+.scanline-animate { animation: scanline 4s linear infinite; }
+.typewriter-cursor { animation: typewriter-cursor 0.8s step-end infinite; }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f5f5f5; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #999; }
+
+/* ─── Navigation ─── */
+.nav-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  transition: all 0.3s ease;
+}
+.nav-header.scrolled { box-shadow: 0 1px 12px rgba(0,0,0,0.06); }
+.nav-inner {
+  max-width: 1280px; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between; height: 64px;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-brand img { width: 32px; height: 32px; object-fit: contain; }
+.nav-brand span { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; color: #0A0A0A; letter-spacing: 0.15em; }
+.nav-links { display: flex; align-items: center; gap: 6px; }
+.nav-links a {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+  color: #525252; text-decoration: none; padding: 8px 12px; border-radius: 4px;
+  letter-spacing: 0.12em; text-transform: uppercase; transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.nav-links a:hover { color: #0A0A0A; background: rgba(0,0,0,0.04); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.lang-toggle {
+  display: flex; border: 1px solid #d4d4d4; border-radius: 4px; overflow: hidden;
+}
+.lang-toggle button {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  padding: 5px 10px; border: none; cursor: pointer; letter-spacing: 0.1em;
+  background: transparent; color: #737373; transition: all 0.2s ease;
+}
+.lang-toggle button.active { background: #0A0A0A; color: #fff; }
+.nav-cta {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  padding: 8px 16px; background: #0A0A0A; color: #fff; border: 1px solid #0A0A0A;
+  border-radius: 4px; cursor: pointer; letter-spacing: 0.12em; text-transform: uppercase;
+  text-decoration: none; transition: all 0.2s ease;
+}
+.nav-cta:hover { background: #1a1a1a; }
+.mobile-menu-btn {
+  display: none; background: none; border: 1px solid #d4d4d4; border-radius: 4px;
+  padding: 8px; cursor: pointer; color: #0A0A0A;
+}
+.mobile-menu-btn svg { width: 20px; height: 20px; stroke: currentColor; }
+.mobile-nav {
+  display: none; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.98); backdrop-filter: blur(12px); z-index: 999;
+  padding: 24px; flex-direction: column; gap: 4px; overflow-y: auto;
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav a {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+  color: #0A0A0A; text-decoration: none; padding: 14px 16px; border-radius: 4px;
+  letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+.mobile-nav a:hover { background: rgba(0,0,0,0.03); }
+.mobile-nav-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 12px; padding-top: 20px; }
+
+/* ─── Section Shared ─── */
+.section { padding: 80px 0; position: relative; overflow: hidden; }
+.section-dark { background: #050508; color: #e5e5e5; }
+.container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.3em; text-transform: uppercase; color: #737373; margin-bottom: 8px;
+}
+.section-title {
+  font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 800;
+  letter-spacing: -0.02em; color: #0A0A0A; margin-bottom: 12px; text-transform: uppercase;
+}
+.section-dark .section-title { color: #ffffff; }
+.section-subtitle {
+  font-size: 15px; color: #525252; max-width: 640px; line-height: 1.7;
+}
+.section-dark .section-subtitle { color: #a3a3a3; }
+.hud-divider {
+  position: relative; height: 1px; background: rgba(0,0,0,0.08); margin: 32px 0;
+}
+.section-dark .hud-divider { background: rgba(255,255,255,0.08); }
+
+/* ─── Hero ─── */
+.hero-section {
+  padding: 120px 0 80px; min-height: 92vh; display: flex; align-items: center;
+  position: relative; background: #fff; overflow: hidden;
+}
+.hero-grid { display: grid; grid-template-columns: 7fr 5fr; gap: 48px; align-items: center; }
+.hero-tagline-badge {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
+  background: #0A0A0A; border: 1px solid #1a1a1a; border-radius: 3px; margin-bottom: 24px;
+}
+.hero-tagline-badge .tick { width: 2px; height: 12px; background: #525252; border-radius: 1px; flex-shrink: 0; }
+.hero-tagline-badge .pulse-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px rgba(255,255,255,0.4);
+  flex-shrink: 0; animation: pulse-dot 2s ease-in-out infinite;
+}
+.hero-tagline-badge span {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #d4d4d4;
+  font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+}
+.hero-headline {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 48px; font-weight: 900;
+  line-height: 0.95; letter-spacing: -0.03em; color: #0A0A0A; text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.hero-headline .part2 { color: #000; }
+.hero-subheadline {
+  font-size: 14px; color: #737373; line-height: 1.7; max-width: 480px; margin-bottom: 32px;
+  padding-left: 16px; position: relative;
+}
+.hero-subheadline::before {
+  content: ''; position: absolute; left: 0; top: 0; width: 1px; height: 8px; background: #d4d4d4;
+}
+.hero-subheadline::after {
+  content: ''; position: absolute; left: 0; top: 0; width: 6px; height: 1px; background: #d4d4d4;
+}
+.hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; position: relative; padding: 12px; }
+.hero-ctas .corner-tick { position: absolute; width: 10px; height: 10px; border-color: #d4d4d4; }
+.hero-ctas .corner-tick.tl { top: 0; left: 0; border-top: 1px solid; border-left: 1px solid; }
+.hero-ctas .corner-tick.tr { top: 0; right: 0; border-top: 1px solid; border-right: 1px solid; }
+.hero-ctas .corner-tick.bl { bottom: 0; left: 0; border-bottom: 1px solid; border-left: 1px solid; }
+.hero-ctas .corner-tick.br { bottom: 0; right: 0; border-bottom: 1px solid; border-right: 1px solid; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px;
+  background: #0A0A0A; color: #fff; border: 1px solid #0A0A0A; border-radius: 3px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+  text-decoration: none; transition: all 0.2s ease;
+}
+.btn-primary:hover { background: #1a1a1a; }
+.btn-primary svg { width: 14px; height: 14px; transition: transform 0.3s ease; }
+.btn-primary:hover svg { transform: translateX(2px); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 6px; padding: 14px 32px;
+  background: #fff; color: #0A0A0A; border: 1px solid #d4d4d4; border-radius: 3px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+  text-decoration: none; transition: all 0.2s ease;
+}
+.btn-secondary:hover { border-color: #0A0A0A; }
+.btn-secondary svg { width: 12px; height: 12px; transition: transform 0.3s ease; }
+.btn-secondary:hover svg { transform: translateX(1px); }
+
+/* Hero Image Card */
+.hero-image-card {
+  position: relative; width: 100%; max-width: 400px; aspect-ratio: 1;
+  padding: 8px; background: #fff; border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 3px; box-shadow: 0 25px 60px rgba(0,0,0,0.08); margin: 0 auto;
+  transition: border-color 0.3s ease;
+}
+.hero-image-card:hover { border-color: rgba(0,0,0,0.15); }
+.hero-image-card .card-corner { position: absolute; width: 16px; height: 16px; border-color: #d4d4d4; }
+.hero-image-card .card-corner.tl { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; }
+.hero-image-card .card-corner.tr { top: -1px; right: -1px; border-top: 2px solid; border-right: 2px solid; }
+.hero-image-card .card-corner.bl { bottom: -1px; left: -1px; border-bottom: 2px solid; border-left: 2px solid; }
+.hero-image-card .card-corner.br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; }
+.hero-image-card .scanline {
+  position: absolute; left: 0; right: 0; height: 2px; background: rgba(0,0,0,0.06);
+  top: 0; z-index: 5; pointer-events: none; animation: scanline 4s linear infinite;
+}
+.hero-image-card .card-label-top {
+  position: absolute; top: 10px; left: 18px; font-family: 'JetBrains Mono', monospace;
+  font-size: 7px; color: #a3a3a3; letter-spacing: 0.2em; text-transform: uppercase; z-index: 5;
+}
+.hero-image-card .card-inner {
+  width: 100%; height: 100%; background: #fafafa; border-radius: 2px;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  position: relative; border: 1px solid rgba(0,0,0,0.04); overflow: hidden;
+}
+.hero-image-card .card-inner img { width: 100%; height: 100%; object-fit: contain; max-height: 300px; position: relative; z-index: 2; }
+.hero-image-card .card-label-bottom {
+  position: absolute; bottom: 12px; left: 12px; right: 12px; padding: 8px 10px;
+  background: rgba(255,255,255,0.95); border: 1px solid #e5e5e5; border-radius: 2px;
+  display: flex; align-items: center; justify-content: space-between; z-index: 5;
+  font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #737373; letter-spacing: 0.1em;
+}
+.card-label-bottom .active-label { color: #000; font-weight: 800; }
+
+/* Hero Ticker */
+.hero-ticker-strip {
+  margin-top: 60px; position: relative; border-radius: 4px; overflow: hidden;
+  background: linear-gradient(180deg, #E8E8EC 0%, #D8D8DD 40%, #CDCDD3 100%);
+  border: 1.5px solid rgba(0,0,0,0.12);
+  box-shadow: 0 -1px 0 rgba(255,255,255,0.7) inset, 0 1px 0 rgba(0,0,0,0.15) inset, 0 6px 20px rgba(0,0,0,0.08);
+  padding: 4px;
+}
+.ticker-inner-panel {
+  border-radius: 3px; overflow: hidden;
+  background: linear-gradient(180deg, #F4F4F7 0%, #EAEAEE 100%);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.1), inset 0 -1px 0 rgba(255,255,255,0.6);
+}
+.ticker-status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+.ticker-status-left { display: flex; align-items: center; gap: 10px; }
+.ticker-status-left .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #0A0A0A; position: relative; }
+.ticker-status-left .live-dot::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; background: #0A0A0A;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+.ticker-status-left .live-text {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #0A0A0A;
+}
+.ticker-status-left .status-text {
+  font-family: 'JetBrains Mono', monospace; font-size: 8.5px; color: #737373;
+  letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700;
+}
+.ticker-dots { display: flex; align-items: center; gap: 4px; }
+.ticker-dots span { width: 3px; height: 3px; border-radius: 50%; }
+.ticker-dots span.active { background: #404040; }
+.ticker-dots span.inactive { background: #d4d4d4; }
+.ticker-ok {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 800;
+  letter-spacing: 0.18em; text-transform: uppercase; color: #525252;
+}
+.ticker-row { padding: 16px 20px; position: relative; overflow: hidden; }
+.ticker-label {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.ticker-label .pulse { width: 4px; height: 4px; border-radius: 50%; background: #a3a3a3; animation: pulse-dot 2s ease-in-out infinite; }
+.ticker-label span {
+  font-family: 'JetBrains Mono', monospace; font-size: 8.5px; color: #737373;
+  letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700;
+}
+.ticker-track { overflow: hidden; }
+.ticker-scroll {
+  display: flex; gap: 32px; white-space: nowrap;
+  animation: ticker-scroll 30s linear infinite;
+}
+.ticker-scroll span {
+  font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.15em; color: #0A0A0A; flex-shrink: 0;
+}
+.ticker-tag-track { overflow: hidden; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 12px; margin-top: 12px; }
+.ticker-tag-scroll {
+  display: flex; gap: 24px; white-space: nowrap;
+  animation: ticker-scroll-slow 40s linear infinite;
+}
+.ticker-tag-scroll span {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 600;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #a3a3a3; flex-shrink: 0;
+}
+
+/* ─── About ─── */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; }
+.about-text p { font-size: 14px; color: #525252; line-height: 1.8; margin-bottom: 16px; }
+.about-philosophy {
+  margin-top: 24px; padding: 24px; border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 4px; position: relative; background: #fafafa;
+}
+.about-philosophy .phil-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #0A0A0A; margin-bottom: 8px;
+}
+.about-philosophy .phil-text { font-size: 13px; color: #525252; line-height: 1.7; }
+.founder-card {
+  padding: 24px; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px;
+  position: relative; background: #fafafa;
+}
+.founder-name {
+  font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700;
+  letter-spacing: 0.05em; color: #0A0A0A; margin-bottom: 4px;
+}
+.founder-role {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #737373; margin-bottom: 16px;
+}
+.founder-quote {
+  font-size: 14px; color: #525252; line-height: 1.7; font-style: italic;
+  border-left: 2px solid #d4d4d4; padding-left: 16px;
+}
+
+/* ─── Ecosystem ─── */
+.eco-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
+.eco-card {
+  padding: 24px 20px; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px;
+  background: #fff; position: relative; transition: all 0.3s ease;
+}
+.eco-card:hover { border-color: rgba(0,0,0,0.2); box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+.eco-card .eco-abbrev {
+  font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 800;
+  letter-spacing: 0.05em; color: #0A0A0A; margin-bottom: 4px;
+}
+.eco-card .eco-name {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600;
+  color: #525252; margin-bottom: 8px; line-height: 1.4;
+}
+.eco-card .eco-tagline {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #a3a3a3; margin-bottom: 12px;
+}
+.eco-card .eco-status {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px;
+  background: rgba(16,185,129,0.08); border-radius: 2px;
+}
+.eco-card .eco-status .dot { width: 4px; height: 4px; border-radius: 50%; background: #10b981; animation: pulse-dot 2s ease-in-out infinite; }
+.eco-card .eco-status span {
+  font-family: 'JetBrains Mono', monospace; font-size: 7px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #10b981;
+}
+
+/* ─── Services ─── */
+.services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 40px; }
+.service-card {
+  padding: 32px; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px;
+  background: #fff; position: relative; transition: all 0.3s ease;
+}
+.service-card:hover { border-color: rgba(0,0,0,0.15); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.service-card .svc-number {
+  font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900;
+  color: rgba(0,0,0,0.05); position: absolute; top: 16px; right: 24px;
+}
+.service-card .svc-icon {
+  width: 40px; height: 40px; border: 1px solid rgba(0,0,0,0.1); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+}
+.service-card .svc-icon svg { width: 20px; height: 20px; stroke: #0A0A0A; }
+.service-card .svc-name {
+  font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.05em; color: #0A0A0A; margin-bottom: 8px;
+}
+.service-card .svc-benefit { font-size: 13px; color: #737373; line-height: 1.7; }
+.service-card .svc-metric {
+  margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #0A0A0A;
+}
+
+/* ─── Workflow ─── */
+.workflow-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px; }
+.workflow-step { position: relative; padding: 28px 24px; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px; background: #fff; }
+.workflow-step .step-id {
+  font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 900;
+  color: rgba(0,0,0,0.04); position: absolute; top: 8px; right: 16px;
+}
+.workflow-step .step-duration {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #10b981; margin-bottom: 12px;
+}
+.workflow-step .step-title {
+  font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: 0.05em; color: #0A0A0A; margin-bottom: 12px; text-transform: uppercase;
+}
+.workflow-step .step-desc { font-size: 13px; color: #737373; line-height: 1.7; }
+
+/* ─── Ratecard ─── */
+.ratecard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
+.ratecard-card {
+  padding: 32px; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px;
+  background: #fff; position: relative; transition: all 0.3s ease;
+}
+.ratecard-card.recommended {
+  border-color: #0A0A0A; box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+}
+.ratecard-card .badge {
+  position: absolute; top: -12px; left: 24px; padding: 4px 12px;
+  background: #0A0A0A; color: #fff; font-family: 'JetBrains Mono', monospace;
+  font-size: 7px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  border-radius: 2px;
+}
+.ratecard-card .pkg-name {
+  font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 800;
+  letter-spacing: 0.05em; color: #0A0A0A; margin-bottom: 8px; margin-top: 8px;
+}
+.ratecard-card .pkg-price {
+  font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900;
+  color: #0A0A0A; margin-bottom: 4px;
+}
+.ratecard-card .pkg-currency {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
+  color: #737373; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px;
+}
+.ratecard-card .pkg-focus { font-size: 13px; color: #525252; line-height: 1.6; margin-bottom: 20px; }
+.ratecard-card .pkg-deliverables { list-style: none; margin-bottom: 20px; }
+.ratecard-card .pkg-deliverables li {
+  font-size: 12px; color: #737373; line-height: 1.6; padding: 6px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.04); display: flex; align-items: flex-start; gap: 8px;
+}
+.ratecard-card .pkg-deliverables li::before {
+  content: ''; width: 4px; height: 4px; border-radius: 50%; background: #d4d4d4;
+  flex-shrink: 0; margin-top: 7px;
+}
+.ratecard-card .pkg-meta {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
+  color: #a3a3a3; letter-spacing: 0.1em; text-transform: uppercase;
+  padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06);
+}
+.ratecard-card .btn-pkg {
+  display: block; width: 100%; text-align: center; margin-top: 20px;
+  padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; border-radius: 3px; cursor: pointer;
+  transition: all 0.2s ease; text-decoration: none;
+}
+.ratecard-card .btn-pkg-outline {
+  background: transparent; color: #0A0A0A; border: 1px solid #d4d4d4;
+}
+.ratecard-card .btn-pkg-outline:hover { border-color: #0A0A0A; background: rgba(0,0,0,0.02); }
+.ratecard-card .btn-pkg-filled {
+  background: #0A0A0A; color: #fff; border: 1px solid #0A0A0A;
+}
+.ratecard-card .btn-pkg-filled:hover { background: #1a1a1a; }
+
+/* ─── Portfolio ─── */
+.portfolio-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 40px; }
+.portfolio-card {
+  position: relative; border: 1px solid rgba(0,0,0,0.08); border-radius: 4px;
+  overflow: hidden; background: #fff; transition: all 0.3s ease;
+}
+.portfolio-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+.portfolio-card .card-img {
+  width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.portfolio-card .card-body { padding: 24px; }
+.portfolio-card .card-cat {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #10b981; margin-bottom: 8px;
+}
+.portfolio-card .card-title {
+  font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 700;
+  letter-spacing: 0.03em; color: #0A0A0A; margin-bottom: 8px;
+}
+.portfolio-card .card-desc { font-size: 13px; color: #737373; line-height: 1.6; }
+
+/* ─── FAQ ─── */
+.faq-list { max-width: 800px; margin: 40px auto 0; }
+.faq-item { border-bottom: 1px solid rgba(0,0,0,0.08); }
+.faq-question {
+  width: 100%; padding: 20px 0; display: flex; align-items: center;
+  justify-content: space-between; background: none; border: none; cursor: pointer;
+  text-align: left; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px; font-weight: 600; color: #0A0A0A; line-height: 1.5;
+}
+.faq-question:hover { color: #000; }
+.faq-question .faq-icon {
+  width: 24px; height: 24px; border: 1px solid #d4d4d4; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  margin-left: 16px; transition: all 0.3s ease;
+}
+.faq-question .faq-icon svg { width: 12px; height: 12px; stroke: #525252; transition: transform 0.3s ease; }
+.faq-item.open .faq-question .faq-icon { background: #0A0A0A; border-color: #0A0A0A; }
+.faq-item.open .faq-question .faq-icon svg { stroke: #fff; transform: rotate(45deg); }
+.faq-answer {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease;
+}
+.faq-item.open .faq-answer { max-height: 500px; padding-bottom: 20px; }
+.faq-answer p { font-size: 14px; color: #737373; line-height: 1.8; }
+
+/* ─── Contact ─── */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; }
+.contact-form { display: flex; flex-direction: column; gap: 16px; }
+.form-group label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #525252; margin-bottom: 6px;
+}
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 12px 14px; border: 1px solid #d4d4d4; border-radius: 4px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #0A0A0A;
+  background: #fff; transition: border-color 0.2s ease; outline: none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #0A0A0A; }
+.form-group textarea { resize: vertical; min-height: 120px; }
+.form-group input::placeholder, .form-group textarea::placeholder { color: #a3a3a3; }
+.form-submit {
+  display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px;
+  background: #0A0A0A; color: #fff; border: 1px solid #0A0A0A; border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease;
+}
+.form-submit:hover { background: #1a1a1a; }
+.form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.form-success {
+  padding: 16px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: #10b981; letter-spacing: 0.05em; line-height: 1.6;
+}
+.contact-info-card {
+  padding: 32px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;
+  background: rgba(255,255,255,0.03);
+}
+.contact-info-card .info-title {
+  font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.1em; color: #fff; margin-bottom: 24px;
+}
+.contact-info-item { margin-bottom: 20px; }
+.contact-info-item .info-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #737373; margin-bottom: 4px;
+}
+.contact-info-item .info-value {
+  font-size: 14px; color: #e5e5e5; line-height: 1.6;
+}
+.contact-info-item .info-value a { color: #e5e5e5; text-decoration: none; }
+.contact-info-item .info-value a:hover { color: #fff; }
+.status-indicator {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+  background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.15);
+  border-radius: 3px; margin-top: 16px;
+}
+.status-indicator .dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; animation: pulse-dot 2s ease-in-out infinite; }
+.status-indicator span {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #10b981;
+}
+
+/* ─── Footer ─── */
+.footer {
+  background: #050508; color: #a3a3a3; padding: 60px 0 32px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+.footer-brand .brand-name {
+  font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700;
+  letter-spacing: 0.15em; color: #fff; margin-bottom: 4px;
+}
+.footer-brand .brand-tagline {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #525252;
+  letter-spacing: 0.1em; margin-bottom: 16px;
+}
+.footer-brand .brand-desc { font-size: 13px; color: #525252; line-height: 1.7; }
+.footer-col-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: #737373; margin-bottom: 16px;
+}
+.footer-links { list-style: none; }
+.footer-links li { margin-bottom: 8px; }
+.footer-links a {
+  font-size: 13px; color: #525252; text-decoration: none; transition: color 0.2s ease;
+}
+.footer-links a:hover { color: #fff; }
+.footer-social { display: flex; gap: 12px; margin-top: 16px; }
+.footer-social a {
+  width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+  color: #525252;
+}
+.footer-social a:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.footer-social a svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+}
+.footer-copyright {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #404040;
+  letter-spacing: 0.1em;
+}
+.backup-section {
+  padding: 20px; border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;
+  margin-top: 24px;
+}
+.backup-section .backup-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #737373; margin-bottom: 8px;
+}
+.backup-section .backup-desc { font-size: 12px; color: #525252; line-height: 1.6; margin-bottom: 12px; }
+.btn-backup {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+  background: transparent; color: #e5e5e5; border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease;
+}
+.btn-backup:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.05); }
+.btn-backup:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-backup svg { width: 14px; height: 14px; stroke: currentColor; }
+.backup-success {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+  background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 3px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #10b981;
+}
+
+/* ─── Scroll to Top ─── */
+.scroll-top-btn {
+  position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px;
+  background: #0A0A0A; color: #fff; border: 1px solid #0A0A0A; border-radius: 4px;
+  cursor: pointer; display: none; align-items: center; justify-content: center;
+  z-index: 100; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.scroll-top-btn.visible { display: flex; }
+.scroll-top-btn:hover { background: #1a1a1a; }
+.scroll-top-btn svg { width: 18px; height: 18px; stroke: currentColor; }
+
+/* ─── Responsive ─── */
+@media (max-width: 1024px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero-headline { font-size: 40px; }
+  .eco-grid { grid-template-columns: repeat(2, 1fr); }
+  .ratecard-grid { grid-template-columns: 1fr; max-width: 480px; margin-left: auto; margin-right: auto; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .mobile-menu-btn { display: flex; }
+  .hero-section { padding: 100px 0 60px; min-height: auto; }
+  .hero-headline { font-size: 32px; }
+  .hero-ctas { flex-direction: column; }
+  .hero-ctas .btn-primary, .hero-ctas .btn-secondary { width: 100%; justify-content: center; }
+  .section { padding: 60px 0; }
+  .section-title { font-size: 22px; }
+  .about-grid { grid-template-columns: 1fr; }
+  .eco-grid { grid-template-columns: 1fr; }
+  .services-grid { grid-template-columns: 1fr; }
+  .workflow-steps { grid-template-columns: 1fr; }
+  .portfolio-grid { grid-template-columns: 1fr; }
+  .contact-grid { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; text-align: center; }
+  .hero-image-card { max-width: 320px; }
+  .hero-ticker-strip { margin-top: 40px; }
+}
+@media (max-width: 480px) {
+  .hero-headline { font-size: 28px; }
+  .container { padding: 0 16px; }
+  .nav-inner { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+<div class="root-wrapper">
+  <!-- ═══════════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════════ -->
+  <header class="nav-header" id="nav-header">
+    <div class="nav-inner">
+      <a href="#home" class="nav-brand">
+        <img src="/images/mizora-logo.png" alt="Mizora KZN Logo" width="32" height="32">
+        <span class="font-display">MIZORA KZN</span>
+      </a>
+      <nav class="nav-links" id="nav-links">
+        <a href="#home" data-i18n="nav.home">Home</a>
+        <a href="#services" data-i18n="nav.services">Services</a>
+        <a href="#ratecard" data-i18n="nav.ratecard">Ratecard</a>
+        <a href="#portfolio" data-i18n="nav.portfolio">Portfolio</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact" data-i18n="nav.about">About</a>
+      </nav>
+      <div class="nav-right">
+        <div class="lang-toggle">
+          <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
+          <button id="lang-id" onclick="setLang('id')">ID</button>
+        </div>
+        <a href="#contact" class="nav-cta" data-i18n="nav.cta">CONSULT</a>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="#home" onclick="closeMobileMenu()" data-i18n="nav.home">Home</a>
+    <a href="#services" onclick="closeMobileMenu()" data-i18n="nav.services">Services</a>
+    <a href="#ratecard" onclick="closeMobileMenu()" data-i18n="nav.ratecard">Ratecard</a>
+    <a href="#portfolio" onclick="closeMobileMenu()" data-i18n="nav.portfolio">Portfolio</a>
+    <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
+    <a href="#contact" onclick="closeMobileMenu()" data-i18n="nav.about">About</a>
+    <div class="mobile-nav-bottom">
+      <div class="lang-toggle" style="align-self:flex-start;">
+        <button class="lang-en-m active" onclick="setLang('en')">EN</button>
+        <button class="lang-id-m" onclick="setLang('id')">ID</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- ═══════════════════════════════════════════
+         HERO
+         ═══════════════════════════════════════════ -->
+    <section class="hero-section section" id="home">
+      <div class="container">
+        <!-- HUD Status Bar -->
+        <div style="margin-bottom: 40px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <span class="font-mono" style="font-size:9px; color:#737373; letter-spacing:0.25em; text-transform:uppercase; font-weight:700;" data-i18n="hero.systemStatus">MIZORA KZN | ミゾラ 改善 未来を作る</span>
+            <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:5px 12px; border-radius:3px; border:1px solid rgba(0,0,0,0.12); position:relative;">
+              <span style="position:absolute;top:-1px;left:-1px;width:6px;height:6px;border-top:1px solid #d4d4d4;border-left:1px solid #d4d4d4;"></span>
+              <span style="position:absolute;top:-1px;right:-1px;width:6px;height:6px;border-top:1px solid #d4d4d4;border-right:1px solid #d4d4d4;"></span>
+              <span style="position:absolute;bottom:-1px;left:-1px;width:6px;height:6px;border-bottom:1px solid #d4d4d4;border-left:1px solid #d4d4d4;"></span>
+              <span style="position:absolute;bottom:-1px;right:-1px;width:6px;height:6px;border-bottom:1px solid #d4d4d4;border-right:1px solid #d4d4d4;"></span>
+              <span class="sci-fi-pulse" style="width:5px;height:5px;border-radius:50%;background:#0A0A0A;flex-shrink:0;"></span>
+              <span class="font-mono" style="font-size:8.5px;color:#525252;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;" data-i18n="hero.statusBadge">ミゾラ 改善</span>
+            </div>
+          </div>
+          <div style="position:relative;height:0;">
+            <div style="position:absolute;left:0;right:0;height:1px;background:rgba(0,0,0,0.08);"></div>
+            <span style="position:absolute;left:-2px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-left:1px solid #d4d4d4;border-bottom:1px solid #d4d4d4;"></span>
+            <span style="position:absolute;right:-2px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-right:1px solid #d4d4d4;border-bottom:1px solid #d4d4d4;"></span>
+          </div>
+        </div>
+
+        <!-- Main Hero Grid -->
+        <div class="hero-grid">
+          <div>
+            <!-- Tagline Badge -->
+            <div class="hero-tagline-badge">
+              <span class="tick"></span>
+              <span class="pulse-dot"></span>
+              <span data-i18n="hero.tagline">AI WORKFLOW DESIGNER &amp; SYSTEM BUILDER</span>
+              <span class="tick"></span>
+            </div>
+
+            <!-- Headline -->
+            <h1 class="hero-headline">
+              <span data-i18n="hero.headlinePart1">Build AI Systems</span><br>
+              <span class="part2" data-i18n="hero.headlinePart2">For More Productive Business</span>
+            </h1>
+
+            <!-- Subheadline -->
+            <p class="hero-subheadline" data-i18n="hero.subheadline">Mizora KZN is an AI ecosystem that helps businesses work more structured, connected, and efficient, making it easier to grow in the digital era.</p>
+
+            <!-- CTAs -->
+            <div class="hero-ctas">
+              <span class="corner-tick tl"></span>
+              <span class="corner-tick tr"></span>
+              <span class="corner-tick bl"></span>
+              <span class="corner-tick br"></span>
+              <a href="#contact" class="btn-primary">
+                <span data-i18n="hero.ctaConsultText">Start Now</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+              <a href="#ratecard" class="btn-secondary">
+                <span data-i18n="hero.ctaRatecardText">Explore Ratecard</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Hero Image -->
+          <div style="display:flex;justify-content:center;">
+            <div class="hero-image-card">
+              <span class="card-corner tl"></span>
+              <span class="card-corner tr"></span>
+              <span class="card-corner bl"></span>
+              <span class="card-corner br"></span>
+              <div class="scanline"></div>
+              <div class="card-label-top font-mono" data-i18n="hero.imageLabelTop">ミゾラ_改善 // MZR_改善_KZN_未来</div>
+              <div class="card-inner">
+                <img src="/images/mizora-logo.png" alt="Mizora KZN System Core" loading="eager">
+              </div>
+              <div class="card-label-bottom">
+                <span style="display:flex;align-items:center;gap:6px;">
+                  <span class="sci-fi-pulse" style="width:4px;height:4px;border-radius:50%;background:#0A0A0A;"></span>
+                  <span data-i18n="hero.imageLabelBottom">Mizora Ecosystem · ミゾラ 改善</span>
+                </span>
+                <span class="active-label">ACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticker Strip -->
+        <div class="hero-ticker-strip">
+          <div class="ticker-inner-panel">
+            <div class="ticker-status-bar">
+              <div class="ticker-status-left">
+                <span class="live-dot"></span>
+                <span class="live-text">LIVE</span>
+                <span class="status-text">MACS_STATUS: ACTIVE</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="ticker-dots">
+                  <span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="active"></span><span class="inactive"></span><span class="inactive"></span><span class="inactive"></span>
+                </div>
+                <span class="ticker-ok">OK</span>
+              </div>
+            </div>
+            <div class="ticker-row">
+              <div class="ticker-label">
+                <span class="pulse"></span>
+                <span data-i18n="hero.tickerLabel">CONNECTED SYSTEMS</span>
+              </div>
+              <div class="ticker-track">
+                <div class="ticker-scroll" id="ticker-scroll">
+                  <span>MACS</span><span>·</span><span>MACPS</span><span>·</span><span>MATLS</span><span>·</span><span>MASDM</span><span>·</span><span>MAOBS</span><span>·</span><span>MAOVDS</span><span>·</span><span>MALVCS</span><span>·</span><span>MAUBS</span>
+                  <span>MACS</span><span>·</span><span>MACPS</span><span>·</span><span>MATLS</span><span>·</span><span>MASDM</span><span>·</span><span>MAOBS</span><span>·</span><span>MAOVDS</span><span>·</span><span>MALVCS</span><span>·</span><span>MAUBS</span>
+                </div>
+              </div>
+              <div class="ticker-tag-track">
+                <div class="ticker-tag-scroll" id="ticker-tag-scroll">
+                  <span>AUTOMATION</span><span>AI WORKFLOW</span><span>SYSTEM BUILDER</span><span>N8N</span><span>MAKE.COM</span><span>ZAPIER</span><span>CHATBOT</span><span>INTEGRATION</span><span>CUSTOM GPT</span><span>WORKFLOW</span>
+                  <span>AUTOMATION</span><span>AI WORKFLOW</span><span>SYSTEM BUILDER</span><span>N8N</span><span>MAKE.COM</span><span>ZAPIER</span><span>CHATBOT</span><span>INTEGRATION</span><span>CUSTOM GPT</span><span>WORKFLOW</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         ABOUT
+         ═══════════════════════════════════════════ -->
+    <section class="section" id="about" style="background:#fafafa;">
+      <div class="container">
+        <div class="section-label font-mono">// 001</div>
+        <div class="section-title font-display" data-i18n="about.sectionTitle">CORE COMPOSER</div>
+        <div class="section-subtitle" data-i18n="about.subtitle">The architect behind the machine orchestration.</div>
+        <div class="hud-divider"></div>
+        <div class="about-grid">
+          <div class="about-text">
+            <p data-i18n="about.storyParagraph1">Mizora KZN was engineered from a singular vision: transitioning from standard manual software and design models to custom cybernetic system integrations. Led by Founder Rendy Awan, we operate as a highly specialized, elite creative production powerhouse that blends deep abstract philosophy, advanced machine reasoning, and meticulous Swiss minimalist layouts.</p>
+            <p data-i18n="about.storyParagraph2">We do not build generic landing pages or standard corporate websites. We construct highly optimized, ultra-efficient, fully structured computational platforms and comprehensive digital ecosystems for enterprise brands looking to dominate their market niches with technical authority.</p>
+            <div class="about-philosophy">
+              <div class="phil-title font-mono" data-i18n="about.philosophyTitle">OUR ARCHITECTURAL PHILOSOPHY</div>
+              <div class="phil-text" data-i18n="about.philosophyText">Aesthetic is not decorative; it is mathematical structure. By pairing precise symmetrical grid boundaries, absolute black-and-white high-contrast visual systems, and procedural logic, we eliminate design slop while magnifying user interaction, trust, and enterprise-grade authority.</div>
+            </div>
+          </div>
+          <div>
+            <div class="founder-card">
+              <div class="founder-name font-display" data-i18n="about.founderName">Rendy Awan</div>
+              <div class="founder-role font-mono" data-i18n="about.founderRole">Founder &amp; Principal Synthesizer</div>
+              <div class="founder-quote" data-i18n="about.founderQuote">"The highest tier of modern engineering is indistinguishable from computational poetry. We design digital assets not to fill space, but to dominate it."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         ECOSYSTEM
+         ═══════════════════════════════════════════ -->
+    <section class="section" id="ecosystem">
+      <div class="container">
+        <div class="section-label font-mono">// 002</div>
+        <div class="section-title font-display" data-i18n="eco.sectionTitle">MIZORA ECOSYSTEM</div>
+        <div class="section-subtitle" data-i18n="eco.subtitle">The core foundation of Mizora KZN, consisting of eight AI systems with specific functions to support various creative, strategic, and operational expertise needs, designed to help produce more consistent output.</div>
+        <div class="hud-divider"></div>
+        <div class="eco-grid">
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MACS</div>
+            <div class="eco-name">Mizora AI Collaboration System</div>
+            <div class="eco-tagline font-mono">Multi-Agent Cognitive Sync Core</div>
+            <div class="eco-status"><span class="dot"></span><span>OPERATIONAL</span></div>
+          </div>
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MACPS</div>
+            <div class="eco-name">Mizora AERA Comic Production System</div>
+            <div class="eco-tagline font-mono">Vector Graphic Orchestrator</div>
+            <div class="eco-status"><span class="dot"></span><span>OPTIMIZED</span></div>
+          </div>
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MATLS</div>
+            <div class="eco-name">Mizora AI Thinking Lab System</div>
+            <div class="eco-tagline font-mono">Deep Research &amp; Narrative Architect</div>
+            <div class="eco-status"><span class="dot"></span><span>ACTIVE</span></div>
+          </div>
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MASDM</div>
+            <div class="eco-name">Mizora AI Song Direction System</div>
+            <div class="eco-tagline font-mono">Solfeggio Frequency Arranger</div>
+            <div class="eco-status"><span class="dot"></span><span>OPERATIONAL</span></div>
+          </div>
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MAOBS</div>
+            <div class="eco-name">Mizora AI Orchestration Builder</div>
+            <div class="eco-tagline font-mono">High-Throughput Task Pipeline</div>
+            <div class="eco-status"><span class="dot"></span><span>OPTIMIZED</span></div>
+          </div>
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MAOVDS</div>
+            <div class="eco-name">Mizora AI ORION Visual Direction System</div>
+            <div class="eco-tagline font-mono">Cinematic Color &amp; Lighting Synthesizer</div>
+            <div class="eco-status"><span class="dot"></span><span>ACTIVE</span></div>
+          </div>
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MALVCS</div>
+            <div class="eco-name">Mizora AI LENS Visual Capture System</div>
+            <div class="eco-tagline font-mono">Synthetic Motion &amp; Frame Interpolator</div>
+            <div class="eco-status"><span class="dot"></span><span>OPERATIONAL</span></div>
+          </div>
+          <div class="eco-card">
+            <div class="eco-abbrev font-display">MAUBS</div>
+            <div class="eco-name">Mizora AI UI/UX Builder System</div>
+            <div class="eco-tagline font-mono">Deterministic Vector Component Assembly</div>
+            <div class="eco-status"><span class="dot"></span><span>OPTIMIZED</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SERVICES
+         ═══════════════════════════════════════════ -->
+    <section class="section" id="services" style="background:#fafafa;">
+      <div class="container">
+        <div class="section-label font-mono">// 003</div>
+        <div class="section-title font-display" data-i18n="svc.sectionTitle">TACTICAL CAPABILITIES</div>
+        <div class="section-subtitle" data-i18n="svc.subtitle">Elite creative execution across visual, sound, and digital technical spaces.</div>
+        <div class="hud-divider"></div>
+        <div class="services-grid">
+          <div class="service-card">
+            <div class="svc-number font-display">01</div>
+            <div class="svc-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+            </div>
+            <div class="svc-name font-display">Enterprise Cognitive Strategy</div>
+            <div class="svc-benefit" data-i18n="svc.benefit1">Integrates custom AI processes to slash workflows by 80% with human-in-the-loop validation.</div>
+            <div class="svc-metric font-mono">→ 80% Process Acceleration</div>
+          </div>
+          <div class="service-card">
+            <div class="svc-number font-display">02</div>
+            <div class="svc-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m2 12 8.58 3.91a2 2 0 0 0 1.66 0L22 12"/><path d="m2 17 8.58 3.91a2 2 0 0 0 1.66 0L22 17"/></svg>
+            </div>
+            <div class="svc-name font-display">High-Fidelity Interface Design</div>
+            <div class="svc-benefit" data-i18n="svc.benefit2">Stunningly minimalist Swiss UI system designed for high usability, conversion, and global prestige.</div>
+            <div class="svc-metric font-mono">→ 100% Mobile &amp; Web Adaptability</div>
+          </div>
+          <div class="service-card">
+            <div class="svc-number font-display">03</div>
+            <div class="svc-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+            </div>
+            <div class="svc-name font-display">Futuristic Visual Production</div>
+            <div class="svc-benefit" data-i18n="svc.benefit3">High-end cinema grading, animated 3D visual assets, and customized graphic narrative production.</div>
+            <div class="svc-metric font-mono">→ Ultra-Sharp 4K/8K Deliverables</div>
+          </div>
+          <div class="service-card">
+            <div class="svc-number font-display">04</div>
+            <div class="svc-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </div>
+            <div class="svc-name font-display">Sound &amp; Audio Strategy</div>
+            <div class="svc-benefit" data-i18n="svc.benefit4">Algorithmic focus frequency synthesis customized for application loops and luxury product loops.</div>
+            <div class="svc-metric font-mono">→ Enhanced User Flow Absorption</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         WORKFLOW
+         ═══════════════════════════════════════════ -->
+    <section class="section" id="workflow">
+      <div class="container">
+        <div class="section-label font-mono">// 004</div>
+        <div class="section-title font-display" data-i18n="wf.sectionTitle">ENGINEERING PIPELINE</div>
+        <div class="section-subtitle" data-i18n="wf.subtitle">A structured, high-order four-stage execution cycle maximizing speed and accuracy.</div>
+        <div class="hud-divider"></div>
+        <div class="workflow-steps">
+          <div class="workflow-step">
+            <div class="step-id font-display">01</div>
+            <div class="step-duration font-mono" data-i18n="wf.duration1">Week 1</div>
+            <div class="step-title font-display" data-i18n="wf.title1">DESTRUCTION &amp; DISCOVERY</div>
+            <div class="step-desc" data-i18n="wf.desc1">We deconstruct your current processes, audit technical bottlenecks, and map cognitive possibilities using MATLS system verification.</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-id font-display">02</div>
+            <div class="step-duration font-mono" data-i18n="wf.duration2">Week 2</div>
+            <div class="step-title font-display" data-i18n="wf.title2">STRATEGIC COGNITIVE SYNTHESIS</div>
+            <div class="step-desc" data-i18n="wf.desc2">We compile the data and design the core components, establishing the bespoke system interfaces, UI design concepts, and sound frameworks.</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-id font-display">03</div>
+            <div class="step-duration font-mono" data-i18n="wf.duration3">Weeks 3-4</div>
+            <div class="step-title font-display" data-i18n="wf.title3">CYBERNETIC EXECUTION</div>
+            <div class="step-desc" data-i18n="wf.desc3">Our expert team builds out the production-ready code with pure Tailwind stylesheets, high-performance visual layers, and optimized API routing.</div>
+          </div>
+          <div class="workflow-step">
+            <div class="step-id font-display">04</div>
+            <div class="step-duration font-mono" data-i18n="wf.duration4">Week 5</div>
+            <div class="step-title font-display" data-i18n="wf.title4">DETERMINISTIC DELIVERY</div>
+            <div class="step-desc" data-i18n="wf.desc4">The final product undergoes rigid security auditing, speed compilation, and responsive verification before launch to ensure absolute success.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         RATECARD
+         ═══════════════════════════════════════════ -->
+    <section class="section" id="ratecard" style="background:#fafafa;">
+      <div class="container">
+        <div class="section-label font-mono">// 005</div>
+        <div class="section-title font-display" data-i18n="rc.sectionTitle">PRICING ARTIFACTS</div>
+        <div class="section-subtitle" data-i18n="rc.subtitle">Transparent, enterprise-grade investment options engineered for global businesses.</div>
+        <div class="hud-divider"></div>
+        <div class="ratecard-grid">
+          <!-- COGNITIVE BASIC -->
+          <div class="ratecard-card">
+            <div class="pkg-name font-display" data-i18n="rc.pkg1Name">COGNITIVE BASIC</div>
+            <div class="pkg-price font-display" data-i18n="rc.pkg1Price">$4,500</div>
+            <div class="pkg-currency font-mono" data-i18n="rc.pkg1Currency">USD</div>
+            <div class="pkg-focus" data-i18n="rc.pkg1Focus">Ideal for disruptive startups seeking unmatched visual authority first</div>
+            <ul class="pkg-deliverables">
+              <li data-i18n="rc.pkg1d1">Full interactive UI/UX (Landing page + 2 subpages)</li>
+              <li data-i18n="rc.pkg1d2">Sleek custom 3D sculpture graphics</li>
+              <li data-i18n="rc.pkg1d3">Responsive Tailwind/React deployment</li>
+              <li data-i18n="rc.pkg1d4">Standard ID/EN bilingual setup</li>
+            </ul>
+            <div class="pkg-meta" data-i18n="rc.pkg1Meta">2 Rounds of Review · 14 Working Days</div>
+            <a href="#contact" class="btn-pkg btn-pkg-outline" data-i18n="rc.getStarted">Initialize Package Deployment</a>
+          </div>
+          <!-- ENTERPRISE SYSTEM -->
+          <div class="ratecard-card recommended">
+            <div class="badge font-mono" data-i18n="rc.badge">RECOMMENDED FOR ENTERPRISES</div>
+            <div class="pkg-name font-display" data-i18n="rc.pkg2Name">ENTERPRISE SYSTEM</div>
+            <div class="pkg-price font-display" data-i18n="rc.pkg2Price">$9,500</div>
+            <div class="pkg-currency font-mono" data-i18n="rc.pkg2Currency">USD</div>
+            <div class="pkg-focus" data-i18n="rc.pkg2Focus">Our flagship plan deploying custom AI consensus and high-throughput systems</div>
+            <ul class="pkg-deliverables">
+              <li data-i18n="rc.pkg2d1">Advanced UI/UX Platform (Up to 8 interactive layouts)</li>
+              <li data-i18n="rc.pkg2d2">MACS Multi-agent collaborative node integration</li>
+              <li data-i18n="rc.pkg2d3">Full 3D abstract core visual animations</li>
+              <li data-i18n="rc.pkg2d4">Continuous 60FPS fluid micro-interactions</li>
+              <li data-i18n="rc.pkg2d5">Performance speed optimization (Lighthouse 95+)</li>
+            </ul>
+            <div class="pkg-meta" data-i18n="rc.pkg2Meta">4 Rounds of Review · 25 Working Days</div>
+            <a href="#contact" class="btn-pkg btn-pkg-filled" data-i18n="rc.getStarted">Initialize Package Deployment</a>
+          </div>
+          <!-- MIZORA ULTIMATE CORE -->
+          <div class="ratecard-card">
+            <div class="pkg-name font-display" data-i18n="rc.pkg3Name">MIZORA ULTIMATE CORE</div>
+            <div class="pkg-price font-display" data-i18n="rc.pkg3Price">$18,500</div>
+            <div class="pkg-currency font-mono" data-i18n="rc.pkg3Currency">USD</div>
+            <div class="pkg-focus" data-i18n="rc.pkg3Focus">The ultimate technological manifestation, deploying all eight Mizora systems</div>
+            <ul class="pkg-deliverables">
+              <li data-i18n="rc.pkg3d1">Infinite scale system UI architecture (15+ complex screens)</li>
+              <li data-i18n="rc.pkg3d2">Sovereign implementation of all 8 Mizora Systems (MACS to MAUBS)</li>
+              <li data-i18n="rc.pkg3d3">Entire custom portfolio narrative vector comic (MACPS)</li>
+              <li data-i18n="rc.pkg3d4">Bespoke solfeggio focus soundtracks (MASDM)</li>
+              <li data-i18n="rc.pkg3d5">24/7 dedicated support SLA and server telemetry dashboard</li>
+            </ul>
+            <div class="pkg-meta" data-i18n="rc.pkg3Meta">Unlimited Revisions (30 Days) · 45 Working Days</div>
+            <a href="#contact" class="btn-pkg btn-pkg-outline" data-i18n="rc.getStarted">Initialize Package Deployment</a>
+          </div>
+        </div>
+        <p class="font-mono" style="font-size:9px;color:#a3a3a3;text-align:center;margin-top:24px;letter-spacing:0.1em;" data-i18n="rc.billing">All packages require a 50% upfront retainer. Signed SLA included.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         PORTFOLIO
+         ═══════════════════════════════════════════ -->
+    <section class="section" id="portfolio">
+      <div class="container">
+        <div class="section-label font-mono">// 006</div>
+        <div class="section-title font-display" data-i18n="port.sectionTitle">CASE ARTIFACTS</div>
+        <div class="section-subtitle" data-i18n="port.subtitle">Real enterprise success stories manifesting absolute visual dominance.</div>
+        <div class="hud-divider"></div>
+        <div class="portfolio-grid">
+          <div class="portfolio-card">
+            <img class="card-img" src="/images/mizora_hero_android_1780342977076.png" alt="Chronos AI Narrative Core" loading="lazy">
+            <div class="card-body">
+              <div class="card-cat font-mono">Enterprise System Synthesis</div>
+              <div class="card-title font-display">Chronos AI Narrative Core</div>
+              <div class="card-desc">Terrigen relied on slow human-only reporting. By integrating MATLS alongside MACS agent nodes, Mizora KZN built a fully autonomous intelligence-gathering system generating real-time visual industry comics.</div>
+            </div>
+          </div>
+          <div class="portfolio-card">
+            <img class="card-img" src="/images/mizora_sculpture_black_1780342998792.png" alt="Metatune Focus Synthesizer" loading="lazy">
+            <div class="card-body">
+              <div class="card-cat font-mono">Technical Sound Platform</div>
+              <div class="card-title font-display">Metatune Focus Synthesizer</div>
+              <div class="card-desc">Sartre Wellness needed a luxury ambient system. We designed a procedural sound synthesizer combining MASDM Solfeggio Hertz frequencies with real-time breathing visuals.</div>
+            </div>
+          </div>
+          <div class="portfolio-card">
+            <img class="card-img" src="/images/mizora_sci_core_1780343020404.png" alt="ORION Visual Command Center" loading="lazy">
+            <div class="card-body">
+              <div class="card-cat font-mono">Visual Direction Platform</div>
+              <div class="card-title font-display">ORION Visual Command Center</div>
+              <div class="card-desc">Aera Labs required a unified visual command dashboard. Deploying MAOVDS alongside MAOBS orchestration for high-fidelity color and lighting control processing 4K HDR layers.</div>
+            </div>
+          </div>
+          <div class="portfolio-card">
+            <img class="card-img" src="/images/mizora_hero_android_1780342977076.png" alt="KAIROS UI Assembly Platform" loading="lazy">
+            <div class="card-body">
+              <div class="card-cat font-mono">Enterprise UI System</div>
+              <div class="card-title font-display">KAIROS UI Assembly Platform</div>
+              <div class="card-desc">Tokyo Creative Group struggled with inconsistent UI across 12 product lines. MAUBS deployed a deterministic, Swiss-grid-aligned component architecture for absolute visual consistency.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         FAQ
+         ═══════════════════════════════════════════ -->
+    <section class="section" id="faq" style="background:#fafafa;">
+      <div class="container">
+        <div class="section-label font-mono">// 007</div>
+        <div class="section-title font-display" data-i18n="faq.sectionTitle">INTELLIGENCE ACCORDION</div>
+        <div class="section-subtitle" data-i18n="faq.subtitle">Rigorous technical answers regarding our workflow, technology, and execution capabilities.</div>
+        <div class="hud-divider"></div>
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span data-i18n="faq.q1">Why doesn't Mizora KZN use colored design templates?</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq-answer"><p data-i18n="faq.a1">Color can act as visual cosmetic distraction to hide underlying structural design flaws. By utilizing a deliberate, strict, pure monochromatic Black &amp; White color matrix paired with Glassmorphism 2.0 and realistic shadows, we enforce absolute spatial balance, visual hierarchy, and pristine typography.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span data-i18n="faq.q2">What are the eight Mizora systems (MACS, MACPS, MATLS, etc.)?</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq-answer"><p data-i18n="faq.a2">They are our proprietary design, development, and AI coordination systems. Rather than relying on generic AI wrappers, each system is a modular pipeline built within Mizora KZN. MACS handles multiple AI node synchronization; MACPS designs structured narrative comic vectors; MATLS focuses on deep context research; MASDM orchestrates solfeggio audio focus levels; and MAUBS compiles high-fidelity UI elements under Swiss grid parameters.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span data-i18n="faq.q3">Are human creatives actually involved in the execution?</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq-answer"><p data-i18n="faq.a3">Yes, absolutely. Mizora KZN operates under a "Cybernetic Orchestration" framework. This means advanced AI algorithms handle massive computational rendering, structured research, and layout drafts, while elite human art directors and senior frontend engineers refine, calibrate, and finalize the output with Apple-level detail.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span data-i18n="faq.q4">How do you guarantee a Lighthouse optimization score of 95+?</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq-answer"><p data-i18n="faq.a4">Our web products are custom coded from the ground up without heavy bloated page builders or templates. We write clean, semantic HTML5, lazy-load dynamic components, optimize all images on-the-fly, bundle our dependencies into tightly encapsulated scripts, and enforce efficient state updates to guarantee outstanding speed and absolute technical authority.</p></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span data-i18n="faq.q5">Who owns the intellectual property and code assets upon project completion?</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </button>
+            <div class="faq-answer"><p data-i18n="faq.a5">Once the final balance is cleared, 100% of the custom assets, UI source files, custom focus soundtracks, and production code belong fully to your enterprise. We also provide full operational hand-off templates to guide seamless integration into your cloud infrastructure.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         CONTACT
+         ═══════════════════════════════════════════ -->
+    <section class="section section-dark" id="contact">
+      <div class="container">
+        <div class="section-label font-mono" style="color:#525252;">// 008</div>
+        <div class="section-title font-display" data-i18n="contact.sectionTitle">SECURE ENQUIRY</div>
+        <div class="section-subtitle" data-i18n="contact.subtitle">Initialize telemetry contact to establish professional collaboration.</div>
+        <div class="hud-divider"></div>
+        <div class="contact-grid">
+          <div>
+            <form class="contact-form" id="contact-form" onsubmit="submitContact(event)">
+              <div class="form-group">
+                <label data-i18n="contact.formName">Legal Name</label>
+                <input type="text" name="name" required placeholder="e.g. Alexander Vance" data-i18n-placeholder="contact.phName">
+              </div>
+              <div class="form-group">
+                <label data-i18n="contact.formEmail">Secure Email Address</label>
+                <input type="email" name="email" required placeholder="e.g. vance@enterprise.com" data-i18n-placeholder="contact.phEmail">
+              </div>
+              <div class="form-group">
+                <label data-i18n="contact.formWhatsApp">WhatsApp/Mobile Identifier</label>
+                <input type="tel" name="whatsapp" required placeholder="e.g. +62 811 xxxx or +1 415 xxxx" data-i18n-placeholder="contact.phWhatsApp">
+              </div>
+              <div class="form-group">
+                <label data-i18n="contact.formService">Desired Tactical Capability</label>
+                <select name="service">
+                  <option value="svc-01">Enterprise Cognitive Strategy</option>
+                  <option value="svc-02">High-Fidelity Interface Design</option>
+                  <option value="svc-03">Futuristic Visual Production</option>
+                  <option value="svc-04">Sound &amp; Audio Strategy</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label data-i18n="contact.formMessage">Strategic Project Outline</label>
+                <textarea name="message" required placeholder="Describe the current technical bottleneck and the desired production output..." data-i18n-placeholder="contact.phMessage"></textarea>
+              </div>
+              <button type="submit" class="form-submit" id="form-submit-btn" data-i18n="contact.formSubmit">TRANSMIT SECURE TRANSMISSION</button>
+            </form>
+            <div id="form-success" class="form-success" style="display:none;" data-i18n="contact.formSuccess">TRANSMISSION RECEIVED. The Mizora Core Team will initiate contact within 4 encrypted hours.</div>
+            <div id="form-error" style="display:none;margin-top:12px;padding:12px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:4px;font-size:13px;color:#ef4444;"></div>
+          </div>
+          <div>
+            <div class="contact-info-card">
+              <div class="info-title font-display" data-i18n="contact.infoTitle">MIZORA OPERATIONS CENTER</div>
+              <div class="contact-info-item">
+                <div class="info-label font-mono">COORDINATES</div>
+                <div class="info-value">Bekasi City, West Java, Indonesia</div>
+              </div>
+              <div class="contact-info-item">
+                <div class="info-label font-mono">AVAILABILITY</div>
+                <div class="info-value">Mon–Fri 08:00–22:00 WIB</div>
+              </div>
+              <div class="contact-info-item">
+                <div class="info-label font-mono">SECURE LINE</div>
+                <div class="info-value"><a href="tel:+628111111111">+62 811-1111-111</a></div>
+              </div>
+              <div class="contact-info-item">
+                <div class="info-label font-mono">ENCRYPTED CHANNEL</div>
+                <div class="info-value"><a href="mailto:hello@mizorakzn.com">hello@mizorakzn.com</a></div>
+              </div>
+              <div class="status-indicator">
+                <span class="dot"></span>
+                <span data-i18n="contact.availableStatus">SLOTS OPEN // SECURE INTEGRATIONS ENABLED</span>
+              </div>
+              <div style="margin-top:12px;" class="status-indicator">
+                <span class="dot"></span>
+                <span data-i18n="contact.responseGuarantee">RESPONSE GUARANTEE: SUB-4 HOURS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="brand-name font-display">MIZORA KZN</div>
+          <div class="brand-tagline font-mono">AI Workflow &amp; System Builder</div>
+          <div class="brand-desc">Premium AI Workflow &amp; System Builder. Mizora KZN delivers elite cybernetic orchestration, visual direction, and enterprise-grade digital production.</div>
+          <div class="footer-social">
+            <a href="https://instagram.com/mizora_kzn" target="_blank" rel="noopener" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="https://tiktok.com/@mizora_kzn" target="_blank" rel="noopener" aria-label="TikTok">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+            </a>
+            <a href="https://wa.me/628111111111" target="_blank" rel="noopener" aria-label="WhatsApp">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </a>
+            <a href="mailto:hello@mizorakzn.com" aria-label="Email">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </a>
+          </div>
+          <!-- Download Source Code Backup — Deploy-Ready -->
+          <div class="backup-section" style="padding:24px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div class="backup-title font-mono" data-i18n="footer.backupTitle" style="margin-bottom:0;">SOURCE CODE BACKUP</div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(16,185,129,0.6);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.1);padding:2px 8px;border-radius:2px;">DEPLOY-READY</span>
+            </div>
+            <div class="backup-desc" data-i18n="footer.backupDesc">Complete source code backup + deployment configs. 1 ZIP file ready to upload to GitHub, Vercel, Google AI Studio, and other platforms — rebuild 100% anywhere.</div>
+            <!-- Platform badges -->
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0;">
+              <span class="font-mono" style="font-size:7px;letter-spacing:0.12em;text-transform:uppercase;color:#525252;font-weight:700;">DEPLOY TO:</span>
+              <span class="font-mono" style="font-size:8px;color:#737373;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:3px 8px;border-radius:2px;">GitHub</span>
+              <span class="font-mono" style="font-size:8px;color:#737373;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:3px 8px;border-radius:2px;">Vercel</span>
+              <span class="font-mono" style="font-size:8px;color:#737373;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:3px 8px;border-radius:2px;">Netlify</span>
+              <span class="font-mono" style="font-size:8px;color:#737373;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:3px 8px;border-radius:2px;">Railway</span>
+              <span class="font-mono" style="font-size:8px;color:#737373;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:3px 8px;border-radius:2px;">Google AI Studio</span>
+            </div>
+            <!-- Included items -->
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);">
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(16,185,129,0.6);"></span><span class="font-mono" style="font-size:8px;color:#525252;">All Source Code</span></span>
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(16,185,129,0.6);"></span><span class="font-mono" style="font-size:8px;color:#525252;">.env.example</span></span>
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(16,185,129,0.6);"></span><span class="font-mono" style="font-size:8px;color:#525252;">vercel.json</span></span>
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(16,185,129,0.6);"></span><span class="font-mono" style="font-size:8px;color:#525252;">.gitignore</span></span>
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(16,185,129,0.6);"></span><span class="font-mono" style="font-size:8px;color:#525252;">index.html</span></span>
+              <span style="display:flex;align-items:center;gap:4px;"><span style="width:4px;height:4px;border-radius:50%;background:rgba(16,185,129,0.6);"></span><span class="font-mono" style="font-size:8px;color:#525252;">RESTORE-README.md</span></span>
+            </div>
+            <button class="btn-backup" id="backup-btn" onclick="downloadBackup()">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span id="backup-btn-text" data-i18n="footer.backupBtn">DOWNLOAD ZIP</span>
+            </button>
+            <div id="backup-success" class="backup-success" style="display:none;margin-top:12px;">
+              <span>✓</span> <span data-i18n="footer.backupSuccess">BACKUP DOWNLOADED — READY TO DEPLOY!</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-title font-mono" data-i18n="footer.navTitle">NAVIGATION</div>
+          <ul class="footer-links">
+            <li><a href="#home" data-i18n="nav.home">Home</a></li>
+            <li><a href="#about" data-i18n="nav.about">About</a></li>
+            <li><a href="#services" data-i18n="nav.services">Services</a></li>
+            <li><a href="#ratecard" data-i18n="nav.ratecard">Ratecard</a></li>
+            <li><a href="#portfolio" data-i18n="nav.portfolio">Portfolio</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title font-mono" data-i18n="footer.systemsTitle">SYSTEMS</div>
+          <ul class="footer-links">
+            <li><a href="#ecosystem">MACS</a></li>
+            <li><a href="#ecosystem">MACPS</a></li>
+            <li><a href="#ecosystem">MATLS</a></li>
+            <li><a href="#ecosystem">MASDM</a></li>
+            <li><a href="#ecosystem">MAOBS</a></li>
+            <li><a href="#ecosystem">MAOVDS</a></li>
+            <li><a href="#ecosystem">MALVCS</a></li>
+            <li><a href="#ecosystem">MAUBS</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title font-mono" data-i18n="footer.contactTitle">CONTACT</div>
+          <ul class="footer-links">
+            <li><a href="mailto:hello@mizorakzn.com">hello@mizorakzn.com</a></li>
+            <li><a href="tel:+628111111111">+62 811-1111-111</a></li>
+            <li><a href="https://wa.me/628111111111" target="_blank" rel="noopener">WhatsApp</a></li>
+            <li style="margin-top:8px;font-size:11px;color:#404040;">Bekasi City, West Java<br>Indonesia</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copyright">&copy; <span id="copyright-year"></span> Mizora KZN. All rights reserved.</div>
+        <div class="footer-copyright font-mono" style="color:#333;">ミゾラ 改善 未来を作る</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll to Top -->
+  <button class="scroll-top-btn" id="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  // ─── i18n Data ───
+  const i18n = {
+    en: {
+      'nav.home': 'Home',
+      'nav.services': 'Services',
+      'nav.ratecard': 'Ratecard',
+      'nav.portfolio': 'Portfolio',
+      'nav.about': 'About',
+      'nav.cta': 'CONSULT',
+      'hero.systemStatus': 'MIZORA KZN | ミゾラ 改善 未来を作る',
+      'hero.statusBadge': 'ミゾラ 改善',
+      'hero.tagline': 'AI WORKFLOW DESIGNER & SYSTEM BUILDER',
+      'hero.headlinePart1': 'Build AI Systems',
+      'hero.headlinePart2': 'For More Productive Business',
+      'hero.subheadline': 'Mizora KZN is an AI ecosystem that helps businesses work more structured, connected, and efficient, making it easier to grow in the digital era.',
+      'hero.ctaConsultText': 'Start Now',
+      'hero.ctaRatecardText': 'Explore Ratecard',
+      'hero.imageLabelTop': 'ミゾラ_改善 // MZR_改善_KZN_未来',
+      'hero.imageLabelBottom': 'Mizora Ecosystem · ミゾラ 改善',
+      'hero.tickerLabel': 'CONNECTED SYSTEMS',
+      'about.sectionTitle': 'CORE COMPOSER',
+      'about.subtitle': 'The architect behind the machine orchestration.',
+      'about.storyParagraph1': 'Mizora KZN was engineered from a singular vision: transitioning from standard manual software and design models to custom cybernetic system integrations. Led by Founder Rendy Awan, we operate as a highly specialized, elite creative production powerhouse that blends deep abstract philosophy, advanced machine reasoning, and meticulous Swiss minimalist layouts.',
+      'about.storyParagraph2': 'We do not build generic landing pages or standard corporate websites. We construct highly optimized, ultra-efficient, fully structured computational platforms and comprehensive digital ecosystems for enterprise brands looking to dominate their market niches with technical authority.',
+      'about.philosophyTitle': 'OUR ARCHITECTURAL PHILOSOPHY',
+      'about.philosophyText': 'Aesthetic is not decorative; it is mathematical structure. By pairing precise symmetrical grid boundaries, absolute black-and-white high-contrast visual systems, and procedural logic, we eliminate design slop while magnifying user interaction, trust, and enterprise-grade authority.',
+      'about.founderName': 'Rendy Awan',
+      'about.founderRole': 'Founder & Principal Synthesizer',
+      'about.founderQuote': '"The highest tier of modern engineering is indistinguishable from computational poetry. We design digital assets not to fill space, but to dominate it."',
+      'eco.sectionTitle': 'MIZORA ECOSYSTEM',
+      'eco.subtitle': 'The core foundation of Mizora KZN, consisting of eight AI systems with specific functions to support various creative, strategic, and operational expertise needs, designed to help produce more consistent output.',
+      'svc.sectionTitle': 'TACTICAL CAPABILITIES',
+      'svc.subtitle': 'Elite creative execution across visual, sound, and digital technical spaces.',
+      'svc.benefit1': 'Integrates custom AI processes to slash workflows by 80% with human-in-the-loop validation.',
+      'svc.benefit2': 'Stunningly minimalist Swiss UI system designed for high usability, conversion, and global prestige.',
+      'svc.benefit3': 'High-end cinema grading, animated 3D visual assets, and customized graphic narrative production.',
+      'svc.benefit4': 'Algorithmic focus frequency synthesis customized for application loops and luxury product loops.',
+      'wf.sectionTitle': 'ENGINEERING PIPELINE',
+      'wf.subtitle': 'A structured, high-order four-stage execution cycle maximizing speed and accuracy.',
+      'wf.duration1': 'Week 1',
+      'wf.duration2': 'Week 2',
+      'wf.duration3': 'Weeks 3-4',
+      'wf.duration4': 'Week 5',
+      'wf.title1': 'DESTRUCTION & DISCOVERY',
+      'wf.title2': 'STRATEGIC COGNITIVE SYNTHESIS',
+      'wf.title3': 'CYBERNETIC EXECUTION',
+      'wf.title4': 'DETERMINISTIC DELIVERY',
+      'wf.desc1': 'We deconstruct your current processes, audit technical bottlenecks, and map cognitive possibilities using MATLS system verification.',
+      'wf.desc2': 'We compile the data and design the core components, establishing the bespoke system interfaces, UI design concepts, and sound frameworks.',
+      'wf.desc3': 'Our expert team builds out the production-ready code with pure Tailwind stylesheets, high-performance visual layers, and optimized API routing.',
+      'wf.desc4': 'The final product undergoes rigid security auditing, speed compilation, and responsive verification before launch to ensure absolute success.',
+      'rc.sectionTitle': 'PRICING ARTIFACTS',
+      'rc.subtitle': 'Transparent, enterprise-grade investment options engineered for global businesses.',
+      'rc.getStarted': 'Initialize Package Deployment',
+      'rc.badge': 'RECOMMENDED FOR ENTERPRISES',
+      'rc.pkg1Name': 'COGNITIVE BASIC',
+      'rc.pkg1Price': '$4,500',
+      'rc.pkg1Currency': 'USD',
+      'rc.pkg1Focus': 'Ideal for disruptive startups seeking unmatched visual authority first',
+      'rc.pkg1d1': 'Full interactive UI/UX (Landing page + 2 subpages)',
+      'rc.pkg1d2': 'Sleek custom 3D sculpture graphics',
+      'rc.pkg1d3': 'Responsive Tailwind/React deployment',
+      'rc.pkg1d4': 'Standard ID/EN bilingual setup',
+      'rc.pkg1Meta': '2 Rounds of Review · 14 Working Days',
+      'rc.pkg2Name': 'ENTERPRISE SYSTEM',
+      'rc.pkg2Price': '$9,500',
+      'rc.pkg2Currency': 'USD',
+      'rc.pkg2Focus': 'Our flagship plan deploying custom AI consensus and high-throughput systems',
+      'rc.pkg2d1': 'Advanced UI/UX Platform (Up to 8 interactive layouts)',
+      'rc.pkg2d2': 'MACS Multi-agent collaborative node integration',
+      'rc.pkg2d3': 'Full 3D abstract core visual animations',
+      'rc.pkg2d4': 'Continuous 60FPS fluid micro-interactions',
+      'rc.pkg2d5': 'Performance speed optimization (Lighthouse 95+)',
+      'rc.pkg2Meta': '4 Rounds of Review · 25 Working Days',
+      'rc.pkg3Name': 'MIZORA ULTIMATE CORE',
+      'rc.pkg3Price': '$18,500',
+      'rc.pkg3Currency': 'USD',
+      'rc.pkg3Focus': 'The ultimate technological manifestation, deploying all eight Mizora systems',
+      'rc.pkg3d1': 'Infinite scale system UI architecture (15+ complex screens)',
+      'rc.pkg3d2': 'Sovereign implementation of all 8 Mizora Systems (MACS to MAUBS)',
+      'rc.pkg3d3': 'Entire custom portfolio narrative vector comic (MACPS)',
+      'rc.pkg3d4': 'Bespoke solfeggio focus soundtracks (MASDM)',
+      'rc.pkg3d5': '24/7 dedicated support SLA and server telemetry dashboard',
+      'rc.pkg3Meta': 'Unlimited Revisions (30 Days) · 45 Working Days',
+      'rc.billing': 'All packages require a 50% upfront retainer. Signed SLA included.',
+      'port.sectionTitle': 'CASE ARTIFACTS',
+      'port.subtitle': 'Real enterprise success stories manifesting absolute visual dominance.',
+      'faq.sectionTitle': 'INTELLIGENCE ACCORDION',
+      'faq.subtitle': 'Rigorous technical answers regarding our workflow, technology, and execution capabilities.',
+      'faq.q1': "Why doesn't Mizora KZN use colored design templates?",
+      'faq.a1': 'Color can act as visual cosmetic distraction to hide underlying structural design flaws. By utilizing a deliberate, strict, pure monochromatic Black & White color matrix paired with Glassmorphism 2.0 and realistic shadows, we enforce absolute spatial balance, visual hierarchy, and pristine typography.',
+      'faq.q2': 'What are the eight Mizora systems (MACS, MACPS, MATLS, etc.)?',
+      'faq.a2': 'They are our proprietary design, development, and AI coordination systems. Rather than relying on generic AI wrappers, each system is a modular pipeline built within Mizora KZN. MACS handles multiple AI node synchronization; MACPS designs structured narrative comic vectors; MATLS focuses on deep context research; MASDM orchestrates solfeggio audio focus levels; and MAUBS compiles high-fidelity UI elements under Swiss grid parameters.',
+      'faq.q3': 'Are human creatives actually involved in the execution?',
+      'faq.a3': 'Yes, absolutely. Mizora KZN operates under a "Cybernetic Orchestration" framework. This means advanced AI algorithms handle massive computational rendering, structured research, and layout drafts, while elite human art directors and senior frontend engineers refine, calibrate, and finalize the output with Apple-level detail.',
+      'faq.q4': 'How do you guarantee a Lighthouse optimization score of 95+?',
+      'faq.a4': 'Our web products are custom coded from the ground up without heavy bloated page builders or templates. We write clean, semantic HTML5, lazy-load dynamic components, optimize all images on-the-fly, bundle our dependencies into tightly encapsulated scripts, and enforce efficient state updates to guarantee outstanding speed and absolute technical authority.',
+      'faq.q5': 'Who owns the intellectual property and code assets upon project completion?',
+      'faq.a5': 'Once the final balance is cleared, 100% of the custom assets, UI source files, custom focus soundtracks, and production code belong fully to your enterprise. We also provide full operational hand-off templates to guide seamless integration into your cloud infrastructure.',
+      'contact.sectionTitle': 'SECURE ENQUIRY',
+      'contact.subtitle': 'Initialize telemetry contact to establish professional collaboration.',
+      'contact.formName': 'Legal Name',
+      'contact.formEmail': 'Secure Email Address',
+      'contact.formWhatsApp': 'WhatsApp/Mobile Identifier',
+      'contact.formService': 'Desired Tactical Capability',
+      'contact.formMessage': 'Strategic Project Outline',
+      'contact.formSubmit': 'TRANSMIT SECURE TRANSMISSION',
+      'contact.formSubmitting': 'ENCRYPTING AND TRANSMITTING...',
+      'contact.formSuccess': 'TRANSMISSION RECEIVED. The Mizora Core Team will initiate contact within 4 encrypted hours.',
+      'contact.phName': 'e.g. Alexander Vance',
+      'contact.phEmail': 'e.g. vance@enterprise.com',
+      'contact.phWhatsApp': 'e.g. +62 811 xxxx or +1 415 xxxx',
+      'contact.phMessage': 'Describe the current technical bottleneck and the desired production output...',
+      'contact.infoTitle': 'MIZORA OPERATIONS CENTER',
+      'contact.availableStatus': 'SLOTS OPEN // SECURE INTEGRATIONS ENABLED',
+      'contact.responseGuarantee': 'RESPONSE GUARANTEE: SUB-4 HOURS',
+      'footer.backupTitle': 'SOURCE CODE BACKUP',
+      'footer.backupDesc': 'Download a complete backup of the Mizora KZN project source code, including this standalone page.',
+      'footer.backupBtn': 'DOWNLOAD BACKUP',
+      'footer.backupSuccess': 'BACKUP DOWNLOADED SUCCESSFULLY',
+      'footer.navTitle': 'NAVIGATION',
+      'footer.systemsTitle': 'SYSTEMS',
+      'footer.contactTitle': 'CONTACT',
+    },
+    id: {
+      'nav.home': 'Beranda',
+      'nav.services': 'Layanan',
+      'nav.ratecard': 'Ratecard',
+      'nav.portfolio': 'Portofolio',
+      'nav.about': 'Tentang',
+      'nav.cta': 'KONSULTASI',
+      'hero.systemStatus': 'MIZORA KZN | ミゾラ 改善 未来を作る',
+      'hero.statusBadge': 'ミゾラ 改善',
+      'hero.tagline': 'AI WORKFLOW DESIGNER & SYSTEM BUILDER',
+      'hero.headlinePart1': 'Bangun Sistem AI',
+      'hero.headlinePart2': 'Untuk Bisnis Lebih Produktif',
+      'hero.subheadline': 'Mizora KZN adalah ekosistem AI yang membantu bisnis bekerja lebih terstruktur, terhubung, dan efisien, sehingga lebih mudah berkembang di era digital.',
+      'hero.ctaConsultText': 'Mulai Sekarang',
+      'hero.ctaRatecardText': 'Jelajahi Ratecard',
+      'hero.imageLabelTop': 'ミゾラ_改善 // MZR_改善_KZN_未来',
+      'hero.imageLabelBottom': 'Mizora Ecosystem · ミゾラ 改善',
+      'hero.tickerLabel': 'SISTEM TERHUBUNG',
+      'about.sectionTitle': 'KOMPOSER INTI',
+      'about.subtitle': 'Arsitek utama di balik harmonisasi mesin.',
+      'about.storyParagraph1': 'Mizora KZN diciptakan dari satu visi utama: bertransisi dari model desain dan perangkat keras manual biasa menuju integrasi sistem sibernetik kustom berkinerja tinggi. Dipimpin oleh Rendy Awan selaku Founder, kami beroperasi sebagai unit produksi kreatif elite yang menggabungkan filosofi abstrak mendalam, penalaran mesin tingkat lanjut, dan tata letak minimalis Swiss yang rapi.',
+      'about.storyParagraph2': 'Kami tidak membuat landing page generik atau situs web korporat standar. Kami membangun platform komputasional berkinerja tinggi yang sangat efisien, terstruktur penuh, serta ekosistem digital komprehensif bagi brand enterprise yang ingin mendominasi ceruk pasar mereka dengan otoritas teknis mutlak.',
+      'about.philosophyTitle': 'FILOSOFI ARSITEKTURAL KAMI',
+      'about.philosophyText': 'Estetika bukan sekadar dekorasi; ia adalah struktur matematis. Dengan memadukan batas grid simetris yang presisi, sistem visual kontras tinggi Hitam-Putih yang murni, dan logika prosedural, kami mengeliminasi "design slop" (desain acak) sekaligus memperkuat interaksi pengguna, rasa percaya, dan wewenang berkelas dunia.',
+      'about.founderName': 'Rendy Awan',
+      'about.founderRole': 'Founder & Principal Synthesizer',
+      'about.founderQuote': '"Tingkatan tertinggi dari rekayasa teknologi modern tidak dapat dibedakan dari puisi komputasi. Kami merancang aset digital bukan untuk mengisi ruang, melainkan untuk mendominasinya."',
+      'eco.sectionTitle': 'MIZORA ECOSYSTEM',
+      'eco.subtitle': 'Fondasi utama Mizora KZN yang terdiri dari delapan sistem AI dengan fungsi spesifik untuk mendukung berbagai kebutuhan kreatif, strategis, dan operasional keahlian yang berbeda, dirancang untuk membantu menghasilkan output yang lebih konsisten.',
+      'svc.sectionTitle': 'KEMAMPUAN TAKTIS',
+      'svc.subtitle': 'Eksekusi kreatif berskala tinggi di seluruh ruang visual, suara, dan teknis digital.',
+      'svc.benefit1': 'Mengintegrasikan alur kognitif AI kustom untuk memangkas proses kerja hingga 80% dengan validasi manusia.',
+      'svc.benefit2': 'Sistem UI Swiss yang sangat minimalis untuk kegunaan tinggi, konversi, dan prestise global.',
+      'svc.benefit3': 'Pewarnaan sinematik premium, pembuatan aset 3D animasi, dan produksi novel visual terstruktur.',
+      'svc.benefit4': 'Kombinasi gelombang frekuensi solfeggio khusus untuk meningkatkan fokus pengguna serta branding produk mewah.',
+      'wf.sectionTitle': 'ALUR ENGINEERING',
+      'wf.subtitle': 'Siklus eksekusi empat tahap terstruktur yang memaksimalkan akurasi dan kecepatan.',
+      'wf.duration1': 'Minggu 1',
+      'wf.duration2': 'Minggu 2',
+      'wf.duration3': 'Minggu 3-4',
+      'wf.duration4': 'Minggu 5',
+      'wf.title1': 'DEKONSTRUKSI & PEMAHAMAN',
+      'wf.title2': 'SINTESIS STRATEGIS KOGNITIF',
+      'wf.title3': 'EKSEKUSI SIBERNETIK',
+      'wf.title4': 'LAUNCHING DETERMINISTIK',
+      'wf.desc1': 'Kami menganalisis proses yang Anda miliki saat ini, mendeteksi hambatan teknis, dan memetakan skalabilitas kognitif menggunakan sistem MATLS.',
+      'wf.desc2': 'Kami menyusun data dan merancang komponen inti, menetapkan antarmuka sistem kustom, tata letak antarmuka, dan dasar-dasar audio.',
+      'wf.desc3': 'Tim ahli kami menuliskan kode siap produksi dengan framework Tailwind murni, struktur visual berkinerja tinggi, dan perutean API yang optimal.',
+      'wf.desc4': 'Produk akhir akan melalui audit keamanan ketat, kompilasi performa kecepatan, dan verifikasi responsif sebelum diluncurkan secara resmi.',
+      'rc.sectionTitle': 'MATRIKS INVESTASI',
+      'rc.subtitle': 'Opsi paket investasi transparan berkelas enterprise yang dirancang untuk skala bisnis global.',
+      'rc.getStarted': 'Inisialisasi Implementasi Paket',
+      'rc.badge': 'DIREKOMENDASIKAN UNTUK PERUSAHAAN',
+      'rc.pkg1Name': 'COGNITIVE BASIC',
+      'rc.pkg1Price': 'Rp 68.000.000',
+      'rc.pkg1Currency': 'IDR',
+      'rc.pkg1Focus': 'Ideal untuk startup yang ingin membangun otoritas visual yang tiada duanya terlebih dahulu',
+      'rc.pkg1d1': 'UI/UX interaktif penuh (Landing page + 2 subhalaman)',
+      'rc.pkg1d2': 'Aset grafis patung 3D kustom yang rapi',
+      'rc.pkg1d3': 'Penempatan kode responsif Tailwind/React',
+      'rc.pkg1d4': 'Konfigurasi bilingual ID/EN lengkap',
+      'rc.pkg1Meta': '2 Sesi Revisi Menyeluruh · 14 Hari Kerja',
+      'rc.pkg2Name': 'ENTERPRISE SYSTEM',
+      'rc.pkg2Price': 'Rp 143.000.000',
+      'rc.pkg2Currency': 'IDR',
+      'rc.pkg2Focus': 'Paket andalan kami yang menggunakan kognisi multi-agen AI serta pipeline berkinerja tinggi',
+      'rc.pkg2d1': 'Platform UI/UX Tingkat Lanjut (Hingga 8 tata letak interaktif)',
+      'rc.pkg2d2': 'Integrasi node kolaboratif multi-agen MACS',
+      'rc.pkg2d3': 'Animasi visual core 3D abstrak premium',
+      'rc.pkg2d4': 'Interaksi mikro visual 60FPS yang sangat mulus',
+      'rc.pkg2d5': 'Optimasi kecepatan maksimal (Skor Lighthouse 95+)',
+      'rc.pkg2Meta': '4 Sesi Revisi Menyeluruh · 25 Hari Kerja',
+      'rc.pkg3Name': 'MIZORA ULTIMATE CORE',
+      'rc.pkg3Price': 'Rp 278.000.000',
+      'rc.pkg3Currency': 'IDR',
+      'rc.pkg3Focus': 'Manifes teknologi terbaik, menerapkan delapan ekosistem sistem Mizora secara penuh',
+      'rc.pkg3d1': 'Arsitektur sistem UI skala tak terbatas (15+ layar kompleks)',
+      'rc.pkg3d2': 'Penerapan penuh 8 Sistem Mizora (dari MACS hingga MAUBS)',
+      'rc.pkg3d3': 'Buku komik vektor naratif kustom (sistem MACPS)',
+      'rc.pkg3d4': 'Frekuensi lagu fokus solfeggio dinamis (MASDM)',
+      'rc.pkg3d5': 'Dukungan SLA 24/7 dedikatif & panel pemantauan server aktif',
+      'rc.pkg3Meta': 'Sesi Revisi Adaptif Tanpa Batas (30 Hari) · 45 Hari Kerja',
+      'rc.billing': 'Semua paket memerlukan pembayaran di muka sebesar 50%. SLA bertanda tangan disertakan.',
+      'port.sectionTitle': 'ARTEFAK KASUS',
+      'port.subtitle': 'Kisah sukses enterprise nyata yang merealisasikan dominasi visual mutlak.',
+      'faq.sectionTitle': 'AKORDEON INTELEJENSIA',
+      'faq.subtitle': 'Jawaban teknis ketat mengenai alur kerja, teknologi, dan kemampuan eksekusi kami.',
+      'faq.q1': 'Mengapa Mizora KZN tidak menggunakan template desain berwarna?',
+      'faq.a1': 'Warna dapat menjadi distraksi kosmetik visual yang menyembunyikan kelemahan desain struktural. Dengan menggunakan matriks warna Hitam-Putih monokromatik murni yang ketat dan disengaja, dipadukan dengan Glassmorphism 2.0 dan bayangan realistis, kami menegakkan keseimbangan spasial absolut, hierarki visual, dan tipografi yang sempurna.',
+      'faq.q2': 'Apa itu delapan sistem Mizora (MACS, MACPS, MATLS, dll.)?',
+      'faq.a2': 'Mereka adalah sistem koordinasi AI dan pengembangan desain eksklusif kami. Alih-alih mengandalkan wrapper AI generik, setiap sistem adalah pipeline modular yang dibangun dalam Mizora KZN. MACS menangani sinkronisasi multi-node AI; MACPS merancang vektor komik naratif terstruktur; MATLS berfokus pada riset konteks mendalam; MASDM mengorkestrasi level fokus audio solfeggio; dan MAUBS mengompilasi elemen UI berketajaman tinggi di bawah parameter grid Swiss.',
+      'faq.q3': 'Apakah kreator manusia benar-benar terlibat dalam eksekusi?',
+      'faq.a3': 'Ya, tentu saja. Mizora KZN beroperasi di bawah kerangka "Orkestrasi Sibernetik". Ini berarti algoritma AI tingkat lanjut menangani rendering komputasional masif, riset terstruktur, dan draf tata letak, sementara direktur seni manusia elite dan insinyur frontend senior menyempurnakan, mengkalibrasi, dan memfinalisasi output dengan detail tingkat Apple.',
+      'faq.q4': 'Bagaimana Anda menjamin skor optimasi Lighthouse 95+?',
+      'faq.a4': 'Produk web kami dikodekan kustom dari awal tanpa page builder atau template yang berat dan lambat. Kami menulis HTML5 semantik yang bersih, lazy-load komponen dinamis, mengoptimalkan semua gambar secara langsung, menggabungkan dependensi menjadi script yang rapat, dan menegakkan pembaruan state yang efisien untuk menjamin kecepatan luar biasa dan otoritas teknis absolut.',
+      'faq.q5': 'Siapa yang memiliki kekayaan intelektual dan aset kode setelah proyek selesai?',
+      'faq.a5': 'Setelah saldo akhir dilunasi, 100% aset kustom, file sumber UI, soundtrack fokus kustom, dan kode produksi sepenuhnya menjadi milik enterprise Anda. Kami juga menyediakan template serah-terima operasional lengkap untuk memandu integrasi tanpa hambatan ke infrastruktur cloud Anda.',
+      'contact.sectionTitle': 'PERTANYAAN AMAN',
+      'contact.subtitle': 'Inisialisasi kontak telemetri untuk menjalin kolaborasi profesional.',
+      'contact.formName': 'Nama Resmi',
+      'contact.formEmail': 'Alamat Email Aman',
+      'contact.formWhatsApp': 'ID WhatsApp/Mobile',
+      'contact.formService': 'Kemampuan Taktis yang Diinginkan',
+      'contact.formMessage': 'Garis Besar Proyek Strategis',
+      'contact.formSubmit': 'KIRIM TRANSMISI AMAN',
+      'contact.formSubmitting': 'MENGENKRIPSI DAN MENGIRIM...',
+      'contact.formSuccess': 'TRANSMISI DITERIMA. Tim Inti Mizora akan menghubungi dalam 4 jam terenkripsi.',
+      'contact.phName': 'cth. Alexander Vance',
+      'contact.phEmail': 'cth. vance@enterprise.com',
+      'contact.phWhatsApp': 'cth. +62 811 xxxx atau +1 415 xxxx',
+      'contact.phMessage': 'Jelaskan hambatan teknis saat ini dan output produksi yang diinginkan...',
+      'contact.infoTitle': 'PUSAT OPERASI MIZORA',
+      'contact.availableStatus': 'SLOT TERBUKA // INTEGRASI AMAN AKTIF',
+      'contact.responseGuarantee': 'JAMINAN RESPONS: DI BAWAH 4 JAM',
+      'footer.backupTitle': 'BACKUP KODE SUMBER',
+      'footer.backupDesc': 'Unduh backup lengkap kode sumber proyek Mizora KZN, termasuk halaman mandiri ini.',
+      'footer.backupBtn': 'UNDUH BACKUP',
+      'footer.backupSuccess': 'BACKUP BERHASIL DIUNDUH',
+      'footer.navTitle': 'NAVIGASI',
+      'footer.systemsTitle': 'SISTEM',
+      'footer.contactTitle': 'KONTAK',
+    }
+  };
+
+  let currentLang = 'en';
+
+  // ─── Language Toggle ───
+  window.setLang = function(lang) {
+    currentLang = lang;
+    // Update toggle buttons
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.getElementById('lang-id').classList.toggle('active', lang === 'id');
+    document.querySelectorAll('.lang-en-m').forEach(b => b.classList.toggle('active', lang === 'en'));
+    document.querySelectorAll('.lang-id-m').forEach(b => b.classList.toggle('active', lang === 'id'));
+    // Update all data-i18n elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (i18n[lang] && i18n[lang][key]) {
+        el.textContent = i18n[lang][key];
+      }
+    });
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (i18n[lang] && i18n[lang][key]) {
+        el.placeholder = i18n[lang][key];
+      }
+    });
+    // Update html lang
+    document.documentElement.lang = lang === 'id' ? 'id' : 'en';
+  };
+
+  // ─── Mobile Menu ───
+  window.toggleMobileMenu = function() {
+    const nav = document.getElementById('mobile-nav');
+    nav.classList.toggle('open');
+  };
+  window.closeMobileMenu = function() {
+    document.getElementById('mobile-nav').classList.remove('open');
+  };
+
+  // ─── FAQ Accordion ───
+  window.toggleFaq = function(btn) {
+    const item = btn.closest('.faq-item');
+    const wasOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    // Toggle current
+    if (!wasOpen) item.classList.add('open');
+  };
+
+  // ─── Contact Form ───
+  window.submitContact = async function(e) {
+    e.preventDefault();
+    const form = document.getElementById('contact-form');
+    const btn = document.getElementById('form-submit-btn');
+    const successDiv = document.getElementById('form-success');
+    const errorDiv = document.getElementById('form-error');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+
+    btn.disabled = true;
+    btn.textContent = i18n[currentLang]['contact.formSubmitting'];
+    errorDiv.style.display = 'none';
+    successDiv.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        successDiv.style.display = 'block';
+        form.reset();
+      } else {
+        const err = await res.json();
+        errorDiv.textContent = err.error || 'Submission failed. Please try again.';
+        errorDiv.style.display = 'block';
+      }
+    } catch (err) {
+      errorDiv.textContent = 'Network error. Please check your connection and try again.';
+      errorDiv.style.display = 'block';
+    }
+    btn.disabled = false;
+    btn.textContent = i18n[currentLang]['contact.formSubmit'];
+  };
+
+  // ─── Download Backup ───
+  window.downloadBackup = async function() {
+    const btn = document.getElementById('backup-btn');
+    const btnText = document.getElementById('backup-btn-text');
+    const successDiv = document.getElementById('backup-success');
+
+    btn.disabled = true;
+    btnText.textContent = currentLang === 'id' ? 'MENGUNDUH...' : 'DOWNLOADING...';
+
+    try {
+      const res = await fetch('/api/backup');
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const disposition = res.headers.get('Content-Disposition');
+        const filename = disposition ? disposition.split('filename=')[1]?.replace(/"/g, '') : 'mizora-kzn-backup.zip';
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        successDiv.style.display = 'flex';
+        setTimeout(() => { successDiv.style.display = 'none'; }, 5000);
+      } else {
+        alert('Failed to download backup. Please try again.');
+      }
+    } catch (err) {
+      alert('Network error. Please check your connection and try again.');
+    }
+    btn.disabled = false;
+    btnText.textContent = i18n[currentLang]['footer.backupBtn'];
+  };
+
+  // ─── Scroll Effects ───
+  const header = document.getElementById('nav-header');
+  const scrollBtn = document.getElementById('scroll-top-btn');
+
+  window.addEventListener('scroll', function() {
+    // Header shadow
+    if (window.scrollY > 10) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+    // Scroll to top button
+    if (window.scrollY > 400) {
+      scrollBtn.classList.add('visible');
+    } else {
+      scrollBtn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  // ─── Intersection Observer for fade-in ───
+  const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.eco-card, .service-card, .workflow-step, .ratecard-card, .portfolio-card, .faq-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+
+  // ─── Smooth scroll for anchor links ───
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      const target = document.querySelector(targetId);
+      if (target) {
+        e.preventDefault();
+        const headerOffset = 80;
+        const elementPosition = target.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Set dynamic copyright year
+  const yearEl = document.getElementById('copyright-year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  // Initialize language
+  setLang('en');
+})();
+</script>
+</body>
+</html>
