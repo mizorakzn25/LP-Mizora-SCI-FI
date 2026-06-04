@@ -2100,15 +2100,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F0F0F3 100%);
+  background: #FFFFFF;
   border: 1.5px solid rgba(0,0,0,0.12);
-  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  border-radius: 10px;
   box-shadow:
-    0 2px 4px rgba(0,0,0,0.08),
-    0 6px 14px rgba(0,0,0,0.06),
-    0 12px 24px rgba(0,0,0,0.04),
-    inset 0 1px 0 rgba(255,255,255,0.8),
-    inset 0 -1px 0 rgba(0,0,0,0.08);
+    0 1px 2px rgba(0,0,0,0.06),
+    0 4px 10px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.95);
   transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -3332,4 +3330,217 @@
     animation: none;
     will-change: auto;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TERMINAL CODE CARDS — SECTOR_03 PERBEDAAN (Retro UX Terminal Design)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 3D Perspective Container ─── */
+.term-perspective {
+  perspective: 1200px;
+}
+
+/* ─── Terminal Card Base ─── */
+.term-card {
+  position: relative;
+  overflow: hidden;
+  will-change: transform, box-shadow;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.4s ease;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.term-card:hover {
+  transform: translateY(-8px);
+}
+
+/* ─── Scanline Sweep ─── */
+.term-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    transparent 0%,
+    rgba(16,185,129,0.006) 38%,
+    rgba(16,185,129,0.015) 50%,
+    rgba(16,185,129,0.006) 62%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 3;
+  animation: term-scanline 6s linear infinite;
+}
+
+/* ─── Terminal Pulse — Red ─── */
+@keyframes term-pulse-red {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+/* ─── Terminal Pulse — Green ─── */
+@keyframes term-pulse-green {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+/* ─── Terminal Scanline Sweep ─── */
+@keyframes term-scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* ─── Terminal Card Hover Shimmer ─── */
+.term-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255,255,255,0.04) 40%,
+    rgba(255,255,255,0.015) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  pointer-events: none;
+  z-index: 4;
+  transition: none;
+}
+
+.term-card:hover::after {
+  animation: term-shimmer 1s ease forwards;
+}
+
+@keyframes term-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ─── 3D Depth Glow — bottom edge ─── */
+.term-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  z-index: 9;
+  pointer-events: none;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .term-scanline,
+  .term-card::after {
+    animation: none;
+  }
+  .term-card:hover {
+    transform: none;
+  }
+}
+
+/* ─── Mobile adjustments ─── */
+@media (max-width: 640px) {
+  .term-card {
+    border-radius: 8px !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM WIDGET CARDS — 9/10+ DESIGN SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════════
+   MIZORA IDE — IMPLEMENTATION PROCESS DESIGN SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Ring pulse for Discovery preview */
+@keyframes ide-ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.08); opacity: 0.6; }
+}
+
+/* Code scroll custom scrollbar */
+.ide-code-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.15) transparent;
+}
+.ide-code-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+.ide-code-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ide-code-scroll::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 2px;
+}
+.ide-code-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.25);
+}
+
+/* Hide mobile tab bar scrollbar */
+.ide-tabs-scrollable {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.ide-tabs-scrollable::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes widget-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   IDE LIVE PREVIEW — LOADING & SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Spinner rotation */
+@keyframes ide-spinner {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Loading progress bar — fills from 0 to 100% over 4 seconds */
+@keyframes ide-load-progress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* Preview card scrollbar — emerald glow */
+.cmd-preview-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+}
+.cmd-preview-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+.cmd-preview-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.cmd-preview-scroll::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.25);
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(16, 185, 129, 0.15);
+}
+.cmd-preview-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
 }

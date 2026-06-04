@@ -612,8 +612,8 @@ export default function ServicesSection({ t, lang }: ServicesSectionProps) {
       />
 
       {/* Decorative side accent lines */}
-      <div className="absolute top-28 left-6 md:left-12 bottom-28 w-px bg-gradient-to-b from-transparent via-neutral-300/40 to-transparent pointer-events-none" />
-      <div className="absolute top-28 right-6 md:right-12 bottom-28 w-px bg-gradient-to-b from-transparent via-neutral-300/40 to-transparent pointer-events-none" />
+      <div className="absolute top-28 left-6 md:left-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
+      <div className="absolute top-28 right-6 md:right-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         {/* ─── Section Header (Terminal-style) ─── */}
@@ -627,10 +627,10 @@ export default function ServicesSection({ t, lang }: ServicesSectionProps) {
               >
                 &gt;
               </span>
-              <Mono className="text-[10px] text-neutral-500 tracking-[0.2em] uppercase font-bold">
+              <Mono className="text-[10px] text-black tracking-[0.2em] uppercase font-bold">
                 SECTOR_02 // OPERATIONAL CAPABILITIES
               </Mono>
-              <span className="flex-1 h-px bg-gradient-to-r from-neutral-300 via-neutral-200 to-transparent" />
+              <span className="flex-1 h-px bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
               <Mono className="text-[9px] text-emerald-600/70 tracking-[0.2em] uppercase font-bold">
                 {t.services.servicesList.length} SERVICES
               </Mono>

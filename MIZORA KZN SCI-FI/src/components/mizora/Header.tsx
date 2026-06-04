@@ -25,9 +25,12 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
   const [activeSection, setActiveSection] = useState<string>('home');
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Map sections to nav items - contact & about both highlight "Tentang/About" nav
+  // Map sections to nav items
+  // - contact & about both highlight "Tentang/About" nav
+  // - ecosystem, services, workflow all highlight "Layanan/Services" nav
   const sectionToNav = (sectionId: string) => {
     if (sectionId === 'contact') return 'about';
+    if (sectionId === 'ecosystem' || sectionId === 'workflow') return 'services';
     return sectionId;
   };
 
@@ -46,7 +49,7 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
 
   // IntersectionObserver for active section highlighting
   useEffect(() => {
-    const sectionIds = ['home', 'services', 'workflow', 'ratecard', 'portfolio', 'faq', 'about', 'contact'];
+    const sectionIds = ['home', 'services', 'ratecard', 'portfolio', 'faq', 'about', 'contact'];
 
     const handleSectionDetection = () => {
       // When near top of page, always show home

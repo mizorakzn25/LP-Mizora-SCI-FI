@@ -232,7 +232,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
     <section
       ref={sectionRef}
       id="home"
-      className="relative pt-20 pb-16 md:pt-24 md:pb-20 bg-white overflow-hidden flex flex-col justify-center min-h-[92vh]"
+      className="relative pt-20 pb-16 md:pt-24 md:pb-20 overflow-hidden flex flex-col justify-center min-h-[92vh]" style={{ background: '#ECECF0' }}
       onMouseMove={handleSectionMouseMove}
     >
       {/* U2 — Cursor Light Trail */}
@@ -453,7 +453,8 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
                 <div className="relative overflow-hidden">
                   <span className="text-[#0A0A0A] block">{t.hero.headlinePart1}</span>
                   <motion.div
-                    className="absolute inset-0 bg-white origin-right"
+                    className="absolute inset-0 origin-right"
+                    style={{ background: '#ECECF0' }}
                     initial={{ scaleX: 1 }}
                     animate={canAnimate ? { scaleX: 0 } : { scaleX: 1 }}
                     transition={{ duration: 0.4, delay: 0.28, ease: [0.76, 0, 0.24, 1] }}
@@ -463,7 +464,8 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
                 <div className="relative overflow-hidden">
                   <span className="text-black block">{t.hero.headlinePart2}</span>
                   <motion.div
-                    className="absolute inset-0 bg-white origin-right"
+                    className="absolute inset-0 origin-right"
+                    style={{ background: '#ECECF0' }}
                     initial={{ scaleX: 1 }}
                     animate={canAnimate ? { scaleX: 0 } : { scaleX: 1 }}
                     transition={{ duration: 0.4, delay: 0.45, ease: [0.76, 0, 0.24, 1] }}

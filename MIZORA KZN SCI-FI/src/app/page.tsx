@@ -12,15 +12,16 @@ import { Language } from '@/lib/mizora-types';
 import { translations } from '@/lib/mizora-translations';
 
 // Dynamic imports for heavy components - SSR disabled to reduce server memory usage
-const EcosystemSection = dynamic(() => import('@/components/mizora/EcosystemSection'), { ssr: false });
-const ServicesSection = dynamic(() => import('@/components/mizora/ServicesSection'), { ssr: false });
-const WorkflowSection = dynamic(() => import('@/components/mizora/WorkflowSection'), { ssr: false });
-const RatecardSection = dynamic(() => import('@/components/mizora/RatecardSection'), { ssr: false });
-const PortfolioSection = dynamic(() => import('@/components/mizora/PortfolioSection'), { ssr: false });
-const FaqSection = dynamic(() => import('@/components/mizora/FaqSection'), { ssr: false });
-const AboutSection = dynamic(() => import('@/components/mizora/AboutSection'), { ssr: false });
-const ContactSection = dynamic(() => import('@/components/mizora/ContactSection'), { ssr: false });
-const Footer = dynamic(() => import('@/components/mizora/Footer'), { ssr: false });
+const EcosystemSection: any = dynamic(() => import('@/components/mizora/EcosystemSection'), { ssr: false });
+const ServicesSection: any = dynamic(() => import('@/components/mizora/ServicesSection'), { ssr: false });
+const WorkflowSection: any = dynamic(() => import('@/components/mizora/WorkflowSection'), { ssr: false });
+const ImplementationSection: any = dynamic(() => import('@/components/mizora/ImplementationSection'), { ssr: false });
+const RatecardSection: any = dynamic(() => import('@/components/mizora/RatecardSection'), { ssr: false });
+const PortfolioSection: any = dynamic(() => import('@/components/mizora/PortfolioSection'), { ssr: false });
+const FaqSection: any = dynamic(() => import('@/components/mizora/FaqSection'), { ssr: false });
+const AboutSection: any = dynamic(() => import('@/components/mizora/AboutSection'), { ssr: false });
+const ContactSection: any = dynamic(() => import('@/components/mizora/ContactSection'), { ssr: false });
+const Footer: any = dynamic(() => import('@/components/mizora/Footer'), { ssr: false });
 
 export default function Home() {
   const [lang, setLang] = useState<Language>('id');
@@ -300,8 +301,9 @@ export default function Home() {
           <section id="services">
             <EcosystemSection t={t} lang={lang} />
             <ServicesSection t={t} lang={lang} />
+            <WorkflowSection t={t} lang={lang} />
+            <ImplementationSection t={t} lang={lang} />
           </section>
-          <WorkflowSection t={t} lang={lang} />
           <RatecardSection t={t} lang={lang} />
           <PortfolioSection t={t} lang={lang} />
           <FaqSection t={t} lang={lang} />
