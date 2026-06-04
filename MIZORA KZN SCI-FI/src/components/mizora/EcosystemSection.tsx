@@ -18,10 +18,10 @@ const GLITCH_MS = 600;
 const CJK_REGEX = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uffef\u4e00-\u9faf\u3400-\u4dbf]/;
 function hasCJK(text: string): boolean { return CJK_REGEX.test(text); }
 
-// ─── System accent colors ───
+// ─── System accent colors — emerald shades only (B&W + green constraint) ───
 const SYSTEM_ACCENTS: Record<string, string> = {
-  macs: '#10b981', macps: '#a855f7', matls: '#f59e0b', masdm: '#ef4444',
-  maobs: '#06b6d4', maovds: '#10b981', malvcs: '#8b5cf6', maubs: '#f97316',
+  macs: '#10b981', macps: '#34d399', matls: '#059669', masdm: '#6ee7b7',
+  maobs: '#047857', maovds: '#10b981', malvcs: '#34d399', maubs: '#059669',
 };
 
 // ─── MACS Detailed Data ───
@@ -590,9 +590,9 @@ const MAUBS_DETAIL: MaubsDetailData = {
 
 function SectionLabel({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
   return (
-    <div className="eco-section-label flex items-center gap-2 mb-3">
-      <Icon className="w-3 h-3 text-neutral-400" />
-      <span className="text-[8px] text-neutral-400 font-bold tracking-[0.15em] uppercase" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+    <div className="noc-section-label flex items-center gap-2 mb-3">
+      <Icon className="w-3 h-3 text-emerald-500/60" />
+      <span className="text-[8px] text-emerald-500/70 font-bold tracking-[0.15em] uppercase" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
         {children}
       </span>
     </div>
@@ -603,38 +603,34 @@ function Mono({ children, className = '' }: { children: React.ReactNode; classNa
   return <span className={className} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{children}</span>;
 }
 
-function Mhosoc({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <span className={className} style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}>{children}</span>;
-}
-
-// ─── Section Divider ───
+// ─── Section Divider (NOC themed) ───
 function SectionDivider({ variant = 'hash' }: { variant?: 'hash' | 'dot' | 'double' }) {
-  if (variant === 'dot') return <div className="eco-dot-line-sep my-1" />;
-  if (variant === 'double') return <div className="eco-double-line-sep my-1" />;
-  return <div className="eco-hash-sep my-4" />;
+  if (variant === 'dot') return <div className="noc-dot-line-sep my-1" />;
+  if (variant === 'double') return <div className="noc-double-line-sep my-1" />;
+  return <div className="noc-hash-sep my-4" />;
 }
 
-// ─── Mini Data Bar ───
+// ─── Mini Data Bar (NOC themed) ───
 function DataBar({ value, max = 100 }: { value: number; max?: number }) {
   const pct = Math.min(100, Math.max(0, (value / max) * 100));
   return (
-    <div className="eco-data-bar w-full mt-1.5">
-      <div className="eco-data-bar-fill" style={{ width: `${pct}%` }} />
+    <div className="noc-data-bar w-full mt-1.5">
+      <div className="noc-data-bar-fill" style={{ width: `${pct}%` }} />
     </div>
   );
 }
 
 
 
-// Agent accent colors for visual distinction
+// Agent accent colors — emerald shades only (B&W + green constraint)
 const AGENT_COLORS: Record<string, string> = {
-  'Ryn Kaizen': '#3b82f6',
-  'Azyra Nozora': '#ec4899',
-  'Zyrahn Itsuro': '#8b5cf6',
-  'Nyvara Reine': '#6366f1',
-  'Cloud Varell': '#f59e0b',
-  'Veyra Synne': '#06b6d4',
-  'Kairen Vox': '#10b981',
+  'Ryn Kaizen': '#10b981',
+  'Azyra Nozora': '#34d399',
+  'Zyrahn Itsuro': '#059669',
+  'Nyvara Reine': '#6ee7b7',
+  'Cloud Varell': '#047857',
+  'Veyra Synne': '#10b981',
+  'Kairen Vox': '#34d399',
 };
 
 function getAgentColor(name: string): string {
@@ -705,30 +701,84 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
   };
 
 
+  // Helper: get detail data
+  const getDetail = () => (isMacs ? MACS_DETAIL : isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL);
+
   return (
-    <div className="relative py-20 md:py-28 bg-white overflow-hidden">
+    <div className="relative py-20 md:py-28 overflow-hidden" style={{ background: '#ECECF0' }}>
+      {/* Section top edge */}
+      <div className="noc-section-edge" />
+      {/* Dot grid */}
+      <div className="noc-dot-grid absolute inset-0 pointer-events-none" />
+      {/* Radial glow */}
+      <div className="noc-radial-glow" />
+      {/* Side accents */}
+      <div className="noc-side-accent-left" />
+      <div className="noc-side-accent-right" />
+
+      {/* SVG Noise texture overlay */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.025] z-[0]" aria-hidden="true">
+        <filter id="eco-noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" /></filter>
+        <rect width="100%" height="100%" filter="url(#eco-noise)" />
+      </svg>
+
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
 
         {/* ─── Section Header ─── */}
         <div className="mb-14 md:mb-18">
+          {/* Terminal command line */}
           <div className="flex items-center gap-3 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A] sci-fi-pulse shrink-0" />
-            <Mono className="text-[10px] text-neutral-500 tracking-[0.25em] uppercase font-bold">01 // ECOSYSTEM ARCHITECTURE</Mono>
-            <span className="flex-1 h-px bg-neutral-200" />
-            <Mono className="text-[9px] text-neutral-400 tracking-[0.2em] uppercase font-bold">8 SYSTEMS</Mono>
-          </div>
-          <h2 className="font-sans font-black text-3xl md:text-5xl text-black tracking-tighter uppercase mb-5">
-            MIZORA{' '}
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+            <Mono className="text-[10px] text-black tracking-[0.25em] uppercase font-bold">&gt; SECTOR_01 // ECOSYSTEM ARCHITECTURE</Mono>
+            <span className="flex-1 h-px bg-black/10" />
+            <Mono className="text-[9px] text-neutral-500 tracking-[0.2em] uppercase font-bold">8 SYSTEMS</Mono>
             <span
-              className={`inline-block ${isGlitching ? 'glitch-active' : ''} ${useKanjiFont ? 'font-kanji' : ''}`}
+              className="inline-block w-[6px] h-[14px] bg-emerald-500 ml-1"
+              style={{ animation: 'noc-cursor-blink 0.8s step-end infinite' }}
+            />
+          </div>
+          {/* Headline with Orbitron */}
+          <h2 className="font-black text-[2.8rem] md:text-7xl text-black tracking-tight leading-[0.92]" style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}>
+            <span className="block uppercase">MIZORA</span>
+            <span
+              className={`block uppercase ${isGlitching ? 'glitch-active' : ''} ${useKanjiFont ? 'font-kanji' : ''}`}
               style={{ minWidth: useKanjiFont ? '2.5ch' : '9ch', letterSpacing: useKanjiFont ? '0.08em' : undefined, transition: 'letter-spacing 0.3s ease' }}
             >
               {displayText}
             </span>
           </h2>
-          <p className="font-sans font-medium text-sm md:text-base text-neutral-500 leading-relaxed max-w-3xl">
-            {t.ecosystem.subtitle}
-          </p>
+          {/* Emerald decorative line */}
+          <div className="noc-headline-line" />
+          {/* Micro data readout */}
+          <div className="flex items-center gap-4 mt-5">
+            <p className="font-sans font-medium text-sm md:text-base text-neutral-500 leading-relaxed max-w-3xl flex-1">
+              {t.ecosystem.subtitle}
+            </p>
+            <div className="hidden md:flex items-center gap-2 shrink-0">
+              <span className="w-1 h-1 rounded-full bg-emerald-500/40" />
+              <span className="w-1 h-1 rounded-full bg-emerald-500/30" />
+              <span className="w-1 h-1 rounded-full bg-emerald-500/20" />
+              <Mono className="text-[8px] text-neutral-400 tracking-[0.15em] uppercase font-bold">ALL SYSTEMS NOMINAL</Mono>
+            </div>
+          </div>
+          {/* Micro data readout line */}
+          <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <span
+                  key={i}
+                  className={`w-[4px] h-[4px] rounded-full ${i < 5 ? 'bg-emerald-500/70' : 'bg-neutral-300/60'}`}
+                />
+              ))}
+            </div>
+            <Mono className="text-[7px] text-neutral-400 tracking-[0.2em] uppercase font-bold">
+              NET.STATUS // V2.4.1
+            </Mono>
+            <span className="flex-1 h-px bg-neutral-200/50" />
+            <Mono className="text-[7px] text-emerald-600/50 tracking-[0.15em] uppercase font-bold">
+              ● ONLINE
+            </Mono>
+          </div>
         </div>
 
         {/* ─── Main Content Grid ─── */}
@@ -738,43 +788,63 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
           <div className="lg:col-span-7">
             <ScrollReveal yOffset={20}>
               <div ref={cardsGridRef} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {t.ecosystem.systems.map((system) => {
+                {t.ecosystem.systems.map((system, sysIdx) => {
                   const isSelected = selectedSystem.id === system.id;
-                  const sysAccent = SYSTEM_ACCENTS[system.id] || '#0A0A0A';
                   return (
-                    <button
+                    <motion.button
                       key={system.id}
                       onClick={() => { setSelectedSystem(system); }}
-                      className={`relative cursor-pointer text-left transition-all duration-350 rounded-lg ${isSelected ? 'eco-card-selected' : 'eco-card'}`}
+                      className={`relative cursor-pointer text-left w-full ${isSelected ? 'noc-card-selected' : 'noc-card'}`}
+                      whileHover={!isSelected ? { y: -4 } : {}}
+                      whileTap={!isSelected ? { scale: 0.98 } : {}}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      <div className={`m-[3px] p-4 rounded-md ${isSelected ? 'eco-card-selected-inner' : 'eco-card-inner'}`}>
+                      {/* Corner accent marks for selected card */}
+                      {isSelected && (
+                        <>
+                          <span className="noc-card-corner noc-card-corner-tl" />
+                          <span className="noc-card-corner noc-card-corner-tr" />
+                          <span className="noc-card-corner noc-card-corner-bl" />
+                          <span className="noc-card-corner noc-card-corner-br" />
+                        </>
+                      )}
+                      <div className="p-4">
                         <div className="flex items-start justify-between mb-3.5">
-                          <div className={`w-9 h-9 rounded-md flex items-center justify-center transition-all duration-350 ${isSelected ? 'eco-icon-selected' : 'eco-icon-normal'}`}>
-                            {getSystemIcon(system.id, isSelected ? 'text-emerald-400' : 'text-neutral-500', 'w-4 h-4')}
+                          {/* Icon container */}
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-350 ${isSelected ? 'noc-icon-selected' : 'noc-icon-normal'}`}>
+                            {getSystemIcon(system.id, isSelected ? 'text-emerald-400' : 'text-black', 'w-4.5 h-4.5')}
                           </div>
+                          {/* Status indicator */}
                           <div className="flex items-center gap-1.5">
                             {isSelected ? (
-                              <><span className="w-1.5 h-1.5 rounded-full bg-emerald-400 sci-fi-pulse" /><Mono className="text-[8px] text-emerald-400/70 font-bold tracking-[0.15em] uppercase">ACTIVE</Mono></>
+                              <>
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 noc-pulse-dot" />
+                                <Mono className="text-[8px] text-emerald-400 font-bold tracking-[0.15em] uppercase">ONLINE</Mono>
+                              </>
                             ) : (
-                              <Mono className="text-[8px] text-neutral-400 font-bold tracking-[0.15em] uppercase">{system.id.toUpperCase()}</Mono>
+                              <>
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
+                                <Mono className="text-[8px] text-neutral-500 font-bold tracking-[0.15em] uppercase">ACTIVE</Mono>
+                              </>
                             )}
                           </div>
                         </div>
+                        {/* System name */}
                         <div className="mb-3">
-                          <Mhosoc className={`text-[9px] font-bold tracking-[0.2em] uppercase mb-0.5 ${isSelected ? 'text-white/40' : 'text-neutral-400'}`}>{system.abbrev}</Mhosoc>
+                          <Mono className={`text-[9px] font-bold tracking-[0.2em] uppercase mb-0.5 ${isSelected ? 'text-emerald-400/70' : 'text-neutral-500'}`}>{system.abbrev}</Mono>
                           <h3 className={`font-sans font-extrabold text-[13px] leading-snug tracking-tight ${isSelected ? 'text-white' : 'text-black'}`}>{system.name}</h3>
                         </div>
-                        <div className={`flex items-center justify-between w-full pt-2.5 border-t ${isSelected ? 'border-white/8' : 'border-black/5'}`}>
-                          <Mono className={`text-[8px] tracking-[0.12em] uppercase font-medium truncate mr-2 ${isSelected ? 'text-white/30' : 'text-neutral-400'}`}>{system.tagline}</Mono>
-                          <div className="flex items-center gap-1">
-                            {!isSelected && <span className="w-1 h-1 rounded-full" style={{ backgroundColor: sysAccent, opacity: 0.6 }} />}
-                            <Mono className={`text-[8px] font-extrabold tracking-[0.15em] uppercase shrink-0 ${isSelected ? 'text-emerald-400' : 'text-neutral-300'}`}>
-                              {isSelected ? system.status.toUpperCase() : `[${system.status}]`}
+                        {/* Bottom bar */}
+                        <div className={`flex items-center justify-between w-full pt-2.5 border-t ${isSelected ? 'border-white/8' : 'border-black/6'}`}>
+                          <Mono className={`text-[8px] tracking-[0.12em] uppercase font-medium truncate mr-2 ${isSelected ? 'text-white/50' : 'text-neutral-400'}`}>{system.tagline}</Mono>
+                          <div className="flex items-center gap-1.5">
+                            <Mono className={`text-[8px] font-bold tracking-[0.12em] uppercase shrink-0 ${isSelected ? 'text-emerald-400/80' : 'text-neutral-400'}`}>
+                              {isSelected ? system.status.toUpperCase() : `SYS_${String(sysIdx + 1).padStart(2, '0')}`}
                             </Mono>
                           </div>
                         </div>
                       </div>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -785,7 +855,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
           <div className="lg:col-span-5">
             <ScrollReveal yOffset={20} delay={0.1}>
               <div
-                className="eco-detail-panel flex flex-col"
+                className="noc-detail-panel flex flex-col"
                 style={detailMaxH ? { maxHeight: `${detailMaxH}px`, height: `${detailMaxH}px` } : undefined}
               >
                 <AnimatePresence mode="wait">
@@ -798,43 +868,37 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                     className="flex flex-col min-h-0"
                     style={detailMaxH ? { height: `${detailMaxH}px` } : undefined}
                   >
-                      <span className="eco-detail-bracket-top" /><span className="eco-detail-bracket-bottom" />
-                      <div className="eco-glitch-line-overlay" />
-                      <div className="eco-holo-shimmer-overlay" />
-
+                      {/* Decorative overlays */}
+                      <div className="noc-glitch-line-overlay" />
+                      <div className="noc-holo-shimmer-overlay" />
 
                       {/* ── HEADER ── */}
-                      <div className="eco-detail-header px-5 py-4">
-                        <div className="eco-header-scanline" />
+                      <div className="noc-detail-header px-5 py-4">
+                        <div className="noc-header-scanline" />
                         <div className="flex items-center gap-3.5">
-                          <div
-                            className="w-10 h-10 rounded-md flex items-center justify-center shrink-0"
-                            style={{
-                              background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04) 100%)',
-                              border: '1px solid rgba(16,185,129,0.15)',
-                              boxShadow: '0 0 12px rgba(16,185,129,0.08)',
-                            }}
-                          >
+                          {/* Icon */}
+                          <div className="noc-icon-selected w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
                             {getSystemIcon(selectedSystem.id, 'text-white', 'w-4.5 h-4.5')}
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 mb-0.5">
-                              <Mhosoc className="text-[9px] font-bold tracking-[0.2em] uppercase text-neutral-500">{selectedSystem.abbrev}</Mhosoc>
-                              <Mono className="text-[8px] font-bold tracking-[0.15em] uppercase text-neutral-400">{selectedSystem.status.toUpperCase()}</Mono>
-                              <Mono className="text-[7px] font-bold tracking-[0.12em] uppercase text-emerald-500/50">v1.0</Mono>
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                              <Mono className="text-[9px] font-bold tracking-[0.2em] uppercase text-neutral-400">{selectedSystem.abbrev}</Mono>
+                              <Mono className="text-[8px] font-bold tracking-[0.15em] uppercase text-emerald-400">{selectedSystem.status.toUpperCase()}</Mono>
+                              <Mono className="text-[7px] font-bold tracking-[0.12em] uppercase text-emerald-500/70">v1.0</Mono>
                             </div>
                             <h3 className="font-sans font-black text-[13px] text-white leading-tight uppercase truncate">{selectedSystem.name}</h3>
                           </div>
                           {/* Activity Waveform */}
-                          <svg className="eco-waveform-svg shrink-0" width="40" height="16" viewBox="0 0 40 16">
-                            <path d="M0 8 Q5 2 10 8 Q15 14 20 8 Q25 2 30 8 Q35 14 40 8" fill="none" stroke="rgba(16,185,129,0.3)" strokeWidth="1" strokeDasharray="4 2" style={{ animation: 'eco-waveform 2s linear infinite' }} />
+                          <svg className="noc-waveform-svg shrink-0" width="40" height="16" viewBox="0 0 40 16">
+                            <path d="M0 8 Q5 2 10 8 Q15 14 20 8 Q25 2 30 8 Q35 14 40 8" fill="none" stroke="rgba(16,185,129,0.3)" strokeWidth="1" strokeDasharray="4 2" style={{ animation: 'noc-waveform 2s linear infinite' }} />
                           </svg>
                         </div>
                       </div>
 
                       {/* ── BODY ── */}
-                      <div className="eco-detail-inner flex-1 min-h-0 overflow-y-auto eco-detail-scroll">
-                        <motion.div 
+                      <div className="noc-detail-inner flex-1 min-h-0 overflow-y-auto noc-detail-scroll">
+                        <motion.div
                           className="px-5 py-5 space-y-5 relative z-[1]"
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -847,12 +911,12 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           {/* DESCRIPTION */}
                           {hasDetail ? (
                             <div className="space-y-2.5 relative z-[1]">
-                              {(isMacs ? MACS_DETAIL : isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).longDescription.map((p, i) => (
-                                <p key={i} className="font-sans text-neutral-400 text-[12px] leading-relaxed">{p}</p>
+                              {getDetail().longDescription.map((p, i) => (
+                                <p key={i} className="font-sans text-neutral-300 text-[12px] leading-relaxed">{p}</p>
                               ))}
                             </div>
                           ) : (
-                            <p className="font-sans text-neutral-400 text-[12px] leading-relaxed relative z-[1]">{selectedSystem.description}</p>
+                            <p className="font-sans text-neutral-300 text-[12px] leading-relaxed relative z-[1]">{selectedSystem.description}</p>
                           )}
 
                           <SectionDivider variant="dot" />
@@ -861,7 +925,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           <div>
                             <SectionLabel icon={Activity}>System Status</SectionLabel>
                             <div className="grid grid-cols-3 gap-2">
-                              <div className="eco-status-v2 p-2.5 rounded-md">
+                              <div className="noc-status-block p-2.5 rounded-md">
                                 <Mono className="text-[7px] text-neutral-400 uppercase tracking-[0.15em] block mb-1.5 font-bold">Status</Mono>
                                 <div className="flex items-center gap-1.5">
                                   <div>
@@ -873,12 +937,12 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                                   </div>
                                 </div>
                               </div>
-                              <div className="eco-status-v2 p-2.5 rounded-md">
+                              <div className="noc-status-block p-2.5 rounded-md">
                                 <Mono className="text-[7px] text-neutral-400 uppercase tracking-[0.15em] block mb-1.5 font-bold">Version</Mono>
                                 <Mono className="text-[10px] font-bold text-white">v1.0</Mono>
                                 <DataBar value={100} />
                               </div>
-                              <div className="eco-status-v2 p-2.5 rounded-md">
+                              <div className="noc-status-block p-2.5 rounded-md">
                                 <Mono className="text-[7px] text-neutral-400 uppercase tracking-[0.15em] block mb-1.5 font-bold">{isMacs ? 'Agent' : 'Category'}</Mono>
                                 <Mono className="text-[10px] font-bold text-white">{isMacs ? '7 Active' : isMacps ? 'Storytelling' : isMatls ? 'Thinking' : isMasdm ? 'Music' : isMaobs ? 'Architecture' : isMaovds ? 'Visual' : isMalvcs ? 'Cinematic' : 'UI/UX'}</Mono>
                                 <DataBar value={isMacs ? 87 : 75} />
@@ -893,18 +957,18 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                             <SectionLabel icon={Activity}>{lang === 'id' ? 'Arsitektur Inti' : 'Core Architecture'}</SectionLabel>
                             <div className="flex flex-col gap-1">
                               {selectedSystem.architecture.map((arch, idx) => (
-                                <div key={idx} className="eco-arch-row-v2 flex items-start gap-2.5 py-2.5 px-3 rounded-md">
-                                  <Mono className="text-[8px] text-neutral-400 font-bold tracking-wider shrink-0 mt-px">{String(idx + 1).padStart(2, '0')}</Mono>
+                                <div key={idx} className="noc-arch-row flex items-start gap-2.5 py-2.5 px-3 rounded-md">
+                                  <Mono className="text-[8px] text-emerald-500/70 font-bold tracking-wider shrink-0 mt-px">{String(idx + 1).padStart(2, '0')}</Mono>
                                   <div className="min-w-0">
                                     <span className="font-sans font-bold text-[11px] text-white uppercase block leading-tight">{arch}</span>
-                                    {hasDetail && idx < (isMacs ? MACS_DETAIL : isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).architectureDescriptions.length && (
-                                      <span className="font-sans text-[9px] text-neutral-400 leading-snug block mt-0.5">
-                                        {(isMacs ? MACS_DETAIL : isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).architectureDescriptions[idx]}
+                                    {hasDetail && idx < getDetail().architectureDescriptions.length && (
+                                      <span className="font-sans text-[9px] text-neutral-300 leading-snug block mt-0.5">
+                                        {getDetail().architectureDescriptions[idx]}
                                       </span>
                                     )}
                                   </div>
                                   <div className="flex flex-col items-end gap-1 shrink-0 mt-0.5">
-                                    <Zap className="w-2.5 h-2.5 text-emerald-500/40" />
+                                    <Zap className="w-2.5 h-2.5 text-emerald-500/70" />
                                     <DataBar value={100 - idx * 20} />
                                   </div>
                                 </div>
@@ -920,23 +984,23 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Cpu}>AI Agents</SectionLabel>
                               <div className="flex flex-col gap-1.5">
                                 {MACS_DETAIL.agents.map((agent, idx) => (
-                                  <div key={idx} className="eco-agent-card-v2 p-3 rounded-md">
+                                  <div key={idx} className="noc-agent-card p-3 rounded-md">
                                     <div className="flex items-start gap-2.5">
                                       <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0 mt-0.5"
                                         style={{
-                                          background: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
-                                          border: '1px solid rgba(255,255,255,0.06)',
+                                          background: `linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 100%)`,
+                                          border: '1px solid rgba(16,185,129,0.1)',
                                           boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.2)'
                                         }}
                                       >
-                                        <agent.icon className="w-3.5 h-3.5 text-neutral-400" />
+                                        <agent.icon className="w-3.5 h-3.5 text-neutral-300" />
                                       </div>
                                       <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2 mb-0.5">
                                           <Mono className="text-[9px] font-bold tracking-[0.12em] uppercase text-white">{agent.name}</Mono>
+                                          <span className="text-[7px] tracking-[0.1em] uppercase font-bold text-emerald-400/60 bg-emerald-500/8 px-1.5 py-0.5 rounded" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{agent.role}</span>
                                         </div>
-                                        <Mono className="text-[7px] text-neutral-400 tracking-[0.1em] uppercase font-bold block mb-1">{agent.role}</Mono>
-                                        <p className="font-sans text-[10px] text-neutral-500 leading-relaxed">{agent.description}</p>
+                                        <p className="font-sans text-[10px] text-neutral-400 leading-relaxed">{agent.description}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -952,10 +1016,10 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                             <div>
                               <SectionLabel icon={Zap}>Core Capabilities</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
-                                {(isMacs ? MACS_DETAIL : isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).capabilities.map((cap, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                {getDetail().capabilities.map((cap, idx) => (
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{cap.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{cap.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{cap.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -969,7 +1033,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                             <SectionLabel icon={Cpu}>{lang === 'id' ? 'Sub Modul' : 'Sub Modules'}</SectionLabel>
                             <div className="flex flex-wrap gap-1.5">
                               {selectedSystem.modules.map((mod, idx) => (
-                                <span key={idx} className="eco-module-chip py-1 px-2.5 text-neutral-600 text-[8px] uppercase tracking-[0.12em] rounded-md font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{mod}</span>
+                                <span key={idx} className="noc-module-chip py-1 px-2.5 text-neutral-300 text-[8px] uppercase tracking-[0.12em] rounded-md font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{mod}</span>
                               ))}
                             </div>
                           </div>
@@ -982,9 +1046,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Film}>Visual Framework</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MACPS_DETAIL.visualFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -997,9 +1061,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Hexagon}>Specialization</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {(isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).specialization.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1010,10 +1074,10 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           {isMacps && (
                             <div>
                               <SectionLabel icon={Palette}>Visual Canon</SectionLabel>
-                              <div className="eco-philosophy-v2 rounded-md p-4 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                <Mono className="text-[9px] text-neutral-500 tracking-[0.2em] uppercase font-bold block mb-2">{MACPS_DETAIL.visualCanon.title}</Mono>
-                                <p className="font-sans text-[11px] text-neutral-500 leading-relaxed mb-2">{MACPS_DETAIL.visualCanon.description}</p>
+                              <div className="noc-philosophy-block rounded-md p-4 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+                                <Mono className="text-[9px] text-neutral-400 tracking-[0.2em] uppercase font-bold block mb-2">{MACPS_DETAIL.visualCanon.title}</Mono>
+                                <p className="font-sans text-[11px] text-neutral-400 leading-relaxed mb-2">{MACPS_DETAIL.visualCanon.description}</p>
                                 <div className="space-y-1.5">
                                   {MACPS_DETAIL.visualCanon.lines.map((line, idx) => (
                                     <p key={idx} className="font-sans text-[10px] text-neutral-400 leading-relaxed">{line}</p>
@@ -1029,9 +1093,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Cpu}>Thinking Framework</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MATLS_DETAIL.thinkingFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1044,9 +1108,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Eye}>Interaction Model</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MATLS_DETAIL.interactionModel.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1059,9 +1123,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Sliders}>Communication Style</SectionLabel>
                               <div className="grid grid-cols-3 gap-1.5">
                                 {MATLS_DETAIL.communicationStyle.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1074,9 +1138,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Music}>Creative Framework</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MASDM_DETAIL.creativeFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1089,7 +1153,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Sparkles}>Creative Outputs</SectionLabel>
                               <div className="flex flex-wrap gap-1.5">
                                 {MASDM_DETAIL.creativeOutputs.map((item, idx) => (
-                                  <span key={idx} className="eco-module-chip py-1 px-2.5 text-neutral-600 text-[8px] uppercase tracking-[0.12em] rounded-md font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{item}</span>
+                                  <span key={idx} className="noc-module-chip py-1 px-2.5 text-neutral-300 text-[8px] uppercase tracking-[0.12em] rounded-md font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{item}</span>
                                 ))}
                               </div>
                             </div>
@@ -1101,9 +1165,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Hexagon}>Build Framework</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MAOBS_DETAIL.buildFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1116,9 +1180,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={ShieldCheck}>Design Principles</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MAOBS_DETAIL.designPrinciples.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1131,9 +1195,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Compass}>Design Framework</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MAOVDS_DETAIL.designFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1146,7 +1210,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Palette}>Design Domains</SectionLabel>
                               <div className="flex flex-wrap gap-1.5">
                                 {MAOVDS_DETAIL.designDomains.map((item, idx) => (
-                                  <span key={idx} className="eco-module-chip py-1 px-2.5 text-neutral-600 text-[8px] uppercase tracking-[0.12em] rounded-md font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{item}</span>
+                                  <span key={idx} className="noc-module-chip py-1 px-2.5 text-neutral-300 text-[8px] uppercase tracking-[0.12em] rounded-md font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{item}</span>
                                 ))}
                               </div>
                             </div>
@@ -1158,9 +1222,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={ShieldCheck}>Quality Control</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MAOVDS_DETAIL.qualityControl.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1173,9 +1237,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Eye}>Visual Framework</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MALVCS_DETAIL.visualFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1188,9 +1252,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Film}>Cinematic Components</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MALVCS_DETAIL.cinematicComponents.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1203,9 +1267,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={ShieldCheck}>Quality Control</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MALVCS_DETAIL.qualityControl.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1216,10 +1280,10 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           {isMalvcs && (
                             <div>
                               <SectionLabel icon={Sparkles}>Signature Style</SectionLabel>
-                              <div className="eco-philosophy-v2 rounded-md p-4 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                <Mono className="text-[9px] text-neutral-500 tracking-[0.2em] uppercase font-bold block mb-2">{MALVCS_DETAIL.signatureStyle.title}</Mono>
-                                <p className="font-sans text-[11px] text-neutral-500 leading-relaxed mb-2">{MALVCS_DETAIL.signatureStyle.description}</p>
+                              <div className="noc-philosophy-block rounded-md p-4 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+                                <Mono className="text-[9px] text-neutral-400 tracking-[0.2em] uppercase font-bold block mb-2">{MALVCS_DETAIL.signatureStyle.title}</Mono>
+                                <p className="font-sans text-[11px] text-neutral-400 leading-relaxed mb-2">{MALVCS_DETAIL.signatureStyle.description}</p>
                                 <div className="space-y-1.5">
                                   {MALVCS_DETAIL.signatureStyle.lines.map((line, idx) => (
                                     <p key={idx} className="font-sans text-[10px] text-neutral-400 leading-relaxed">{line}</p>
@@ -1235,9 +1299,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={Sliders}>Product Design Framework</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MAUBS_DETAIL.productDesignFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1250,9 +1314,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={BrainCircuit}>Design Intelligence</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MAUBS_DETAIL.designIntelligence.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1265,9 +1329,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={ShieldCheck}>Quality Standards</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
                                 {MAUBS_DETAIL.qualityStandards.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
+                                  <div key={idx} className="noc-cap-card p-2.5 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{item.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1280,158 +1344,9 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <SectionLabel icon={ChevronRight}>{isMacs ? 'Activation Mode' : isMacps ? 'Production Modes' : isMasdm ? 'Song Development Process' : 'Operation Modes'}</SectionLabel>
                               <div className="flex flex-col gap-1.5">
                                 {(isMacs ? MACS_DETAIL.activationModes : isMacps ? MACPS_DETAIL.productionModes : isMasdm ? MASDM_DETAIL.songDevelopmentProcess : MAOBS_DETAIL.operationModes).map((mode, idx) => (
-                                  <div key={idx} className="eco-mode-card-v2 p-3 rounded-md">
+                                  <div key={idx} className="noc-mode-card p-3 rounded-md">
                                     <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{mode.name}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{mode.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── DESIGN FRAMEWORK (MAOVDS only) ── */}
-                          {isMaovds && (
-                            <div>
-                              <SectionLabel icon={Compass}>Design Framework</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MAOVDS_DETAIL.designFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── DESIGN DOMAINS (MAOVDS only) ── */}
-                          {isMaovds && (
-                            <div>
-                              <SectionLabel icon={Palette}>Design Domains</SectionLabel>
-                              <div className="flex flex-wrap gap-1.5">
-                                {MAOVDS_DETAIL.designDomains.map((item, idx) => (
-                                  <span key={idx} className="eco-module-chip py-1 px-2.5 text-neutral-600 text-[8px] uppercase tracking-[0.12em] rounded-md font-bold" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{item}</span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── QUALITY CONTROL (MAOVDS only) ── */}
-                          {isMaovds && (
-                            <div>
-                              <SectionLabel icon={ShieldCheck}>Quality Control</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MAOVDS_DETAIL.qualityControl.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── VISUAL FRAMEWORK (MALVCS only) ── */}
-                          {isMalvcs && (
-                            <div>
-                              <SectionLabel icon={Eye}>Visual Framework</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MALVCS_DETAIL.visualFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── CINEMATIC COMPONENTS (MALVCS only) ── */}
-                          {isMalvcs && (
-                            <div>
-                              <SectionLabel icon={Film}>Cinematic Components</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MALVCS_DETAIL.cinematicComponents.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── QUALITY CONTROL (MALVCS only) ── */}
-                          {isMalvcs && (
-                            <div>
-                              <SectionLabel icon={ShieldCheck}>Quality Control</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MALVCS_DETAIL.qualityControl.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── SIGNATURE STYLE (MALVCS only) ── */}
-                          {isMalvcs && (
-                            <div>
-                              <SectionLabel icon={Sparkles}>Signature Style</SectionLabel>
-                              <div className="eco-philosophy-v2 rounded-md p-4 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                <Mono className="text-[9px] text-neutral-500 tracking-[0.2em] uppercase font-bold block mb-2">{MALVCS_DETAIL.signatureStyle.title}</Mono>
-                                <p className="font-sans text-[11px] text-neutral-500 leading-relaxed mb-2">{MALVCS_DETAIL.signatureStyle.description}</p>
-                                <div className="space-y-1.5">
-                                  {MALVCS_DETAIL.signatureStyle.lines.map((line, idx) => (
-                                    <p key={idx} className="font-sans text-[10px] text-neutral-400 leading-relaxed">{line}</p>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── PRODUCT DESIGN FRAMEWORK (MAUBS only) ── */}
-                          {isMaubs && (
-                            <div>
-                              <SectionLabel icon={Sliders}>Product Design Framework</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MAUBS_DETAIL.productDesignFramework.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── DESIGN INTELLIGENCE (MAUBS only) ── */}
-                          {isMaubs && (
-                            <div>
-                              <SectionLabel icon={BrainCircuit}>Design Intelligence</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MAUBS_DETAIL.designIntelligence.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* ── QUALITY STANDARDS (MAUBS only) ── */}
-                          {isMaubs && (
-                            <div>
-                              <SectionLabel icon={ShieldCheck}>Quality Standards</SectionLabel>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {MAUBS_DETAIL.qualityStandards.map((item, idx) => (
-                                  <div key={idx} className="eco-cap-card-v2 p-2.5 rounded-md">
-                                    <h4 className="font-sans font-bold text-[10px] text-white leading-tight mb-0.5">{item.title}</h4>
-                                    <p className="font-sans text-[9px] text-neutral-500 leading-relaxed">{item.description}</p>
+                                    <p className="font-sans text-[9px] text-neutral-400 leading-relaxed">{mode.description}</p>
                                   </div>
                                 ))}
                               </div>
@@ -1443,24 +1358,26 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                             <div>
                               <SectionLabel icon={Activity}>Positioning</SectionLabel>
                               <div className="grid grid-cols-2 gap-1.5">
-                                <div className="eco-philosophy-v2 rounded-md p-3 relative overflow-hidden">
-                                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                  <Mhosoc className="text-[8px] text-neutral-500 tracking-[0.15em] uppercase font-bold block mb-2">What {selectedSystem.abbrev.toUpperCase()} Is</Mhosoc>
+                                <div className="noc-position-is rounded-md p-3 relative overflow-hidden">
+                                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+                                  <Mono className="text-[8px] text-emerald-400/80 tracking-[0.15em] uppercase font-bold block mb-2">IS ✓</Mono>
                                   <div className="space-y-1">
                                     {(isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).positioning.is.map((item, idx) => (
                                       <div key={idx} className="flex items-center gap-1.5">
-                                        <span className="font-sans text-[10px] text-neutral-600 leading-tight">{item}</span>
+                                        <span className="w-1 h-1 rounded-full bg-emerald-500/50 shrink-0" />
+                                        <span className="font-sans text-[10px] text-neutral-300 leading-tight">{item}</span>
                                       </div>
                                     ))}
                                   </div>
                                 </div>
-                                <div className="eco-philosophy-v2 rounded-md p-3 relative overflow-hidden">
-                                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                  <Mhosoc className="text-[8px] text-neutral-500 tracking-[0.15em] uppercase font-bold block mb-2">What {selectedSystem.abbrev.toUpperCase()} Is Not</Mhosoc>
+                                <div className="noc-position-is-not rounded-md p-3 relative overflow-hidden">
+                                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/15 to-transparent" />
+                                  <Mono className="text-[8px] text-neutral-500 tracking-[0.15em] uppercase font-bold block mb-2">IS NOT ✗</Mono>
                                   <div className="space-y-1">
                                     {(isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).positioning.isNot.map((item, idx) => (
                                       <div key={idx} className="flex items-center gap-1.5">
-                                        <span className="font-sans text-[10px] text-neutral-600 leading-tight">{item}</span>
+                                        <span className="w-1 h-1 rounded-full bg-neutral-600/50 shrink-0" />
+                                        <span className="font-sans text-[10px] text-neutral-500 leading-tight">{item}</span>
                                       </div>
                                     ))}
                                   </div>
@@ -1473,11 +1390,11 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           {hasDetail && (
                             <div>
                               <SectionLabel icon={Eye}>Philosophy</SectionLabel>
-                              <div className="eco-philosophy-v2 rounded-md p-4 relative overflow-hidden">
-                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                <Mono className="text-[9px] text-neutral-500 tracking-[0.2em] uppercase font-bold block mb-3">{(isMacs ? MACS_DETAIL : isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).philosophy.title}</Mono>
+                              <div className="noc-philosophy-block rounded-md p-4 relative overflow-hidden">
+                                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+                                <Mono className="text-[9px] text-neutral-400 tracking-[0.2em] uppercase font-bold block mb-3">{getDetail().philosophy.title}</Mono>
                                 <div className="space-y-2">
-                                  {(isMacs ? MACS_DETAIL : isMacps ? MACPS_DETAIL : isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).philosophy.lines.map((line, idx) => (
+                                  {getDetail().philosophy.lines.map((line, idx) => (
                                     <p key={idx} className="font-sans text-[11px] text-neutral-400 leading-relaxed">{line}</p>
                                   ))}
                                 </div>
@@ -1488,7 +1405,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           {/* ── SYSTEM TAG ── */}
                           <div className="flex items-center justify-between pt-2 relative z-[1]">
                             <div className="flex items-center gap-2">
-                              <Mhosoc className="text-[8px] text-neutral-500 tracking-[0.1em] font-bold">{isMacs ? MACS_DETAIL.systemTag : isMacps ? MACPS_DETAIL.systemTag : isMatls ? MATLS_DETAIL.systemTag : isMasdm ? MASDM_DETAIL.systemTag : isMaobs ? MAOBS_DETAIL.systemTag : isMaovds ? MAOVDS_DETAIL.systemTag : isMalvcs ? MALVCS_DETAIL.systemTag : isMaubs ? MAUBS_DETAIL.systemTag : `[MIZORA_${selectedSystem.abbrev}]`}<span className="inline-block w-[5px] h-[9px] bg-emerald-500/50 ml-0.5 align-middle" style={{ animation: 'eco-cursor-blink 1s step-end infinite' }} /></Mhosoc>
+                              <Mono className="text-[8px] text-neutral-400 tracking-[0.1em] font-bold">{isMacs ? MACS_DETAIL.systemTag : isMacps ? MACPS_DETAIL.systemTag : isMatls ? MATLS_DETAIL.systemTag : isMasdm ? MASDM_DETAIL.systemTag : isMaobs ? MAOBS_DETAIL.systemTag : isMaovds ? MAOVDS_DETAIL.systemTag : isMalvcs ? MALVCS_DETAIL.systemTag : isMaubs ? MAUBS_DETAIL.systemTag : `[MIZORA_${selectedSystem.abbrev}]`}<span className="inline-block w-[5px] h-[9px] bg-emerald-500/50 ml-0.5 align-middle" style={{ animation: 'noc-cursor-blink 1s step-end infinite' }} /></Mono>
                             </div>
                           </div>
 
@@ -1498,7 +1415,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <div className="flex items-center gap-2">
                                 <div>
                                   <Mono className="text-[7px] text-neutral-400 tracking-[0.15em] uppercase font-bold block mb-0.5">Founder & Creator</Mono>
-                                  <span className="font-sans font-bold text-[11px] text-white">{hasDetail ? (isMacs ? MACS_DETAIL.founder : isMacps ? MACPS_DETAIL.founder : isMatls ? MATLS_DETAIL.founder : isMasdm ? MASDM_DETAIL.founder : isMaobs ? MAOBS_DETAIL.founder : isMaovds ? MAOVDS_DETAIL.founder : isMalvcs ? MALVCS_DETAIL.founder : MAUBS_DETAIL.founder) : 'Rendy Awan'}</span>
+                                  <span className="font-sans font-bold text-[11px] text-white">{hasDetail ? getDetail().founder : 'Rendy Awan'}</span>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
@@ -1515,8 +1432,8 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
 
                       {/* ── DECORATIVE SYSTEM BADGE ── */}
                       {hasDetail && (
-                        <div className="shrink-0 px-4 py-4 eco-detail-cta-bar">
-                          <div className="eco-cta-v2 w-full flex items-center justify-center py-3 px-4 select-none relative">
+                        <div className="shrink-0 px-4 py-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div className="noc-cta-badge w-full flex items-center justify-center py-3 px-4 select-none relative">
                             <span className="absolute top-1.5 left-2.5 w-1.5 h-1.5 border-t border-l border-emerald-500/30" />
                             <span className="absolute top-1.5 right-2.5 w-1.5 h-1.5 border-t border-r border-emerald-500/30" />
                             <span className="absolute bottom-1.5 left-2.5 w-1.5 h-1.5 border-b border-l border-emerald-500/30" />

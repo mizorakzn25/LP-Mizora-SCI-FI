@@ -178,7 +178,7 @@ export const translations: Record<'id' | 'en', TranslationSet> = {
           benefit: 'Helps structure and plan digital systems that are more organized, making them easier to use, manage, and develop according to business needs.',
           scope: ['System needs analysis', 'System blueprint preparation', 'Operational structure planning', 'Usage flow preparation', 'Business needs validation', 'System planning refinement'],
           features: ['SYSTEM BLUEPRINT', 'WORKFLOW PLANNING', 'DIGITAL STRUCTURE'],
-          targetMetric: 'MORE DIRECTED IMPLEMENTATION',
+          targetMetric: 'MORE DIRECTED APPLICATION',
           detail: {
             title: 'DIGITAL SYSTEM PLANNING',
             about: 'This service helps design a more structured digital system foundation so that operational processes can run more clearly, efficiently, and be easier to develop in the future.',

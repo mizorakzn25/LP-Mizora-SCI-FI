@@ -1,23 +1,26 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { AnimatePresence } from 'framer-motion';
 import Header from '@/components/mizora/Header';
 import HeroSection from '@/components/mizora/HeroSection';
-import AboutSection from '@/components/mizora/AboutSection';
-import EcosystemSection from '@/components/mizora/EcosystemSection';
-import ServicesSection from '@/components/mizora/ServicesSection';
-import WorkflowSection from '@/components/mizora/WorkflowSection';
-import RatecardSection from '@/components/mizora/RatecardSection';
-import PortfolioSection from '@/components/mizora/PortfolioSection';
-import FaqSection from '@/components/mizora/FaqSection';
-import ContactSection from '@/components/mizora/ContactSection';
-import Footer from '@/components/mizora/Footer';
 import LoadingScreen from '@/components/mizora/LoadingScreen';
 import ScrollToTopButton from '@/components/mizora/ScrollToTopButton';
 
 import { Language } from '@/lib/mizora-types';
 import { translations } from '@/lib/mizora-translations';
+
+// Dynamic imports for heavy components - SSR disabled to reduce server memory usage
+const EcosystemSection = dynamic(() => import('@/components/mizora/EcosystemSection'), { ssr: false });
+const ServicesSection = dynamic(() => import('@/components/mizora/ServicesSection'), { ssr: false });
+const WorkflowSection = dynamic(() => import('@/components/mizora/WorkflowSection'), { ssr: false });
+const RatecardSection = dynamic(() => import('@/components/mizora/RatecardSection'), { ssr: false });
+const PortfolioSection = dynamic(() => import('@/components/mizora/PortfolioSection'), { ssr: false });
+const FaqSection = dynamic(() => import('@/components/mizora/FaqSection'), { ssr: false });
+const AboutSection = dynamic(() => import('@/components/mizora/AboutSection'), { ssr: false });
+const ContactSection = dynamic(() => import('@/components/mizora/ContactSection'), { ssr: false });
+const Footer = dynamic(() => import('@/components/mizora/Footer'), { ssr: false });
 
 export default function Home() {
   const [lang, setLang] = useState<Language>('id');
@@ -243,7 +246,7 @@ export default function Home() {
         {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
 
-      <div className="relative min-h-screen flex flex-col bg-white text-[#0A0A0A] selection:bg-black selection:text-white antialiased overflow-x-hidden">
+      <div className="relative min-h-screen flex flex-col text-[#0A0A0A] selection:bg-black selection:text-white antialiased overflow-x-hidden" style={{ background: '#ECECF0' }}>
         {/* Skip to content link for keyboard navigation */}
         <a
           href="#home"
@@ -262,6 +265,38 @@ export default function Home() {
         
         <main className="relative z-10 font-sans flex-1">
           <HeroSection t={t} lang={lang} isLoading={isLoading} />
+
+          {/* ─── FUD Section Separator ─── */}
+          <div className="relative py-6 md:py-8 overflow-hidden" style={{ background: '#ECECF0' }}>
+            <div className="max-w-7xl mx-auto px-6 md:px-12">
+              {/* Decorative line composition */}
+              <div className="flex items-center gap-0">
+                {/* Left segment — solid */}
+                <div className="h-[2px] w-8 bg-black/80" />
+                {/* Dot node */}
+                <div className="w-1.5 h-1.5 rounded-full bg-black/60 shrink-0" />
+                {/* Center long line — gradient fade */}
+                <div className="flex-1 h-[1px] bg-gradient-to-r from-neutral-300 via-neutral-200 to-neutral-300" />
+                {/* Center diamond */}
+                <div className="w-2 h-2 rotate-45 border border-neutral-300 bg-white shrink-0 mx-3" />
+                {/* Right long line — gradient fade */}
+                <div className="flex-1 h-[1px] bg-gradient-to-r from-neutral-300 via-neutral-200 to-neutral-300" />
+                {/* Dot node */}
+                <div className="w-1.5 h-1.5 rounded-full bg-black/60 shrink-0" />
+                {/* Right segment — solid */}
+                <div className="h-[2px] w-8 bg-black/80" />
+              </div>
+              {/* Sub-labels */}
+              <div className="flex items-center justify-between mt-2.5">
+                <span className="font-mono text-[7px] tracking-[0.2em] uppercase font-bold text-neutral-400">BERANDA</span>
+                <div className="flex items-center gap-2">
+                  <div className="h-[1px] w-6 bg-neutral-200" />
+                  <span className="font-mono text-[7px] tracking-[0.2em] uppercase font-bold text-neutral-400">LAYANAN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <section id="services">
             <EcosystemSection t={t} lang={lang} />
             <ServicesSection t={t} lang={lang} />

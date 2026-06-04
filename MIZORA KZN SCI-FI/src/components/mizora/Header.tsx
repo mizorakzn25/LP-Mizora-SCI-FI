@@ -177,8 +177,8 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
             </div>
             <div className="flex flex-col text-left">
               <span
-                className="text-[#0A0A0A] text-sm tracking-[0.3em] font-medium leading-none"
-                style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}
+                className="text-[#0A0A0A] text-sm tracking-[0.3em] font-bold leading-none"
+                style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}
               >
                 MIZORA KZN
               </span>
@@ -322,8 +322,8 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
                       </div>
                       <div className="flex flex-col">
                         <span
-                          className="text-white text-xs tracking-[0.3em] font-medium leading-none"
-                          style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}
+                          className="text-white text-xs tracking-[0.3em] font-bold leading-none"
+                          style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}
                         >
                           MIZORA KZN
                         </span>

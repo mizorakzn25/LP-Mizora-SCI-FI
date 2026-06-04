@@ -62,24 +62,6 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
   const animRef = useRef<number | null>(null);
   const positionRef = useRef(0);
 
-  // ─── System Status Cycle (ROW 1 — Cycling system abbreviations) ───
-  const SYSTEMS = ['MACS', 'MACPS', 'MATLS', 'MASDM', 'MAOBS', 'MAOVDS', 'MALVCS', 'MAUBS'] as const;
-  const [activeSystemIdx, setActiveSystemIdx] = useState(0);
-  const [systemGlitching, setSystemGlitching] = useState(false);
-
-  useEffect(() => {
-    const CYCLE_MS = 3500;
-    const GLITCH_MS = 300;
-    const interval = setInterval(() => {
-      setSystemGlitching(true);
-      setTimeout(() => {
-        setActiveSystemIdx((prev) => (prev + 1) % SYSTEMS.length);
-        setSystemGlitching(false);
-      }, GLITCH_MS);
-    }, CYCLE_MS);
-    return () => clearInterval(interval);
-  }, []);
-
   // ─── Tag Stream Ticker (ROW 3 — Tags, slower speed) ───
   const tagRef = useRef<HTMLDivElement>(null);
   const tagAnimRef = useRef<number | null>(null);
@@ -800,7 +782,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
               }}
             >
 
-              {/* ─── ROW 1 — System Status Bar (Cycling with MHOSOQ) ─── */}
+              {/* ─── ROW 1 — MACS Status Bar ─── */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={canAnimate ? { opacity: 1 } : { opacity: 0 }}
@@ -819,26 +801,19 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
                   >
                     LIVE
                   </span>
-                  {/* System abbreviation with MHOSOQ font — cycling animation */}
                   <span
-                    className={`text-[9px] tracking-[0.18em] uppercase font-bold ml-1 transition-all duration-200 ${systemGlitching ? 'opacity-0 translate-y-1' : 'opacity-100 translate-y-0'}`}
-                    style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace', color: '#0A0A0A' }}
-                  >
-                    {SYSTEMS[activeSystemIdx]}
-                  </span>
-                  <span
-                    className="text-[8.5px] text-neutral-500 tracking-[0.15em] uppercase font-bold"
+                    className="text-[8.5px] text-neutral-500 tracking-[0.15em] uppercase font-bold ml-1"
                     style={{ fontFamily: '"JetBrains Mono", monospace' }}
                   >
-                    _STATUS: ACTIVE
+                    MACS_STATUS: ACTIVE
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  {/* Segmented dots — progress indicator matching system index */}
+                  {/* Segmented dots — larger */}
                   {Array.from({ length: 8 }).map((_, i) => (
                     <span
-                      key={`sys-dot-${i}`}
-                      className={`w-[3px] h-[3px] rounded-full transition-all duration-300 ${i <= activeSystemIdx ? 'bg-neutral-700' : 'bg-neutral-300'}`}
+                      key={`macs-dot-${i}`}
+                      className={`w-[3px] h-[3px] rounded-full ${i < 5 ? 'bg-neutral-700' : 'bg-neutral-300'}`}
                     />
                   ))}
                   <span
