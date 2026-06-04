@@ -1,0 +1,444 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { Layers, CheckCircle2, ArrowRight, ChevronRight, X, Zap, FileText, Users, Target } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Language, TranslationSet, ServiceItem, ServiceDetail } from '@/lib/mizora-types';
+import ScrollReveal from './ScrollReveal';
+
+interface ServicesSectionProps {
+  t: TranslationSet;
+  lang: Language;
+}
+
+// ─── Sci-fi Scanline Keyframes ───
+const scanlineVariants = {
+  hidden: { opacity: 0, scaleY: 0 },
+  visible: {
+    opacity: 1,
+    scaleY: 1,
+    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: {
+    opacity: 0,
+    scaleY: 0,
+    transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const contentVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: { duration: 0.2 },
+  },
+};
+
+// ─── Service Card Component ───
+function ServiceCard({
+  service,
+  index,
+  lang,
+  viewDetailText,
+  onSelect,
+}: {
+  service: ServiceItem;
+  index: number;
+  lang: Language;
+  viewDetailText: string;
+  onSelect: (service: ServiceItem) => void;
+}) {
+  return (
+    <ScrollReveal yOffset={35} delay={index * 0.08} className="h-full">
+      <div className="p-8 bg-white border border-neutral-200 rounded-sm hover:border-black/30 transition-all duration-300 flex flex-col justify-between relative group widget-3d h-full">
+        {/* Corner accents */}
+        <div className="absolute top-0 right-0 h-4 w-[1px] bg-neutral-200 transition-all group-hover:bg-black/40" />
+        <div className="absolute top-0 right-0 w-4 h-[1px] bg-neutral-200 transition-all group-hover:bg-black/40" />
+
+        <div className="text-left w-full">
+          <div className="flex items-center justify-between mb-6">
+            <div className="w-8 h-8 rounded-sm bg-neutral-100 flex items-center justify-center transition-transform group-hover:scale-105 duration-300 border border-neutral-200">
+              <Layers className="w-4 h-4 text-black" />
+            </div>
+            <span className="font-mono text-[9px] text-neutral-400 tracking-wider font-extrabold uppercase">
+              SERVICE // ID: {service.id.toUpperCase()}
+            </span>
+          </div>
+
+          <h3 className="font-sans font-black text-xl md:text-2xl text-black tracking-tight uppercase mb-2">
+            {service.name}
+          </h3>
+
+          {/* Tagline */}
+          <p className="font-mono text-[10px] text-neutral-400 tracking-widest uppercase font-bold mb-3">
+            {service.tagline}
+          </p>
+
+          <p className="font-sans text-neutral-500 text-xs md:text-sm leading-relaxed mb-6">
+            {service.benefit}
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-neutral-100 mb-8 w-full">
+            <div>
+              <h4 className="font-mono text-[9px] text-neutral-400 tracking-widest uppercase mb-3 font-bold">
+                {lang === 'id' ? 'LINGKUP UTAMA' : 'DELIVERY SCOPE'}
+              </h4>
+              <ul className="flex flex-col gap-2">
+                {service.scope.map((item, idy) => (
+                  <li key={idy} className="flex items-start gap-2 font-sans text-xs text-neutral-600">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-mono text-[9px] text-neutral-400 tracking-widest uppercase mb-3 font-bold">
+                {lang === 'id' ? 'FITUR OPERASIONAL' : 'OPERATIONAL FEATURES'}
+              </h4>
+              <div className="flex flex-col gap-1.5">
+                {service.features.map((feature, idz) => (
+                  <span key={idz} className="p-2 border border-neutral-200 bg-neutral-50 rounded-xs font-mono text-[9px] font-bold uppercase tracking-wider text-neutral-600 shadow-2xs">
+                    {feature}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-4 border-t border-neutral-100 mt-auto w-full">
+          <div className="text-left">
+            <span className="font-mono text-[8px] text-neutral-400 uppercase tracking-widest block mb-0.5 font-bold">TARGET OUTCOME</span>
+            <span className="font-mono text-xs font-black text-black uppercase">{service.targetMetric}</span>
+          </div>
+
+          {/* CTA — "Lihat Detail →" with sci-fi hover effect */}
+          <button
+            onClick={() => onSelect(service)}
+            className="svc-cta-detail group/btn relative overflow-hidden p-2.5 px-5 bg-black border border-black hover:bg-neutral-800 text-white transition-all duration-300 text-[10px] font-extrabold rounded-sm flex items-center gap-2 uppercase tracking-widest active:scale-95 cursor-pointer shadow-sm"
+          >
+            {/* Scanline sweep on hover */}
+            <span className="absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <span className="svc-scanline-sweep absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </span>
+            <span className="relative z-10">{viewDetailText}</span>
+            <ChevronRight className="w-3.5 h-3.5 relative z-10 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+          </button>
+        </div>
+      </div>
+    </ScrollReveal>
+  );
+}
+
+// ─── Detail Panel Component ───
+function ServiceDetailPanel({
+  detail,
+  lang,
+  onClose,
+}: {
+  detail: ServiceDetail;
+  lang: Language;
+  onClose: () => void;
+}) {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Scroll lock when panel is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      {/* Backdrop — dark sci-fi overlay */}
+      <motion.div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      {/* Scanline overlay across entire screen */}
+      <div className="absolute inset-0 pointer-events-none z-[101] overflow-hidden">
+        <motion.div
+          className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent"
+          initial={{ top: '-2px' }}
+          animate={{ top: '100vh' }}
+          transition={{ duration: 1.2, ease: 'linear', repeat: Infinity, repeatDelay: 2 }}
+        />
+      </div>
+
+      {/* Panel Container */}
+      <motion.div
+        ref={panelRef}
+        className="relative z-[102] w-[95vw] max-w-4xl max-h-[90vh] rounded-sm overflow-hidden"
+        variants={scanlineVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        style={{ transformOrigin: 'top center' }}
+      >
+        {/* ─── Panel Frame — Sci-fi Tech Border ─── */}
+        <div className="absolute inset-0 border border-white/[0.08] rounded-sm pointer-events-none z-50">
+          {/* Corner brackets */}
+          <span className="absolute -top-px -left-px w-5 h-5 border-t-2 border-l-2 border-emerald-500/50" />
+          <span className="absolute -top-px -right-px w-5 h-5 border-t-2 border-r-2 border-emerald-500/50" />
+          <span className="absolute -bottom-px -left-px w-5 h-5 border-b-2 border-l-2 border-emerald-500/50" />
+          <span className="absolute -bottom-px -right-px w-5 h-5 border-b-2 border-r-2 border-emerald-500/50" />
+        </div>
+
+        {/* ─── Panel Background ─── */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#080808] to-[#060606]" />
+
+        {/* Noise texture overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[1] opacity-30"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")`,
+            backgroundSize: '200px 200px',
+          }}
+        />
+
+        {/* Top accent glow line */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent z-[60]" />
+
+        {/* Holographic shimmer sweep */}
+        <motion.div
+          className="absolute inset-0 z-[2] pointer-events-none"
+          initial={{ backgroundPosition: '-200% 0' }}
+          animate={{ backgroundPosition: '200% 0' }}
+          transition={{ duration: 1.5, ease: 'linear' }}
+          style={{
+            background: 'linear-gradient(90deg, transparent 30%, rgba(16,185,129,0.04) 45%, rgba(16,185,129,0.02) 55%, transparent 70%)',
+            backgroundSize: '200% 100%',
+          }}
+        />
+
+        {/* ─── Panel Content ─── */}
+        <motion.div
+          className="relative z-10 flex flex-col h-full"
+          variants={contentVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-white/[0.06] bg-gradient-to-r from-white/[0.02] to-transparent">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-sm bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <Layers className="w-4 h-4 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-sm md:text-base tracking-wider uppercase" style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}>
+                  {detail.title}
+                </h3>
+                <span className="font-mono text-[8px] text-emerald-400/60 tracking-widest uppercase">
+                  {lang === 'id' ? 'DETAIL LAYANAN' : 'SERVICE DETAILS'}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-sm border border-white/[0.1] bg-white/[0.04] flex items-center justify-center text-neutral-400 hover:text-white hover:border-white/[0.2] transition-all cursor-pointer"
+              aria-label="Close detail panel"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-6 md:px-8 py-6 eco-detail-scroll">
+            {/* About */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-3.5 h-3.5 text-emerald-400/70" />
+                <span className="font-mono text-[9px] text-emerald-400/60 tracking-widest uppercase font-bold">
+                  {lang === 'id' ? 'TENTANG LAYANAN' : 'ABOUT SERVICE'}
+                </span>
+              </div>
+              <p className="text-neutral-300 text-sm leading-relaxed">{detail.about}</p>
+            </div>
+
+            {/* Suitable For */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <Users className="w-3.5 h-3.5 text-emerald-400/70" />
+                <span className="font-mono text-[9px] text-emerald-400/60 tracking-widest uppercase font-bold">
+                  {lang === 'id' ? 'COCOK UNTUK' : 'SUITABLE FOR'}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {detail.suitableFor.map((item, i) => (
+                  <span key={i} className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.06] rounded-full text-[11px] text-neutral-300 font-medium">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Work Items */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-3.5 h-3.5 text-emerald-400/70" />
+                <span className="font-mono text-[9px] text-emerald-400/60 tracking-widest uppercase font-bold">
+                  {lang === 'id' ? 'YANG AKAN DIKERJAKAN' : 'WHAT WILL BE DONE'}
+                </span>
+              </div>
+              <div className="flex flex-col gap-3">
+                {detail.workItems.map((item, i) => (
+                  <div key={i} className="eco-arch-row p-4 rounded-sm">
+                    <div className="flex items-start gap-3">
+                      <span className="font-mono text-[10px] text-emerald-400/50 font-bold shrink-0 mt-0.5">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <h5 className="text-white text-sm font-bold mb-1">{item.title}</h5>
+                        <p className="text-neutral-400 text-xs leading-relaxed">{item.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Deliverables */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <Target className="w-3.5 h-3.5 text-emerald-400/70" />
+                <span className="font-mono text-[9px] text-emerald-400/60 tracking-widest uppercase font-bold">
+                  DELIVERABLES
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {detail.deliverables.map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2.5 bg-white/[0.03] border border-white/[0.05] rounded-sm">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400/70 shrink-0" />
+                    <span className="text-neutral-300 text-xs font-medium">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Benefits */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-3.5 h-3.5 text-emerald-400/70" />
+                <span className="font-mono text-[9px] text-emerald-400/60 tracking-widest uppercase font-bold">
+                  {lang === 'id' ? 'MANFAAT' : 'BENEFITS'}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {detail.benefits.map((item, i) => (
+                  <div key={i} className="eco-capability-card p-4 rounded-sm">
+                    <h5 className="text-white text-sm font-bold mb-1">{item.title}</h5>
+                    <p className="text-neutral-400 text-xs leading-relaxed">{item.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="px-6 md:px-8 py-5 border-t border-white/[0.06] bg-gradient-to-r from-white/[0.02] to-transparent">
+            <button
+              onClick={() => {
+                onClose();
+                setTimeout(() => {
+                  const el = document.getElementById('contact');
+                  if (el) {
+                    const offset = el.getBoundingClientRect().top + window.pageYOffset - 85;
+                    window.scrollTo({ top: offset, behavior: 'smooth' });
+                  }
+                }, 400);
+              }}
+              className="eco-cta-primary w-full py-4 text-center text-white font-bold text-xs uppercase tracking-widest rounded-sm flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>{detail.ctaLabel}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* ─── Scanline Animation Inside Panel ─── */}
+        <div className="absolute inset-0 pointer-events-none z-[55] overflow-hidden">
+          <motion.div
+            className="absolute left-0 right-0 h-[30%] bg-gradient-to-b from-transparent via-emerald-500/[0.03] to-transparent"
+            initial={{ top: '-30%' }}
+            animate={{ top: '130%' }}
+            transition={{ duration: 3, ease: 'linear', repeat: Infinity, repeatDelay: 1 }}
+          />
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─── Main Component ───
+export default function ServicesSection({ t, lang }: ServicesSectionProps) {
+  const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
+
+  return (
+    <section id="services" className="relative py-24 md:py-32 bg-[#FAFAFA] border-b border-neutral-200/60 overflow-hidden">
+      <div className="absolute inset-0 tech-grid opacity-[0.25] pointer-events-none" />
+      <div className="absolute bottom-[-100px] left-[5%] w-[350px] h-[350px] rounded-full bg-neutral-200/40 opacity-30 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 md:mb-20 pb-8 border-b border-neutral-200/80">
+          <div className="lg:col-span-5 flex flex-col justify-end text-left">
+            <span className="font-mono text-xs tracking-[0.25em] text-neutral-400 uppercase mb-2 font-bold">02 // OPERATIONAL CAPABILITIES</span>
+            <h2 className="font-sans font-black text-3xl md:text-5xl text-black tracking-tighter uppercase">
+              {t.services.sectionTitle}
+            </h2>
+          </div>
+          <div className="lg:col-span-7 flex items-end text-left">
+            <p className="font-sans font-medium text-base md:text-lg text-neutral-500 tracking-tight leading-relaxed max-w-2xl">
+              {t.services.subtitle}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {t.services.servicesList.map((service, idx) => (
+            <ServiceCard
+              key={service.id}
+              service={service}
+              index={idx}
+              lang={lang}
+              viewDetailText={t.services.viewDetail}
+              onSelect={setSelectedService}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Detail Panel Overlay */}
+      <AnimatePresence>
+        {selectedService && (
+          <ServiceDetailPanel
+            detail={selectedService.detail}
+            lang={lang}
+            onClose={() => setSelectedService(null)}
+          />
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}

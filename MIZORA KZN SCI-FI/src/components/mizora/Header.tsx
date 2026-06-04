@@ -25,6 +25,12 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
   const [activeSection, setActiveSection] = useState<string>('home');
   const [scrollProgress, setScrollProgress] = useState(0);
 
+  // Map sections to nav items - contact & about both highlight "Tentang/About" nav
+  const sectionToNav = (sectionId: string) => {
+    if (sectionId === 'contact') return 'about';
+    return sectionId;
+  };
+
   // Scroll handler: scrolled state + progress bar
   useEffect(() => {
     const handleScroll = () => {
@@ -40,49 +46,65 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
 
   // IntersectionObserver for active section highlighting
   useEffect(() => {
-    const sectionIds = ['home', 'services', 'ratecard', 'portfolio', 'faq', 'about'];
-    const observers: IntersectionObserver[] = [];
-    const sectionVisibility: Record<string, number> = {};
+    const sectionIds = ['home', 'services', 'workflow', 'ratecard', 'portfolio', 'faq', 'about', 'contact'];
+
+    const handleSectionDetection = () => {
+      // When near top of page, always show home
+      if (window.scrollY < 100) {
+        setActiveSection('home');
+        return;
+      }
+
+      const headerOffset = 85;
+      const viewportHeight = window.innerHeight;
+      const visibleTop = headerOffset;
+      const visibleBottom = viewportHeight;
+
+      // Find which section has the most visible area in the viewport
+      let activeId = 'home';
+      let maxVisibleArea = 0;
+
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        
+        // Calculate visible portion of this section within the viewport
+        const sectionVisibleTop = Math.max(rect.top, visibleTop);
+        const sectionVisibleBottom = Math.min(rect.bottom, visibleBottom);
+        const visibleArea = Math.max(0, sectionVisibleBottom - sectionVisibleTop);
+
+        if (visibleArea > maxVisibleArea) {
+          maxVisibleArea = visibleArea;
+          activeId = id;
+        }
+      }
+
+      setActiveSection(activeId);
+    };
+
+    const observer = new IntersectionObserver(
+      () => {
+        handleSectionDetection();
+      },
+      {
+        root: null,
+        rootMargin: '0px',
+        threshold: [0, 0.05, 0.1, 0.2, 0.5],
+      }
+    );
 
     sectionIds.forEach((id) => {
-      sectionVisibility[id] = 0;
       const element = document.getElementById(id);
-      if (!element) return;
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            sectionVisibility[id] = entry.intersectionRatio;
-          });
-
-          if (window.scrollY < 100) {
-            setActiveSection('home');
-            return;
-          }
-
-          let maxVisibility = 0;
-          let mostVisible = 'home';
-          for (const [sectionId, ratio] of Object.entries(sectionVisibility)) {
-            if (ratio > maxVisibility) {
-              maxVisibility = ratio;
-              mostVisible = sectionId;
-            }
-          }
-          setActiveSection(mostVisible);
-        },
-        {
-          root: null,
-          rootMargin: '-85px 0px 0px 0px',
-          threshold: [0.2, 0.5],
-        }
-      );
-
-      observer.observe(element);
-      observers.push(observer);
+      if (element) observer.observe(element);
     });
 
+    // Also listen to scroll for more responsive detection
+    window.addEventListener('scroll', handleSectionDetection, { passive: true });
+
     return () => {
-      observers.forEach((observer) => observer.disconnect());
+      observer.disconnect();
+      window.removeEventListener('scroll', handleSectionDetection);
     };
   }, []);
 
@@ -156,7 +178,7 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
             <div className="flex flex-col text-left">
               <span
                 className="text-[#0A0A0A] text-sm tracking-[0.3em] font-medium leading-none"
-                style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}
+                style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}
               >
                 MIZORA KZN
               </span>
@@ -178,22 +200,22 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
                   <button
                     onClick={() => scrollToSection(item.id)}
                     className={`font-sans font-bold text-xs transition-all duration-200 cursor-pointer uppercase tracking-wider relative group flex items-center gap-1.5 ${
-                      activeSection === item.id
+                      sectionToNav(activeSection) === item.id
                         ? 'text-[#0A0A0A]'
                         : 'text-neutral-500 hover:text-[#0A0A0A]'
                     }`}
-                    aria-current={activeSection === item.id ? 'page' : undefined}
+                    aria-current={sectionToNav(activeSection) === item.id ? 'page' : undefined}
                   >
                     {/* Active dot indicator */}
                     <span className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                      activeSection === item.id
+                      sectionToNav(activeSection) === item.id
                         ? 'bg-[#0A0A0A] scale-100 nav-dot-heartbeat'
                         : 'bg-transparent scale-0 group-hover:bg-neutral-400 group-hover:scale-100'
                     }`} />
                     {item.name}
                     {/* Underline indicator — sharper tech style */}
                     <span className={`absolute -bottom-1 left-0 h-[1.5px] transition-all duration-300 ${
-                      activeSection === item.id
+                      sectionToNav(activeSection) === item.id
                         ? 'w-full bg-[#0A0A0A]'
                         : 'w-0 bg-[#0A0A0A] group-hover:w-full'
                     }`} />
@@ -301,7 +323,7 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
                       <div className="flex flex-col">
                         <span
                           className="text-white text-xs tracking-[0.3em] font-medium leading-none"
-                          style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}
+                          style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}
                         >
                           MIZORA KZN
                         </span>
@@ -339,7 +361,7 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
                               setSheetOpen(false);
                             }}
                             className={`sidebar-nav-item font-sans font-bold text-[15px] text-left uppercase tracking-[0.15em] block w-full py-3.5 px-4 cursor-pointer rounded-sm flex items-center gap-3 border-l-2 ${
-                              activeSection === item.id
+                              sectionToNav(activeSection) === item.id
                                 ? 'sidebar-nav-item-active text-white border-l-white'
                                 : 'sidebar-nav-item text-neutral-500 hover:text-neutral-300 border-l-transparent'
                             }`}
@@ -347,7 +369,7 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
                           >
                             {/* Active indicator dot */}
                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                              activeSection === item.id ? 'bg-white nav-dot-heartbeat' : 'bg-neutral-700'
+                              sectionToNav(activeSection) === item.id ? 'bg-white nav-dot-heartbeat' : 'bg-neutral-700'
                             }`} />
                             <span>{item.name}</span>
                           </button>

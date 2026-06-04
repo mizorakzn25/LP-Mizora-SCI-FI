@@ -20,10 +20,22 @@ export interface ServiceItem {
   id: string;
   iconName: string;
   name: string;
+  tagline: string;
   benefit: string;
   scope: string[];
   features: string[];
   targetMetric: string;
+  detail: ServiceDetail;
+}
+
+export interface ServiceDetail {
+  title: string;
+  about: string;
+  suitableFor: string[];
+  workItems: { title: string; description: string }[];
+  deliverables: string[];
+  benefits: { title: string; description: string }[];
+  ctaLabel: string;
 }
 
 export interface PricingPackage {
@@ -112,7 +124,7 @@ export interface TranslationSet {
     sectionTitle: string;
     subtitle: string;
     servicesList: ServiceItem[];
-    getQuote: string;
+    viewDetail: string;
   };
   workflow: {
     sectionTitle: string;

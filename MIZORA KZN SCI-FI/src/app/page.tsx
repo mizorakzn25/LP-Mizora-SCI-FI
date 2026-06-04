@@ -262,8 +262,10 @@ export default function Home() {
         
         <main className="relative z-10 font-sans flex-1">
           <HeroSection t={t} lang={lang} isLoading={isLoading} />
-          <EcosystemSection t={t} lang={lang} />
-          <ServicesSection t={t} lang={lang} />
+          <section id="services">
+            <EcosystemSection t={t} lang={lang} />
+            <ServicesSection t={t} lang={lang} />
+          </section>
           <WorkflowSection t={t} lang={lang} />
           <RatecardSection t={t} lang={lang} />
           <PortfolioSection t={t} lang={lang} />

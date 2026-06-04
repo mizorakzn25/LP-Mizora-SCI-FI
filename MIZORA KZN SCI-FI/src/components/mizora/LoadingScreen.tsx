@@ -198,7 +198,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
         >
           <h1
             className="text-white text-xl sm:text-2xl md:text-3xl tracking-[0.4em] sm:tracking-[0.5em] font-medium text-center relative glitch-text"
-            style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}
             data-text="MIZORA KZN"
           >
             MIZORA KZN

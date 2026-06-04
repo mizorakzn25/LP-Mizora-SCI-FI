@@ -603,6 +603,10 @@ function Mono({ children, className = '' }: { children: React.ReactNode; classNa
   return <span className={className} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{children}</span>;
 }
 
+function Mhosoc({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return <span className={className} style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}>{children}</span>;
+}
+
 // ─── Section Divider ───
 function SectionDivider({ variant = 'hash' }: { variant?: 'hash' | 'dot' | 'double' }) {
   if (variant === 'dot') return <div className="eco-dot-line-sep my-1" />;
@@ -702,7 +706,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
 
 
   return (
-    <section id="ecosystem" className="relative py-20 md:py-28 bg-white overflow-hidden">
+    <div className="relative py-20 md:py-28 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
 
         {/* ─── Section Header ─── */}
@@ -757,7 +761,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           </div>
                         </div>
                         <div className="mb-3">
-                          <Mono className={`text-[9px] font-bold tracking-[0.2em] uppercase mb-0.5 ${isSelected ? 'text-white/40' : 'text-neutral-400'}`}>{system.abbrev}</Mono>
+                          <Mhosoc className={`text-[9px] font-bold tracking-[0.2em] uppercase mb-0.5 ${isSelected ? 'text-white/40' : 'text-neutral-400'}`}>{system.abbrev}</Mhosoc>
                           <h3 className={`font-sans font-extrabold text-[13px] leading-snug tracking-tight ${isSelected ? 'text-white' : 'text-black'}`}>{system.name}</h3>
                         </div>
                         <div className={`flex items-center justify-between w-full pt-2.5 border-t ${isSelected ? 'border-white/8' : 'border-black/5'}`}>
@@ -815,7 +819,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 mb-0.5">
-                              <Mono className="text-[9px] font-bold tracking-[0.2em] uppercase text-neutral-500">{selectedSystem.abbrev}</Mono>
+                              <Mhosoc className="text-[9px] font-bold tracking-[0.2em] uppercase text-neutral-500">{selectedSystem.abbrev}</Mhosoc>
                               <Mono className="text-[8px] font-bold tracking-[0.15em] uppercase text-neutral-400">{selectedSystem.status.toUpperCase()}</Mono>
                               <Mono className="text-[7px] font-bold tracking-[0.12em] uppercase text-emerald-500/50">v1.0</Mono>
                             </div>
@@ -1441,7 +1445,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                               <div className="grid grid-cols-2 gap-1.5">
                                 <div className="eco-philosophy-v2 rounded-md p-3 relative overflow-hidden">
                                   <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                  <Mono className="text-[8px] text-neutral-500 tracking-[0.15em] uppercase font-bold block mb-2">What {selectedSystem.abbrev.toUpperCase()} Is</Mono>
+                                  <Mhosoc className="text-[8px] text-neutral-500 tracking-[0.15em] uppercase font-bold block mb-2">What {selectedSystem.abbrev.toUpperCase()} Is</Mhosoc>
                                   <div className="space-y-1">
                                     {(isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).positioning.is.map((item, idx) => (
                                       <div key={idx} className="flex items-center gap-1.5">
@@ -1452,7 +1456,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                                 </div>
                                 <div className="eco-philosophy-v2 rounded-md p-3 relative overflow-hidden">
                                   <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neutral-400/30 to-transparent" />
-                                  <Mono className="text-[8px] text-neutral-500 tracking-[0.15em] uppercase font-bold block mb-2">What {selectedSystem.abbrev.toUpperCase()} Is Not</Mono>
+                                  <Mhosoc className="text-[8px] text-neutral-500 tracking-[0.15em] uppercase font-bold block mb-2">What {selectedSystem.abbrev.toUpperCase()} Is Not</Mhosoc>
                                   <div className="space-y-1">
                                     {(isMatls ? MATLS_DETAIL : isMasdm ? MASDM_DETAIL : isMaobs ? MAOBS_DETAIL : isMaovds ? MAOVDS_DETAIL : isMalvcs ? MALVCS_DETAIL : MAUBS_DETAIL).positioning.isNot.map((item, idx) => (
                                       <div key={idx} className="flex items-center gap-1.5">
@@ -1484,7 +1488,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                           {/* ── SYSTEM TAG ── */}
                           <div className="flex items-center justify-between pt-2 relative z-[1]">
                             <div className="flex items-center gap-2">
-                              <Mono className="text-[8px] text-neutral-500 tracking-[0.1em] font-bold">{isMacs ? MACS_DETAIL.systemTag : isMacps ? MACPS_DETAIL.systemTag : isMatls ? MATLS_DETAIL.systemTag : isMasdm ? MASDM_DETAIL.systemTag : isMaobs ? MAOBS_DETAIL.systemTag : isMaovds ? MAOVDS_DETAIL.systemTag : isMalvcs ? MALVCS_DETAIL.systemTag : isMaubs ? MAUBS_DETAIL.systemTag : `[MIZORA_${selectedSystem.abbrev}]`}<span className="inline-block w-[5px] h-[9px] bg-emerald-500/50 ml-0.5 align-middle" style={{ animation: 'eco-cursor-blink 1s step-end infinite' }} /></Mono>
+                              <Mhosoc className="text-[8px] text-neutral-500 tracking-[0.1em] font-bold">{isMacs ? MACS_DETAIL.systemTag : isMacps ? MACPS_DETAIL.systemTag : isMatls ? MATLS_DETAIL.systemTag : isMasdm ? MASDM_DETAIL.systemTag : isMaobs ? MAOBS_DETAIL.systemTag : isMaovds ? MAOVDS_DETAIL.systemTag : isMalvcs ? MALVCS_DETAIL.systemTag : isMaubs ? MAUBS_DETAIL.systemTag : `[MIZORA_${selectedSystem.abbrev}]`}<span className="inline-block w-[5px] h-[9px] bg-emerald-500/50 ml-0.5 align-middle" style={{ animation: 'eco-cursor-blink 1s step-end infinite' }} /></Mhosoc>
                             </div>
                           </div>
 
@@ -1530,6 +1534,6 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

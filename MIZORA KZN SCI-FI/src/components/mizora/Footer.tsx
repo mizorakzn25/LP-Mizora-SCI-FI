@@ -113,7 +113,7 @@ export default function Footer({ t, lang }: FooterProps) {
                   <div className="flex flex-col">
                     <span
                       className="text-white text-sm tracking-[0.35em] font-medium leading-none mb-1.5"
-                      style={{ fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}
+                      style={{ fontFamily: 'var(--font-mhosoc), "Orbitron", "JetBrains Mono", monospace' }}
                     >
                       MIZORA KZN
                     </span>

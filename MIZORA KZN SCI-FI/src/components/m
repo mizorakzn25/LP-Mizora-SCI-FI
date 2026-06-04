@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Layers, Compass, Shield, TrendingUp, CheckCircle2, ArrowRight, ChevronRight, ChevronLeft, Zap, FileText, Users, Target, LucideIcon } from 'lucide-react';
+import { Layers, CheckCircle2, ArrowRight, ChevronRight, ChevronLeft, Zap, FileText, Users, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Language, TranslationSet, ServiceItem } from '@/lib/mizora-types';
 import ScrollReveal from './ScrollReveal';
@@ -11,45 +11,35 @@ interface ServicesSectionProps {
   lang: Language;
 }
 
-// ─── Icon Map ───
-const iconMap: Record<string, LucideIcon> = {
-  Layers,
-  Compass,
-  Shield,
-  TrendingUp
-};
-
 // ─── Animation Variants ───
-
-const defaultEasing = [0.4, 0, 0.2, 1] as const;
 
 const summaryVariants = {
   initial: { opacity: 0, y: -15 },
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, delay: 0.15, ease: defaultEasing },
+    transition: { duration: 0.4, delay: 0.15, ease: [0.4, 0, 0.2, 1] },
   },
   exit: {
     opacity: 0,
     y: -15,
-    transition: { duration: 0.2, ease: defaultEasing },
+    transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] },
   },
-} as const;
+};
 
 const detailVariants = {
   initial: { opacity: 0, y: 20 },
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, delay: 0.15, ease: defaultEasing },
+    transition: { duration: 0.4, delay: 0.15, ease: [0.4, 0, 0.2, 1] },
   },
   exit: {
     opacity: 0,
     y: 20,
-    transition: { duration: 0.2, ease: defaultEasing },
+    transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] },
   },
-} as const;
+};
 
 const detailContainerVariants = {
   hidden: { opacity: 0 },
@@ -61,21 +51,21 @@ const detailContainerVariants = {
     opacity: 0,
     transition: { staggerChildren: 0.02, staggerDirection: -1 },
   },
-} as const;
+};
 
 const detailItemVariants = {
   hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3, ease: defaultEasing },
+    transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] },
   },
   exit: {
     opacity: 0,
     y: 8,
     transition: { duration: 0.15 },
   },
-} as const;
+};
 
 // ─── Service Card Component (with in-card Detail Panel, same height) ───
 function ServiceCard({
@@ -165,10 +155,7 @@ function ServiceCard({
                 {/* Header: Icon + Service ID */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-8 h-8 rounded-sm bg-neutral-100 flex items-center justify-center transition-transform group-hover:scale-105 duration-300 border border-neutral-200">
-                    {(() => {
-                      const Icon = iconMap[service.iconName] || Layers;
-                      return <Icon className="w-4 h-4 text-black" />;
-                    })()}
+                    <Layers className="w-4 h-4 text-black" />
                   </div>
                   <span className="font-mono text-[9px] text-neutral-400 tracking-wider font-extrabold uppercase">
                     SERVICE // ID: {service.id.toUpperCase()}
@@ -255,10 +242,7 @@ function ServiceCard({
               <div className="flex items-center justify-between px-8 pt-6 pb-3 border-b border-neutral-100 shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-sm bg-neutral-100 flex items-center justify-center border border-neutral-200">
-                    {(() => {
-                      const Icon = iconMap[service.iconName] || Layers;
-                      return <Icon className="w-4 h-4 text-black" />;
-                    })()}
+                    <Layers className="w-4 h-4 text-black" />
                   </div>
                   <div>
                     <h3 className="font-sans font-black text-sm md:text-base text-black tracking-tight uppercase">

@@ -1,12 +1,19 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@font-face {
+  font-family: "MHOSOQ";
+  src: url("/fonts/MHOSOQ-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-display: "Orbitron", "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "MHOSOQ", ui-monospace, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -1752,4 +1759,45 @@
       0 1px 2px rgba(0, 0, 0, 0.02),
       0 4px 8px rgba(0, 0, 0, 0.04);
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SERVICES SECTION — SCI-FI DETAIL PANEL ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* CTA Button Scanline Sweep */
+@keyframes svc-scanline-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.svc-scanline-sweep {
+  animation: svc-scanline-sweep 0.6s ease-out forwards;
+}
+
+/* Detail Panel Entrance — Glitch Flash */
+@keyframes svc-glitch-flash {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  20% { opacity: 0.3; }
+  30% { opacity: 0.9; }
+  40% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Detail Panel — Scanline Sweep Inside */
+@keyframes svc-panel-scanline {
+  0% { top: -30%; }
+  100% { top: 130%; }
+}
+
+/* Detail Panel — Corner Bracket Glow */
+@keyframes svc-corner-glow {
+  0%, 100% { border-color: rgba(16, 185, 129, 0.3); }
+  50% { border-color: rgba(16, 185, 129, 0.6); }
+}
+
+.svc-corner-glow {
+  animation: svc-corner-glow 3s ease-in-out infinite;
 }
