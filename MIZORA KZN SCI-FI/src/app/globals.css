@@ -32,15 +32,39 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Prevent layout shift from scrollbar — only when not loading */
-html:not(.loading-active) {
-  overflow-y: auto;
-}
+/* ═══ LOADING SCREEN: Zero scrollbar, zero white line ═══ */
 html.loading-active {
   overflow: hidden !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
 }
 html.loading-active body {
   overflow: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html.loading-active::-webkit-scrollbar {
+  display: none !important; /* Chrome/Safari/Opera */
+  width: 0 !important;
+  background: transparent !important;
+}
+html.loading-active body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  background: transparent !important;
+}
+/* After loading: normal scrollbar */
+html:not(.loading-active) {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
+}
+html:not(.loading-active) body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
 }
 
 /* Optimize font rendering */
@@ -210,16 +234,30 @@ canvas[aria-hidden="true"] {
     border-color: var(--border);
     outline-color: var(--ring);
   }
-  /* Hide scrollbar on initial load — loading-active class controls this */
-  html {
-    overflow: hidden;
-  }
   body {
     background-color: var(--background);
     color: var(--foreground);
+  }
+  /* Initial load: hide scrollbar completely until JS takes over */
+  html {
     overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    background: transparent;
+  }
+  html.loading-active body {
+    overflow: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html.loading-active body::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    background: transparent;
   }
 }
 
@@ -702,7 +740,7 @@ canvas[aria-hidden="true"] {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   MIZORA ECOSYSTEM — FUD SCI-FI FUTURISTIC DESIGN SYSTEM
+   MIZORA ECOSYSTEM — SCI-FI DESIGN SYSTEM
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── KEYFRAME ANIMATIONS ─── */
@@ -3654,5 +3692,469 @@ canvas[aria-hidden="true"] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RATECARD SECTION — Premium Minimal Design System (10/10+ REDESIGN)
+   References: Linear, Stripe, Vercel Enterprise, Framer
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Noise Background — SVG texture like Linear.app ─── */
+.rc-noise-bg {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.5;
+}
+
+/* ─── Conic gradient sweep — slowly rotating radar ─── */
+@keyframes rc-conic-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.rc-conic-sweep {
+  animation: rc-conic-rotate 60s linear infinite;
+  will-change: transform;
+}
+
+/* ─── Stat dot pulse ─── */
+@keyframes rc-stat-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+.rc-stat-dot {
+  animation: rc-stat-pulse 2s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ─── Pill Rail Navigation ─── */
+.rc-pill {
+  border: none;
+  outline: none;
+  letter-spacing: 0.01em;
+  will-change: transform, background-color;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rc-pill:active {
+  transform: scale(0.97);
+}
+
+/* Hidden scrollbar for pill rail */
+.rc-pill-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.rc-pill-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ─── Featured Card — Hero Banner ─── */
+.rc-featured-card {
+  will-change: transform;
+  contain: content;
+  position: relative;
+  /* Subtle inner top-left glow for depth */
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(255,255,255,0.03) 0%, transparent 50%);
+}
+
+/* Hover glow handled inline for dynamic accent color */
+
+/* ─── Service Card — Premium Catalog ─── */
+.rc-service-card {
+  will-change: transform;
+  contain: content;
+  position: relative;
+  /* Subtle noise texture for depth */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+}
+
+/* Hover glow handled inline for dynamic accent color */
+
+/* ─── Spec Pill — Inline spec display ─── */
+.rc-spec-pill {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.rc-spec-pill:hover,
+.rc-service-card:hover .rc-spec-pill {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Ghost Button — Text button with arrow ─── */
+.rc-ghost-btn {
+  border: none;
+  outline: none;
+  letter-spacing: 0.01em;
+  will-change: transform;
+}
+
+.rc-ghost-btn:active {
+  transform: scale(0.98);
+}
+
+/* ─── Commitment item — hover accent ─── */
+.rc-commitment-item:hover .hover-show-accent {
+  opacity: 1 !important;
+}
+
+/* ─── Terminal Panel — Bottom dark panel ─── */
+.rc-terminal-panel {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 16px 48px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* ─── Accordion Item — Pricing accordion ─── */
+.rc-accordion-item {
+  transition: background 0.2s ease;
+}
+
+/* ─── Command Palette Modal ─── */
+.rc-cmd-palette {
+  will-change: transform, opacity;
+  contain: content;
+}
+
+/* Subtle noise texture on modal */
+.rc-cmd-palette::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 8px;
+  opacity: 0.7;
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .rc-conic-sweep,
+  .rc-stat-dot {
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RATECARD DECORATIVE ENHANCEMENTS
+   Premium hiasan — dot grid, corner brackets, holo shimmer,
+   scanline sweep, floating particles, pulse ring, data stream,
+   crosshair markers, breathing diamond, hash separator
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── 1. DOT GRID BACKGROUND (Stripe/Vercel style) ─── */
+.rc-dot-grid {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.35;
+}
+
+/* ─── 2. CORNER BRACKETS on Featured Card ─── */
+.rc-corner-bracket {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  z-index: 5;
+}
+.rc-corner-bracket--tl {
+  top: 6px;
+  left: 6px;
+  border-top: 1.5px solid currentColor;
+  border-left: 1.5px solid currentColor;
+  opacity: 0.18;
+}
+.rc-corner-bracket--tr {
+  top: 6px;
+  right: 6px;
+  border-top: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  opacity: 0.18;
+}
+.rc-corner-bracket--bl {
+  bottom: 6px;
+  left: 6px;
+  border-bottom: 1.5px solid currentColor;
+  border-left: 1.5px solid currentColor;
+  opacity: 0.18;
+}
+.rc-corner-bracket--br {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  opacity: 0.18;
+}
+
+/* ─── 3. HOLO SHIMMER SWEEP on Card Hover ─── */
+@keyframes rc-holo-sweep {
+  0% { transform: translateX(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(200%); opacity: 0; }
+}
+.rc-holo-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+.rc-holo-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0.02) 55%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.rc-holo-shimmer--active::before {
+  animation: rc-holo-sweep 0.8s ease forwards;
+}
+
+/* ─── 4. SCANLINE SWEEP on Featured Card ─── */
+@keyframes rc-scanline-sweep {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(400%); }
+}
+.rc-scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.015) 40%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0.015) 60%,
+    transparent 100%
+  );
+  animation: rc-scanline-sweep 6s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+  will-change: transform;
+}
+
+/* ─── 5. FLOATING MICRO-PARTICLES ─── */
+@keyframes rc-float-1 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.15; }
+  25% { transform: translate(12px, -18px); opacity: 0.3; }
+  50% { transform: translate(-8px, -30px); opacity: 0.2; }
+  75% { transform: translate(16px, -12px); opacity: 0.35; }
+}
+@keyframes rc-float-2 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.12; }
+  25% { transform: translate(-14px, -20px); opacity: 0.25; }
+  50% { transform: translate(10px, -35px); opacity: 0.18; }
+  75% { transform: translate(-6px, -10px); opacity: 0.28; }
+}
+@keyframes rc-float-3 {
+  0%, 100% { transform: translate(0, 0); opacity: 0.1; }
+  25% { transform: translate(8px, -25px); opacity: 0.22; }
+  50% { transform: translate(-12px, -15px); opacity: 0.15; }
+  75% { transform: translate(18px, -28px); opacity: 0.25; }
+}
+.rc-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
+}
+.rc-particle--1 {
+  top: 20%;
+  left: 15%;
+  animation: rc-float-1 18s ease-in-out infinite;
+}
+.rc-particle--2 {
+  top: 45%;
+  right: 20%;
+  animation: rc-float-2 22s ease-in-out infinite;
+  animation-delay: -5s;
+}
+.rc-particle--3 {
+  bottom: 30%;
+  left: 60%;
+  animation: rc-float-3 20s ease-in-out infinite;
+  animation-delay: -10s;
+}
+.rc-particle--4 {
+  top: 70%;
+  left: 35%;
+  animation: rc-float-1 25s ease-in-out infinite;
+  animation-delay: -15s;
+  width: 2px;
+  height: 2px;
+}
+.rc-particle--5 {
+  top: 15%;
+  right: 40%;
+  animation: rc-float-2 23s ease-in-out infinite;
+  animation-delay: -8s;
+  width: 2px;
+  height: 2px;
+}
+
+/* ─── 6. PULSE RING on Category Active Dot ─── */
+@keyframes rc-pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(3.5); opacity: 0; }
+}
+.rc-pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: none;
+  animation: rc-pulse-ring 2s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+/* ─── 7. DATA STREAM LINES in Terminal Panel ─── */
+@keyframes rc-data-stream {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+.rc-data-stream {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2;
+  will-change: transform;
+}
+.rc-data-stream::before {
+  content: '';
+  display: block;
+  width: 200%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 4px,
+    rgba(255, 255, 255, 0.04) 4px,
+    rgba(255, 255, 255, 0.04) 8px
+  );
+  animation: rc-data-stream 30s linear infinite;
+}
+.rc-data-stream--2::before {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 6px,
+    rgba(255, 255, 255, 0.03) 6px,
+    rgba(255, 255, 255, 0.03) 10px
+  );
+  animation-duration: 45s;
+  animation-direction: reverse;
+}
+.rc-data-stream--3::before {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(255, 255, 255, 0.025) 3px,
+    rgba(255, 255, 255, 0.025) 6px
+  );
+  animation-duration: 38s;
+  animation-delay: -12s;
+}
+
+/* ─── 8. CROSSHAIR MARKERS on Terminal Panel ─── */
+.rc-crosshair {
+  position: absolute;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  z-index: 3;
+  line-height: 1;
+  user-select: none;
+}
+.rc-crosshair--tl {
+  top: 8px;
+  left: 10px;
+}
+.rc-crosshair--br {
+  bottom: 8px;
+  right: 10px;
+}
+
+/* ─── 9. BREATHING GLOW on Section Header Diamond ─── */
+@keyframes rc-diamond-breathe {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.45; }
+}
+.rc-diamond-breathe {
+  animation: rc-diamond-breathe 3s ease-in-out infinite;
+  will-change: opacity;
+}
+
+/* ─── 10. HASH SEPARATOR between service grid and terminal ─── */
+.rc-hash-sep {
+  position: relative;
+  text-align: center;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+}
+.rc-hash-sep::before {
+  content: '///';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: rgba(0, 0, 0, 0.08);
+  background: #FAFAFA;
+  padding: 0 10px;
+}
+
+/* ─── Reduced motion for new ratecard decorations ─── */
+@media (prefers-reduced-motion: reduce) {
+  .rc-scanline,
+  .rc-particle,
+  .rc-pulse-ring,
+  .rc-data-stream::before,
+  .rc-diamond-breathe,
+  .rc-holo-shimmer--active::before {
+    animation: none !important;
+  }
+  .rc-holo-shimmer::before {
+    opacity: 0 !important;
   }
 }

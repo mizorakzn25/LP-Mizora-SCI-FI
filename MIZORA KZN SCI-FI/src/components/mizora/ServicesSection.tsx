@@ -593,36 +593,6 @@ export default function ServicesSection({ t, lang }: ServicesSectionProps) {
       className="relative py-20 md:py-28 overflow-hidden"
       style={{ background: '#ECECF0' }}
     >
-      {/* Section top edge — emerald gradient line */}
-      <div className="cmd-section-edge" />
-
-      {/* Dot grid background (light) */}
-      <div className="absolute inset-0 cmd-dot-grid pointer-events-none" />
-
-      {/* Subtle radial emerald glow behind cards */}
-      <div className="cmd-radial-glow" />
-
-      {/* Top radial accent — more visible */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, rgba(16,185,129,0.02) 40%, transparent 70%)',
-        }}
-      />
-
-      {/* Bottom gradient fade */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{
-          background: 'linear-gradient(to top, rgba(236,236,240,0.9), transparent)',
-        }}
-      />
-
-      {/* Decorative side accent lines */}
-      <div className="absolute top-28 left-6 md:left-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
-      <div className="absolute top-28 right-6 md:right-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         {/* ─── Section Header (Terminal-style) ─── */}
         <ScrollReveal yOffset={30} delay={0}>

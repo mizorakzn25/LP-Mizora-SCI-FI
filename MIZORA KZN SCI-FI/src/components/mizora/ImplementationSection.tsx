@@ -710,30 +710,6 @@ export default function ImplementationSection({ t, lang }: ImplementationSection
   return (
     <section id="implementation" className="relative py-20 md:py-28 overflow-hidden" style={{ background: '#ECECF0' }}>
 
-      {/* ═══ FUD SCI-FI DECORATIVE ELEMENTS ═══ */}
-      <div className="cmd-section-edge" />
-      <div className="absolute inset-0 cmd-dot-grid pointer-events-none" />
-      <div className="cmd-radial-glow" />
-
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, rgba(16,185,129,0.02) 40%, transparent 70%)' }}
-      />
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: 'linear-gradient(to top, rgba(236,236,240,0.9), transparent)' }}
-      />
-      <div className="absolute top-28 left-6 md:left-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
-      <div className="absolute top-28 right-6 md:right-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
-
-      {/* Floating corner brackets */}
-      <div className="absolute top-20 left-8 md:left-16 pointer-events-none hidden lg:block">
-        <div className="w-6 h-6 border-l-2 border-t-2 border-black/10 rounded-tl-sm" />
-      </div>
-      <div className="absolute bottom-20 right-8 md:right-16 pointer-events-none hidden lg:block">
-        <div className="w-6 h-6 border-r-2 border-b-2 border-black/10 rounded-br-sm" />
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
 
         {/* ═══ SECTION HEADER (OUTSIDE IDE) ═══ */}

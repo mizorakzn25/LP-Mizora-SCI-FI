@@ -50,6 +50,48 @@ export interface PricingPackage {
   badge?: string;
 }
 
+export interface RatecardService {
+  code: string;
+  name: string;
+  desc: { en: string; id: string };
+  fullDesc: { en: string; id: string };
+  tags: { timeline: string; scope: string; tech: string };
+  price: { en: string; id: string };
+  specs: {
+    timeline: { en: string; id: string };
+    pages: { en: string; id: string };
+    techStack: string;
+    revisions: string;
+    responsive: boolean;
+    seo: boolean;
+  };
+  deliverables: { en: string[]; id: string[] };
+}
+
+export interface RatecardCategory {
+  id: string;
+  name: string;
+  prefix: string;
+  color: string;
+  count: number;
+  label: { en: string; id: string };
+  services: RatecardService[];
+}
+
+export interface RatecardCommitment {
+  icon: string;
+  title: { en: string; id: string };
+  description: { en: string; id: string };
+}
+
+export interface RatecardProjectEntry {
+  category: { en: string; id: string };
+  service: string;
+  code: string;
+  price: { en: string; id: string };
+  time: { en: string; id: string };
+}
+
 export interface CaseStudy {
   id: string;
   title: string;
@@ -138,13 +180,30 @@ export interface TranslationSet {
     }[];
   };
   ratecard: {
+    sectionLabel: string;
     sectionTitle: string;
     subtitle: string;
-    packages: PricingPackage[];
-    getStarted: string;
-    currency: string;
-    addonsTitle: string;
-    billingSubtitle: string;
+    statsLabel: string;
+    detailBtn: string;
+    orderBtn: string;
+    closeBtn: string;
+    orderNowBtn: string;
+    projectListTab: string;
+    commitmentTab: string;
+    projectListTitle: string;
+    projectListSubtitle: string;
+    commitmentTitle: string;
+    commitmentSubtitle: string;
+    specificationsLabel: string;
+    includesLabel: string;
+    billingNote: string;
+    comingSoonLabel: string;
+    startingFromLabel: string;
+    serviceLabel: string;
+    codeLabel: string;
+    categories: RatecardCategory[];
+    commitments: RatecardCommitment[];
+    projectEntries: RatecardProjectEntry[];
   };
   portfolio: {
     sectionTitle: string;

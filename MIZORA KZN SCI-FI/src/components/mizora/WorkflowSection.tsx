@@ -811,61 +811,6 @@ export default function WorkflowSection({ t, lang }: WorkflowSectionProps) {
   return (
     <section id="workflow" className="relative py-20 md:py-28 overflow-hidden" style={{ background: '#ECECF0' }}>
 
-      {/* ═══ FUD SCI-FI DECORATIVE ELEMENTS ═══ */}
-
-      {/* Top edge */}
-      <div className="cmd-section-edge" />
-
-      {/* Dot grid */}
-      <div className="absolute inset-0 cmd-dot-grid pointer-events-none" />
-
-      {/* Radial glow */}
-      <div className="cmd-radial-glow" />
-
-      {/* Top radial accent */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, rgba(16,185,129,0.02) 40%, transparent 70%)' }}
-      />
-
-      {/* Bottom gradient fade */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: 'linear-gradient(to top, rgba(236,236,240,0.9), transparent)' }}
-      />
-
-      {/* Side accent lines */}
-      <div className="absolute top-28 left-6 md:left-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
-      <div className="absolute top-28 right-6 md:right-12 bottom-28 w-px bg-gradient-to-b from-transparent via-black/25 to-transparent pointer-events-none" />
-
-      {/* Left binary markers */}
-      <div className="absolute left-10 md:left-20 top-[40%] pointer-events-none hidden lg:flex flex-col items-center gap-5">
-        {[0, 1, 1, 0, 1, 0].map((bit, i) => (
-          <div key={i} className="flex items-center gap-1.5">
-            <div className={`w-1 h-1 rounded-full ${bit ? 'bg-emerald-500/40' : 'bg-neutral-300/30'}`} />
-            <Mono className="text-[6px] tracking-[0.2em] font-bold text-neutral-400/40">{String(bit)}</Mono>
-          </div>
-        ))}
-      </div>
-
-      {/* Right pipeline connector */}
-      <div className="absolute right-10 md:right-20 top-[35%] pointer-events-none hidden lg:flex flex-col items-center gap-0">
-        <div className="w-px h-6 bg-black/10" />
-        <div className="w-1.5 h-1.5 rotate-45 border border-black/12" />
-        <div className="w-px h-12 bg-gradient-to-b from-black/8 to-emerald-500/15" />
-        <Terminal className="w-3 h-3 text-emerald-500/25 mb-2" />
-        <div className="w-px h-8 bg-emerald-500/10" />
-        <div className="w-1 h-1 rounded-full bg-emerald-500/20" />
-      </div>
-
-      {/* Floating corner brackets */}
-      <div className="absolute top-20 left-8 md:left-16 pointer-events-none hidden lg:block">
-        <div className="w-6 h-6 border-l-2 border-t-2 border-black/10 rounded-tl-sm" />
-      </div>
-      <div className="absolute bottom-20 right-8 md:right-16 pointer-events-none hidden lg:block">
-        <div className="w-6 h-6 border-r-2 border-b-2 border-black/10 rounded-br-sm" />
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
 
         {/* ═══ SECTION HEADER ═══ */}

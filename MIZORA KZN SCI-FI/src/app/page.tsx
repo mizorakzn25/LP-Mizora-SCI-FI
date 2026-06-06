@@ -11,6 +11,7 @@ import ScrollToTopButton from '@/components/mizora/ScrollToTopButton';
 import { Language } from '@/lib/mizora-types';
 import { translations } from '@/lib/mizora-translations';
 
+
 // Loading fallback component — static, no animation jank
 function SectionLoader() {
   return (
@@ -263,43 +264,13 @@ export default function Home() {
         <main className="relative z-10 font-sans flex-1">
           <HeroSection t={t} lang={lang} isLoading={isLoading} />
 
-          {/* ─── FUD Section Separator ─── */}
-          <div className="relative py-6 md:py-8 overflow-hidden" style={{ background: '#ECECF0' }}>
-            <div className="max-w-7xl mx-auto px-6 md:px-12">
-              {/* Decorative line composition */}
-              <div className="flex items-center gap-0">
-                {/* Left segment — solid */}
-                <div className="h-[2px] w-8 bg-black/80" />
-                {/* Dot node */}
-                <div className="w-1.5 h-1.5 rounded-full bg-black/60 shrink-0" />
-                {/* Center long line — gradient fade */}
-                <div className="flex-1 h-[1px] bg-gradient-to-r from-neutral-300 via-neutral-200 to-neutral-300" />
-                {/* Center diamond */}
-                <div className="w-2 h-2 rotate-45 border border-neutral-300 bg-white shrink-0 mx-3" />
-                {/* Right long line — gradient fade */}
-                <div className="flex-1 h-[1px] bg-gradient-to-r from-neutral-300 via-neutral-200 to-neutral-300" />
-                {/* Dot node */}
-                <div className="w-1.5 h-1.5 rounded-full bg-black/60 shrink-0" />
-                {/* Right segment — solid */}
-                <div className="h-[2px] w-8 bg-black/80" />
-              </div>
-              {/* Sub-labels */}
-              <div className="flex items-center justify-between mt-2.5">
-                <span className="font-mono text-[7px] tracking-[0.2em] uppercase font-bold text-neutral-400">BERANDA</span>
-                <div className="flex items-center gap-2">
-                  <div className="h-[1px] w-6 bg-neutral-200" />
-                  <span className="font-mono text-[7px] tracking-[0.2em] uppercase font-bold text-neutral-400">LAYANAN</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <section id="services">
             <EcosystemSection t={t} lang={lang} />
             <ServicesSection t={t} lang={lang} />
             <WorkflowSection t={t} lang={lang} />
             <ImplementationSection t={t} lang={lang} />
           </section>
+
           <RatecardSection t={t} lang={lang} />
           <PortfolioSection t={t} lang={lang} />
           <FaqSection t={t} lang={lang} />
