@@ -210,26 +210,36 @@ function CodeLine({ line, lineNum, isActive, delay }: {
 }) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (!isActive) { setDisplayed(''); setDone(false); return; }
-    if (!line.text) { setDisplayed(''); setDone(true); return; }
+    if (!isActive || !line.text) return;
 
-    setDisplayed('');
-    setDone(false);
+    const code = line.text;
+    const startMs = performance.now() + delay;
+    const charInterval = 14;
+    let rafId: number;
+    let lastCharCount = 0;
 
-    timerRef.current = setTimeout(() => {
-      let i = 0;
-      const interval = setInterval(() => {
-        i++;
-        setDisplayed(line.text.slice(0, i));
-        if (i >= line.text.length) { clearInterval(interval); setDone(true); }
-      }, 14);
-      return () => clearInterval(interval);
-    }, delay);
+    const tick = (now: number) => {
+      const elapsed = now - startMs;
+      if (elapsed < 0) {
+        rafId = requestAnimationFrame(tick);
+        return;
+      }
+      const charCount = Math.min(Math.floor(elapsed / charInterval), code.length);
+      if (charCount !== lastCharCount) {
+        lastCharCount = charCount;
+        setDisplayed(code.slice(0, charCount));
+        if (charCount >= code.length) {
+          setDone(true);
+          return;
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    };
 
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [isActive, line.text, delay]);
 
   if (!line.text) return <div className="h-[18px]" />;
@@ -260,7 +270,6 @@ const LOADING_DURATION = 4000; // 4 seconds
 
 function PreviewLoading() {
   const [percentage, setPercentage] = useState(0);
-  const [dots, setDots] = useState('');
   const [hasStarted, setHasStarted] = useState(false);
   const rafRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
@@ -295,12 +304,16 @@ function PreviewLoading() {
     };
   }, []);
 
-  // Dots animation
+  // Dots animation — use CSS animation instead of setInterval
+  const dotsRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => {
+    const el = dotsRef.current;
+    if (!el) return;
     let count = 0;
     const interval = setInterval(() => {
       count = (count + 1) % 5;
-      setDots('.'.repeat(count));
+      el.textContent = '.'.repeat(count);
     }, 400);
     return () => clearInterval(interval);
   }, []);
@@ -347,6 +360,7 @@ function PreviewLoading() {
               src="/images/mizora-logo.png"
               alt="Mizora KZN"
               fill
+              sizes="100vw"
               className="object-contain"
               priority
             />
@@ -383,14 +397,12 @@ function PreviewLoading() {
         >
           <div className={`relative transition-all duration-500 ${isComplete ? 'scale-105' : ''}`}>
             {isComplete && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.25, 0.1, 0.25, 0.15] }}
-                transition={{ duration: 1, repeat: Infinity, repeatType: 'reverse' }}
+              <div
                 className="absolute inset-0 rounded-full"
                 style={{
                   background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
                   filter: 'blur(12px)',
+                  animation: 'pulse-glow 1s ease-in-out infinite alternate',
                 }}
               />
             )}
@@ -440,11 +452,9 @@ function PreviewLoading() {
             )}
             {/* Complete flash */}
             {isComplete && (
-              <motion.div
+              <div
                 className="absolute inset-0 bg-white rounded-full"
-                initial={{ opacity: 0.7 }}
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 0.8, repeat: Infinity, repeatType: 'reverse' }}
+                style={{ animation: 'gpu-pulse 0.8s ease-in-out infinite alternate' }}
               />
             )}
           </div>
@@ -456,7 +466,7 @@ function PreviewLoading() {
             className="text-[8px] text-emerald-400/60 tracking-[0.15em] uppercase font-bold"
             style={{ fontFamily: '"JetBrains Mono", monospace' }}
           >
-            Loading{dots}
+            Loading<span ref={dotsRef} />
           </span>
         </div>
       </div>

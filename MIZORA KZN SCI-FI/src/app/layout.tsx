@@ -43,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="loading-active" suppressHydrationWarning>
       <body
         className={`${plusJakartaSans.variable} ${jetBrainsMono.variable} ${orbitron.variable} ${zenKakuGothicNew.variable} antialiased bg-background text-foreground`}
       >

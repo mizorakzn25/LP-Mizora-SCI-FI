@@ -86,18 +86,34 @@ function TypingLine({
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
 
+  // RAF-based typewriter animation
   useEffect(() => {
-    if (!isInView) { setDisplayed(''); setDone(false); return; }
-    const startTimer = setTimeout(() => {
-      let i = 0;
-      const interval = setInterval(() => {
-        i++;
-        setDisplayed(text.slice(0, i));
-        if (i >= text.length) { clearInterval(interval); setDone(true); }
-      }, 22);
-      return () => clearInterval(interval);
-    }, delay);
-    return () => clearTimeout(startTimer);
+    if (!isInView) return;
+    const startMs = performance.now() + delay;
+    const charInterval = 22;
+    let rafId: number;
+    let lastCharCount = 0;
+
+    const tick = (now: number) => {
+      const elapsed = now - startMs;
+      if (elapsed < 0) {
+        rafId = requestAnimationFrame(tick);
+        return;
+      }
+      const charCount = Math.min(Math.floor(elapsed / charInterval), text.length);
+      if (charCount !== lastCharCount) {
+        lastCharCount = charCount;
+        setDisplayed(text.slice(0, charCount));
+        if (charCount >= text.length) {
+          setDone(true);
+          return;
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [isInView, delay, text]);
 
   return (
@@ -416,14 +432,28 @@ function AnimatedCounter({ target, suffix = '', duration = 2 }: { target: number
 
   useEffect(() => {
     if (!inView) return;
-    let start = 0;
-    const step = target / (duration * 60);
-    const interval = setInterval(() => {
-      start += step;
-      if (start >= target) { setCount(target); clearInterval(interval); }
-      else setCount(Math.floor(start));
-    }, 1000 / 60);
-    return () => clearInterval(interval);
+    const startTime = performance.now();
+    const durationMs = duration * 1000;
+    let rafId: number;
+
+    const step = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / durationMs, 1);
+      // Ease-out cubic for smooth deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.floor(eased * target);
+
+      setCount(current);
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(step);
+      } else {
+        setCount(target);
+      }
+    };
+
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
   }, [inView, target, duration]);
 
   return <span ref={ref}>{count}{suffix}</span>;

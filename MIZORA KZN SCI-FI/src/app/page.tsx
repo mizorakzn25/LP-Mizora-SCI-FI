@@ -11,17 +11,26 @@ import ScrollToTopButton from '@/components/mizora/ScrollToTopButton';
 import { Language } from '@/lib/mizora-types';
 import { translations } from '@/lib/mizora-translations';
 
+// Loading fallback component — static, no animation jank
+function SectionLoader() {
+  return (
+    <div className="flex items-center justify-center py-20" style={{ background: '#ECECF0' }}>
+      <span className="font-mono text-[10px] text-neutral-400 tracking-[0.2em] uppercase">Loading...</span>
+    </div>
+  );
+}
+
 // Dynamic imports for heavy components - SSR disabled to reduce server memory usage
-const EcosystemSection: any = dynamic(() => import('@/components/mizora/EcosystemSection'), { ssr: false });
-const ServicesSection: any = dynamic(() => import('@/components/mizora/ServicesSection'), { ssr: false });
-const WorkflowSection: any = dynamic(() => import('@/components/mizora/WorkflowSection'), { ssr: false });
-const ImplementationSection: any = dynamic(() => import('@/components/mizora/ImplementationSection'), { ssr: false });
-const RatecardSection: any = dynamic(() => import('@/components/mizora/RatecardSection'), { ssr: false });
-const PortfolioSection: any = dynamic(() => import('@/components/mizora/PortfolioSection'), { ssr: false });
-const FaqSection: any = dynamic(() => import('@/components/mizora/FaqSection'), { ssr: false });
-const AboutSection: any = dynamic(() => import('@/components/mizora/AboutSection'), { ssr: false });
-const ContactSection: any = dynamic(() => import('@/components/mizora/ContactSection'), { ssr: false });
-const Footer: any = dynamic(() => import('@/components/mizora/Footer'), { ssr: false });
+const EcosystemSection: any = dynamic(() => import('@/components/mizora/EcosystemSection'), { ssr: false, loading: () => <SectionLoader /> });
+const ServicesSection: any = dynamic(() => import('@/components/mizora/ServicesSection'), { ssr: false, loading: () => <SectionLoader /> });
+const WorkflowSection: any = dynamic(() => import('@/components/mizora/WorkflowSection'), { ssr: false, loading: () => <SectionLoader /> });
+const ImplementationSection: any = dynamic(() => import('@/components/mizora/ImplementationSection'), { ssr: false, loading: () => <SectionLoader /> });
+const RatecardSection: any = dynamic(() => import('@/components/mizora/RatecardSection'), { ssr: false, loading: () => <SectionLoader /> });
+const PortfolioSection: any = dynamic(() => import('@/components/mizora/PortfolioSection'), { ssr: false, loading: () => <SectionLoader /> });
+const FaqSection: any = dynamic(() => import('@/components/mizora/FaqSection'), { ssr: false, loading: () => <SectionLoader /> });
+const AboutSection: any = dynamic(() => import('@/components/mizora/AboutSection'), { ssr: false, loading: () => <SectionLoader /> });
+const ContactSection: any = dynamic(() => import('@/components/mizora/ContactSection'), { ssr: false, loading: () => <SectionLoader /> });
+const Footer: any = dynamic(() => import('@/components/mizora/Footer'), { ssr: false, loading: () => <SectionLoader /> });
 
 export default function Home() {
   const [lang, setLang] = useState<Language>('id');
@@ -30,20 +39,16 @@ export default function Home() {
 
   const t = translations[lang];
 
-  // Lock scroll during loading, unlock when done
+  // Lock scroll during loading, unlock when done — uses CSS class for !important override
   useEffect(() => {
+    const html = document.documentElement;
     if (isLoading) {
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
+      html.classList.add('loading-active');
     } else {
-      document.documentElement.style.overflowX = 'hidden';
-      document.documentElement.style.overflowY = 'auto';
-      document.body.style.overflowX = 'hidden';
-      document.body.style.overflowY = 'auto';
+      html.classList.remove('loading-active');
     }
     return () => {
-      document.documentElement.style.overflow = '';
-      document.body.style.overflow = '';
+      html.classList.remove('loading-active');
     };
   }, [isLoading]);
 
@@ -53,11 +58,8 @@ export default function Home() {
       if (isLoading) {
         setIsLoading(false);
       }
-      document.documentElement.style.overflowX = 'hidden';
-      document.documentElement.style.overflowY = 'auto';
-      document.body.style.overflowX = 'hidden';
-      document.body.style.overflowY = 'auto';
-    }, 9000); // Safety net — must exceed total loading duration (~6.7s) + exit animation
+      document.documentElement.classList.remove('loading-active');
+    }, 9000);
     return () => clearTimeout(maxTimer);
   }, [isLoading]);
 
@@ -70,7 +72,6 @@ export default function Home() {
 
     const isMobile = window.innerWidth < 768;
 
-    // Skip canvas entirely on very small/low-end mobile devices
     if (isMobile && window.innerWidth < 480) {
       canvas.style.display = 'none';
       return;
@@ -79,10 +80,8 @@ export default function Home() {
     let animationFrameId: number;
     let isAnimating = true;
     let width = (canvas.width = window.innerWidth);
-    // Use viewport height instead of full page height for better performance
     let height = (canvas.height = window.innerHeight);
 
-    // Aggressively reduce nodes on mobile
     const nodeCount = isMobile ? 15 : 40;
     const connectionDist = isMobile ? 100 : 130;
     const mouseDistThreshold = isMobile ? 120 : 180;
@@ -110,7 +109,6 @@ export default function Home() {
       mouse.y = e.clientY;
     };
 
-    // Only add mousemove listener on desktop
     if (!isMobile) {
       window.addEventListener('mousemove', handleMouseMove);
     }
@@ -122,7 +120,6 @@ export default function Home() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Visibility API: pause animation when tab is not visible
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isAnimating = false;
@@ -137,7 +134,6 @@ export default function Home() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // IntersectionObserver: pause animation when canvas is not in viewport
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -157,16 +153,18 @@ export default function Home() {
 
     intersectionObserver.observe(canvas);
 
-    // Throttle render on mobile for battery savings
     let lastRenderTime = 0;
-    const targetFPS = isMobile ? 24 : 60;
+    const targetFPS = isMobile ? 30 : 60;
     const frameInterval = 1000 / targetFPS;
+    // Pre-compute squared distance for faster comparison (avoids Math.hypot)
+    const connectionDistSq = connectionDist * connectionDist;
+    const mouseDistThresholdSq = mouseDistThreshold * mouseDistThreshold;
 
     const render = (timestamp?: number) => {
       if (!isAnimating) return;
 
-      // Throttle frame rate on mobile
-      if (isMobile && timestamp) {
+      // FPS throttle for ALL devices to cap at targetFPS
+      if (timestamp) {
         const delta = timestamp - lastRenderTime;
         if (delta < frameInterval) {
           animationFrameId = requestAnimationFrame(render);
@@ -177,55 +175,53 @@ export default function Home() {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Keep canvas at viewport size (not full page height)
-      if (canvas.width !== window.innerWidth) {
-        width = canvas.width = window.innerWidth;
-      }
-      if (canvas.height !== window.innerHeight) {
-        height = canvas.height = window.innerHeight;
-      }
-
+      // Batch dots and lines separately to minimize context state switches
+      // Phase 1: Draw all dots
       ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.025)';
-      ctx.lineWidth = 0.5;
-
-      nodes.forEach((node, idx) => {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
         node.x += node.vx;
         node.y += node.vy;
-
         if (node.x < 0 || node.x > width) node.vx *= -1;
         if (node.y < 0 || node.y > height) node.vy *= -1;
-
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
         ctx.fill();
+      }
 
-        // Skip node-to-node connections on mobile for performance
-        if (!isMobile) {
-          for (let j = idx + 1; j < nodes.length; j++) {
-            const otherNode = nodes[j];
-            const dist = Math.hypot(node.x - otherNode.x, node.y - otherNode.y);
-
-            if (dist < connectionDist) {
+      // Phase 2: Draw all connection lines
+      if (!isMobile) {
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.025)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+          for (let j = i + 1; j < nodes.length; j++) {
+            const other = nodes[j];
+            const dx = node.x - other.x;
+            const dy = node.y - other.y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < connectionDistSq) {
               ctx.beginPath();
               ctx.moveTo(node.x, node.y);
-              ctx.lineTo(otherNode.x, otherNode.y);
+              ctx.lineTo(other.x, other.y);
               ctx.stroke();
             }
           }
+          // Mouse connection
+          const mdx = node.x - mouse.x;
+          const mdy = node.y - mouse.y;
+          const mDistSq = mdx * mdx + mdy * mdy;
+          if (mDistSq < mouseDistThresholdSq) {
+            const mDist = Math.sqrt(mDistSq);
+            ctx.strokeStyle = `rgba(0, 0, 0, ${0.08 * (1 - mDist / mouseDistThreshold)})`;
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.025)';
+          }
         }
-
-        // Mouse interaction (desktop only)
-        const mouseDist = Math.hypot(node.x - mouse.x, node.y - mouse.y);
-        if (mouseDist < mouseDistThreshold) {
-          ctx.strokeStyle = `rgba(0, 0, 0, ${0.08 * (1 - mouseDist / mouseDistThreshold)})`;
-          ctx.beginPath();
-          ctx.moveTo(node.x, node.y);
-          ctx.lineTo(mouse.x, mouse.y);
-          ctx.stroke();
-          ctx.strokeStyle = 'rgba(0, 0, 0, 0.025)';
-        }
-      });
+      }
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -247,7 +243,7 @@ export default function Home() {
         {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
 
-      <div className="relative min-h-screen flex flex-col text-[#0A0A0A] selection:bg-black selection:text-white antialiased overflow-x-hidden" style={{ background: '#ECECF0' }}>
+      <div className="relative min-h-screen flex flex-col text-[#0A0A0A] selection:bg-black selection:text-white antialiased overflow-x-hidden" style={{ background: '#ECECF0', contain: 'layout style paint' }}>
         {/* Skip to content link for keyboard navigation */}
         <a
           href="#home"
@@ -310,7 +306,6 @@ export default function Home() {
           <AboutSection t={t} lang={lang} />
           <ContactSection t={t} lang={lang} />
         </main>
-
 
         <Footer t={t} lang={lang} />
         <ScrollToTopButton />

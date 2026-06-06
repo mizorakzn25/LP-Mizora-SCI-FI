@@ -1,6 +1,99 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ═══ PERFORMANCE: GPU Compositing & Animation Optimization ═══ */
+
+/* Force GPU layers for all animated elements */
+*[class*="animate-"],
+*[class*="motion-"],
+*[style*="will-change"],
+.sci-fi-pulse,
+.scanline-animate,
+.glitch-text,
+.hero-glitch,
+.typewriter-cursor {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Optimize CSS animations to use compositor-only properties */
+/* All keyframe animations should only animate transform and opacity */
+/* This ensures they run on the compositor thread, not main thread */
+
+/* Reduce paint on scroll by containing layout */
+main {
+  contain: layout style;
+}
+
+/* Smooth scrolling with GPU acceleration */
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent layout shift from scrollbar — only when not loading */
+html:not(.loading-active) {
+  overflow-y: auto;
+}
+html.loading-active {
+  overflow: hidden !important;
+}
+html.loading-active body {
+  overflow: hidden !important;
+}
+
+/* Optimize font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Lazy render off-screen sections for faster initial load */
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 500px;
+}
+
+/* GPU layer promotion for smooth 120fps animations */
+.gpu-layer {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.gpu-layer-subtle {
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Reduce backdrop-filter performance cost */
+.backdrop-optimize {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  will-change: auto;
+}
+
+/* Strict containment for particle canvas */
+canvas[aria-hidden="true"] {
+  contain: strict;
+  content-visibility: auto;
+}
+
+/* GPU-accelerated pulse animation */
+@keyframes gpu-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+
+/* GPU-accelerated glow pulse */
+@keyframes pulse-glow {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.8; }
+}
+
 :root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -117,14 +210,14 @@
     border-color: var(--border);
     outline-color: var(--ring);
   }
-  /* Hide scrollbar on initial load until JS takes over */
+  /* Hide scrollbar on initial load — loading-active class controls this */
   html {
     overflow: hidden;
   }
   body {
     background-color: var(--background);
     color: var(--foreground);
-    overflow-x: hidden;
+    overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -143,6 +236,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
+  contain: content;
 }
 
 .widget-3d:hover {
@@ -203,6 +297,7 @@
 
 .nav-dot-heartbeat {
   animation: heartbeat-pulse 2.5s ease-in-out infinite;
+  contain: layout style;
 }
 
 /* Typewriter blinking cursor — classic terminal aesthetic */
@@ -434,13 +529,13 @@
   font-family: var(--font-display);
 }
 
-/* Scanline animation for hero image */
+/* Scanline animation for hero image — compositor-only via transform */
 @keyframes scanlineMove {
   0% {
-    top: -2px;
+    transform: translateY(-2px);
   }
   100% {
-    top: 100%;
+    transform: translateY(100vh);
   }
 }
 
@@ -698,6 +793,7 @@
               border-color 0.35s ease;
   overflow: hidden;
   will-change: transform;
+  contain: content;
 }
 
 /* Holo shimmer on hover */
@@ -746,7 +842,7 @@
 }
 
 .eco-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-8px) translate3d(0, 0, 0);
   border-color: rgba(0, 0, 0, 0.15);
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.08),
@@ -774,6 +870,7 @@
               box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   will-change: transform;
+  contain: content;
 }
 
 /* Top emerald accent line */
@@ -853,6 +950,7 @@
     0 16px 48px rgba(0, 0, 0, 0.2),
     0 0 0 1px rgba(255, 255, 255, 0.02);
   overflow: hidden;
+  contain: content;
 }
 
 /* Tech frame accent — left+top border glow */
@@ -885,6 +983,7 @@
 .eco-detail-inner {
   background: rgba(255, 255, 255, 0.02);
   animation: eco-holo-flicker 8s ease-in-out infinite;
+  will-change: opacity;
   position: relative;
   z-index: 1;
 }
@@ -918,6 +1017,7 @@
 .eco-detail-scroll {
   scrollbar-width: thin;
   scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+  contain: layout style;
 }
 .eco-detail-scroll::-webkit-scrollbar {
   width: 3px;
@@ -3543,4 +3643,16 @@
 .cmd-preview-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(16, 185, 129, 0.5);
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+/* ═══ PERFORMANCE: Respect reduced motion preferences for accessibility ═══ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

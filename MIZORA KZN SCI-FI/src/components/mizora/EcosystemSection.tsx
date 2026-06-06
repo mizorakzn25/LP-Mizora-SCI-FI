@@ -648,12 +648,20 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
   useEffect(() => {
     const el = cardsGridRef.current;
     if (!el) return;
+    let rafId: number | null = null;
     const ro = new ResizeObserver(() => {
-      setDetailMaxH(el.offsetHeight);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        setDetailMaxH(el.offsetHeight);
+      });
     });
     ro.observe(el);
     setDetailMaxH(el.offsetHeight);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // ─── Glitch Word Cycle ───
@@ -866,7 +874,7 @@ export default function EcosystemSection({ t, lang }: EcosystemSectionProps) {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.15 }}
                     className="flex flex-col min-h-0"
-                    style={detailMaxH ? { height: `${detailMaxH}px` } : undefined}
+                    style={{ willChange: 'transform', ...(detailMaxH ? { height: `${detailMaxH}px` } : {}) }}
                   >
                       {/* Decorative overlays */}
                       <div className="noc-glitch-line-overlay" />

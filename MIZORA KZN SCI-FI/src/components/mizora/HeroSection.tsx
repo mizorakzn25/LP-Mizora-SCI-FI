@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ChevronRight } from 'lucide-react';
@@ -13,7 +13,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
-  const scrollToSegment = (id: string) => {
+  const scrollToSegment = useCallback((id: string) => {
     const element = document.getElementById(id);
     if (element) {
       const headerOffset = 85;
@@ -21,7 +21,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
       window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
-  };
+  }, []);
 
   // ─── Animation Control ───
   // Only start hero entrance after loading screen exits
@@ -34,25 +34,47 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
     }
   }, [isLoading]);
 
-  // ─── F — Subheadline Typewriter ───
-  // Max 2.5s total visual: typewriter starts at 0.55s, 12ms/char → ~2.34s for ~149 chars
-  const [subheadChars, setSubheadChars] = useState(0);
+  // ─── F — Subheadline Typewriter (RAF-based, no setTimeout chain) ───
+  const subheadCharsRef = useRef(0);
+  const [subheadText, setSubheadText] = useState('');
+  const [subheadComplete, setSubheadComplete] = useState(false);
+  const [subheadStarted, setSubheadStarted] = useState(false);
 
   useEffect(() => {
     if (!canAnimate) return;
-    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    let cancelled = false;
     const text = t.hero.subheadline;
-    const startDelay = 550; // ms after canAnimate
-    const charSpeed = 12; // ms per character
+    const startDelay = 550;
+    const charSpeed = 12;
 
-    for (let i = 0; i <= text.length; i++) {
-      timeouts.push(setTimeout(() => setSubheadChars(i), startDelay + i * charSpeed));
-    }
+    // Pre-calculate timing
+    const startTime = performance.now() + startDelay;
 
-    return () => timeouts.forEach(clearTimeout);
+    const tick = () => {
+      if (cancelled) return;
+      const elapsed = performance.now() - startTime;
+      const chars = Math.min(Math.floor(elapsed / charSpeed), text.length);
+
+      if (chars !== subheadCharsRef.current) {
+        subheadCharsRef.current = chars;
+        setSubheadText(text.slice(0, chars));
+        if (chars > 0 && chars < text.length) {
+          setSubheadStarted(true);
+        }
+        if (chars >= text.length) {
+          setSubheadComplete(true);
+          setSubheadStarted(false);
+        }
+      }
+
+      if (chars < text.length) {
+        requestAnimationFrame(tick);
+      }
+    };
+
+    requestAnimationFrame(tick);
+    return () => { cancelled = true; };
   }, [canAnimate, t.hero.subheadline]);
-
-  const subheadText = t.hero.subheadline.slice(0, subheadChars);
 
   // ─── Infinite Marquee Ticker (ROW 2 — Client names) ───
   const tickerRef = useRef<HTMLDivElement>(null);
@@ -68,6 +90,19 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
   const tagPositionRef = useRef(0);
   const [tagPaused, setTagPaused] = useState(false);
 
+  // ─── Pause marquees when hero section is off-screen ───
+  const heroInViewRef = useRef(true);
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { heroInViewRef.current = entry.isIntersecting; },
+      { threshold: 0, rootMargin: '100px' }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   // ROW 2 animation
   useEffect(() => {
     const ticker = tickerRef.current;
@@ -76,7 +111,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
     const speed = 0.6;
 
     const animate = () => {
-      if (!isPaused && !isDragging) {
+      if (!isPaused && !isDragging && heroInViewRef.current) {
         positionRef.current -= speed;
         const halfWidth = ticker.scrollWidth / 2;
         if (Math.abs(positionRef.current) >= halfWidth) {
@@ -101,7 +136,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
     const speed = 0.3;
 
     const animate = () => {
-      if (!tagPaused) {
+      if (!tagPaused && heroInViewRef.current) {
         tagPositionRef.current -= speed;
         const halfWidth = tag.scrollWidth / 2;
         if (Math.abs(tagPositionRef.current) >= halfWidth) {
@@ -162,20 +197,31 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
   const parallaxLogo = useTransform(scrollYProgress, [0, 1], [0, -70]);   // Logo card
   const parallaxTicker = useTransform(scrollYProgress, [0, 1], [0, -90]); // Ticker strip
 
-  // ─── U2 — Cursor Light Trail ───
-  const [cursorPos, setCursorPos] = useState({ x: -500, y: -500 });
+  // ─── U2 — Cursor Light Trail (ref + direct DOM, RAF throttled) ───
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const cursorRafRef = useRef<number | null>(null);
+  const cursorPosRef = useRef({ x: 0, y: 0 });
 
-  const handleSectionMouseMove = (e: React.MouseEvent) => {
-    if (!sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
+  const handleSectionMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!sectionRef.current || !cursorRef.current) return;
+    cursorPosRef.current = {
+      x: e.clientX - sectionRef.current.getBoundingClientRect().left,
+      y: e.clientY - sectionRef.current.getBoundingClientRect().top,
+    };
+    if (cursorRafRef.current) return;
+    cursorRafRef.current = requestAnimationFrame(() => {
+      cursorRafRef.current = null;
+      if (!cursorRef.current) return;
+      const { x, y } = cursorPosRef.current;
+      cursorRef.current.style.transform = `translate(${x - 200}px, ${y - 200}px)`;
+      cursorRef.current.style.opacity = x > 0 ? '1' : '0';
+    });
+  }, []);
 
-  // ─── U1 — Logo Card 3D Tilt ───
+  // ─── U1 — Logo Card 3D Tilt (ref + direct DOM, no useState) ───
   const logoCardRef = useRef<HTMLDivElement>(null);
-  const [logoTilt, setLogoTilt] = useState({ rotateX: 0, rotateY: 0 });
 
-  const handleLogoMouseMove = (e: React.MouseEvent) => {
+  const handleLogoMouseMove = useCallback((e: React.MouseEvent) => {
     if (!logoCardRef.current) return;
     const rect = logoCardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -184,34 +230,39 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
     const centerY = rect.height / 2;
     const rotateY = ((x - centerX) / centerX) * 8;
     const rotateX = ((centerY - y) / centerY) * 8;
-    setLogoTilt({ rotateX, rotateY });
-  };
+    logoCardRef.current.style.transition = 'transform 0.1s ease-out, border-color 0.3s';
+    logoCardRef.current.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  }, []);
 
-  const handleLogoMouseLeave = () => {
-    setLogoTilt({ rotateX: 0, rotateY: 0 });
-  };
+  const handleLogoMouseLeave = useCallback(() => {
+    if (logoCardRef.current) {
+      logoCardRef.current.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      logoCardRef.current.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s';
+    }
+  }, []);
 
-  // ─── U4 — Magnetic CTA Buttons ───
+  // ─── U4 — Magnetic CTA Buttons (ref + direct DOM, no useState) ───
   const cta1Ref = useRef<HTMLButtonElement>(null);
   const cta2Ref = useRef<HTMLButtonElement>(null);
-  const [cta1Offset, setCta1Offset] = useState({ x: 0, y: 0 });
-  const [cta2Offset, setCta2Offset] = useState({ x: 0, y: 0 });
 
-  const handleMagneticMove = (
+  const handleMagneticMove = useCallback((
     e: React.MouseEvent,
     ref: React.RefObject<HTMLButtonElement | null>,
-    setter: (val: { x: number; y: number }) => void
   ) => {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
-    setter({ x: x * 0.15, y: y * 0.15 });
-  };
+    ref.current.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+    ref.current.style.transition = 'transform 0.15s ease-out';
+  }, []);
 
-  const handleMagneticLeave = (setter: (val: { x: number; y: number }) => void) => {
-    setter({ x: 0, y: 0 });
-  };
+  const handleMagneticLeave = useCallback((ref: React.RefObject<HTMLButtonElement | null>) => {
+    if (ref.current) {
+      ref.current.style.transform = 'translate(0px, 0px)';
+      ref.current.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+    }
+  }, []);
 
   // ─── U3 — Glitch Text Flash ───
   const [isGlitching, setIsGlitching] = useState(false);
@@ -235,17 +286,17 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
       className="relative pt-20 pb-16 md:pt-24 md:pb-20 overflow-hidden flex flex-col justify-center min-h-[92vh]" style={{ background: '#ECECF0' }}
       onMouseMove={handleSectionMouseMove}
     >
-      {/* U2 — Cursor Light Trail */}
+      {/* U2 — Cursor Light Trail (ref + direct DOM) */}
       <div
+        ref={cursorRef}
         className="absolute pointer-events-none z-[5] transition-opacity duration-300"
         style={{
-          left: cursorPos.x - 200,
-          top: cursorPos.y - 200,
           width: 400,
           height: 400,
           background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)',
           borderRadius: '50%',
-          opacity: cursorPos.x > 0 ? 1 : 0,
+          opacity: 0,
+          willChange: 'transform, opacity',
         }}
       />
 
@@ -256,7 +307,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
         animate={canAnimate ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.5, delay: 1.0 }}
         className="absolute inset-0 pointer-events-none z-20"
-        style={{ y: parallaxF8 }}
+        style={{ y: parallaxF8, willChange: 'transform' }}
       >
         {/* Top-left readout */}
         <span
@@ -296,7 +347,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
           animate={canAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
           transition={{ duration: 0.35, delay: 0, ease: easeOut }}
           className="relative pb-5 mb-10"
-          style={{ y: parallaxF1 }}
+          style={{ y: parallaxF1, willChange: 'transform' }}
         >
           {/* Content row */}
           <div className="flex items-center justify-between mb-3.5">
@@ -420,7 +471,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
           {/* Headline Area (Parallax Layer: mid) */}
           <motion.div
             className="lg:col-span-7 flex flex-col items-start text-left"
-            style={{ y: parallaxHeadline }}
+            style={{ y: parallaxHeadline, willChange: 'transform' }}
           >
 
             {/* ─── C + F6 — Tagline Badge with Accent (slide from left) ─── */}
@@ -489,7 +540,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
 
               <p className="font-sans font-medium text-sm md:text-sm text-neutral-500 leading-relaxed tracking-tight">
                 {subheadText}
-                {subheadChars < t.hero.subheadline.length && subheadChars > 0 && (
+                {subheadStarted && (
                   <span className="typewriter-cursor">█</span>
                 )}
               </p>
@@ -499,7 +550,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
                 className="flex items-center mt-3"
                 initial={{ opacity: 0, height: 0 }}
                 animate={
-                  canAnimate && subheadChars >= t.hero.subheadline.length
+                  canAnimate && subheadComplete
                     ? { opacity: 1, height: 'auto' }
                     : { opacity: 0, height: 0 }
                 }
@@ -571,13 +622,10 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
                 <button
                   ref={cta1Ref}
                   onClick={() => scrollToSegment('contact')}
-                  onMouseMove={(e) => handleMagneticMove(e, cta1Ref, setCta1Offset)}
-                  onMouseLeave={() => handleMagneticLeave(setCta1Offset)}
-                  style={{
-                    transform: `translate(${cta1Offset.x}px, ${cta1Offset.y}px)`,
-                    transition: cta1Offset.x === 0 ? 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' : 'transform 0.15s ease-out',
-                  }}
+                  onMouseMove={(e) => handleMagneticMove(e, cta1Ref)}
+                  onMouseLeave={() => handleMagneticLeave(cta1Ref)}
                   className="hero-cta-primary group px-8 py-4 bg-[#0A0A0A] text-white border border-[#0A0A0A] rounded-sm font-sans font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer"
+                  style={{ willChange: 'transform' }}
                 >
                   <span>{t.hero.ctaConsultText}</span>
                   <ArrowRight className="w-4 h-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
@@ -587,13 +635,10 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
                 <button
                   ref={cta2Ref}
                   onClick={() => scrollToSegment('ratecard')}
-                  onMouseMove={(e) => handleMagneticMove(e, cta2Ref, setCta2Offset)}
-                  onMouseLeave={() => handleMagneticLeave(setCta2Offset)}
-                  style={{
-                    transform: `translate(${cta2Offset.x}px, ${cta2Offset.y}px)`,
-                    transition: cta2Offset.x === 0 ? 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' : 'transform 0.15s ease-out',
-                  }}
+                  onMouseMove={(e) => handleMagneticMove(e, cta2Ref)}
+                  onMouseLeave={() => handleMagneticLeave(cta2Ref)}
                   className="hero-cta-secondary group px-8 py-4 bg-white text-[#0A0A0A] border border-neutral-300 rounded-sm font-sans font-extrabold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 cursor-pointer"
+                  style={{ willChange: 'transform' }}
                 >
                   <span>{t.hero.ctaRatecardText}</span>
                   <ChevronRight className="w-3.5 h-3.5 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -605,7 +650,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
           {/* ─── H + U1 — Hero Image (Parallax Layer: foreground) ─── */}
           <motion.div
             className="lg:col-span-5 flex justify-center"
-            style={{ y: parallaxLogo }}
+            style={{ y: parallaxLogo, willChange: 'transform' }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.85 }}
@@ -619,11 +664,10 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
                 onMouseLeave={handleLogoMouseLeave}
                 className="relative w-full max-w-sm aspect-square p-2 bg-white border border-neutral-200/80 rounded-sm shadow-2xl overflow-hidden group hover:border-black/20"
                 style={{
-                  transform: `rotateX(${logoTilt.rotateX}deg) rotateY(${logoTilt.rotateY}deg)`,
-                  transition: logoTilt.rotateX === 0 && logoTilt.rotateY === 0
-                    ? 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s'
-                    : 'transform 0.1s ease-out, border-color 0.3s',
                   transformStyle: 'preserve-3d',
+                  willChange: 'transform',
+                  transition: 'transform 0.1s ease-out, border-color 0.3s',
+                  backfaceVisibility: 'hidden',
                 }}
               >
 
@@ -738,7 +782,7 @@ export default function HeroSection({ t, lang, isLoading }: HeroSectionProps) {
           animate={canAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
           transition={{ duration: 0.6, delay: 1.2, ease: easeOut }}
           className="relative mt-20"
-          style={{ perspective: '1400px', y: parallaxTicker }}
+          style={{ perspective: '1400px', y: parallaxTicker, willChange: 'transform' }}
         >
           {/* ─── Outer Bezel — Premium Raised 3D Frame ─── */}
           <div

@@ -34,17 +34,25 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
     return sectionId;
   };
 
-  // Scroll handler: scrolled state + progress bar
+  // Scroll handler: scrolled state + progress bar — throttled with RAF
   useEffect(() => {
+    let rafId: number | null = null;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        setScrolled(window.scrollY > 20);
 
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
-      setScrollProgress(Math.min(progress, 100));
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+        setScrollProgress(Math.min(progress, 100));
+      });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // IntersectionObserver for active section highlighting
@@ -102,12 +110,21 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
       if (element) observer.observe(element);
     });
 
-    // Also listen to scroll for more responsive detection
-    window.addEventListener('scroll', handleSectionDetection, { passive: true });
+    // Also listen to scroll for more responsive detection — throttled with RAF
+    let sectionScrollRaf: number | null = null;
+    const throttledSectionDetection = () => {
+      if (sectionScrollRaf) return;
+      sectionScrollRaf = requestAnimationFrame(() => {
+        sectionScrollRaf = null;
+        handleSectionDetection();
+      });
+    };
+    window.addEventListener('scroll', throttledSectionDetection, { passive: true });
 
     return () => {
       observer.disconnect();
-      window.removeEventListener('scroll', handleSectionDetection);
+      window.removeEventListener('scroll', throttledSectionDetection);
+      if (sectionScrollRaf) cancelAnimationFrame(sectionScrollRaf);
     };
   }, []);
 
@@ -320,6 +337,7 @@ export default function Header({ lang, setLang, t, isLoading }: HeaderProps) {
                           src="/images/mizora-logo.png"
                           alt="Mizora KZN"
                           fill
+              sizes="100vw"
                           className="object-contain"
                         />
                       </div>

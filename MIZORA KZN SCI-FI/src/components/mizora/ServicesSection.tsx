@@ -169,12 +169,20 @@ function CommandTerminalCard({
   // Measure summary height for smooth detail transition
   useEffect(() => {
     if (!showDetail && summaryRef.current) {
+      let rafId: number | null = null;
       const ro = new ResizeObserver(() => {
-        setCardHeight(summaryRef.current?.offsetHeight);
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          setCardHeight(summaryRef.current?.offsetHeight);
+        });
       });
       ro.observe(summaryRef.current);
       setCardHeight(summaryRef.current.offsetHeight);
-      return () => ro.disconnect();
+      return () => {
+        ro.disconnect();
+        if (rafId) cancelAnimationFrame(rafId);
+      };
     }
   }, [showDetail]);
 

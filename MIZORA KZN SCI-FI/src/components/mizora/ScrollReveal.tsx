@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import { gpuAccel } from '@/lib/perf';
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -15,30 +16,34 @@ export default function ScrollReveal({
   className = '',
   yOffset = 30
 }: ScrollRevealProps) {
+  const prefersReducedMotion = useReducedMotion();
+
+  // Skip animation entirely if reduced motion is preferred
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       initial={{
         opacity: 0,
         y: yOffset,
-        scale: 0.98,
       }}
       whileInView={{
         opacity: 1,
         y: 0,
-        scale: 1,
       }}
       viewport={{
         once: true,
-        amount: 0.1,
-        margin: "-80px 0px -80px 0px"
+        amount: 0.05,
+        margin: "0px 0px -50px 0px"
       }}
       transition={{
-        type: "spring",
-        stiffness: 80,
-        damping: 20,
-        mass: 0.5,
+        duration: 0.6,
+        ease: [0.16, 1, 0.3, 1],
         delay: delay
       }}
+      style={gpuAccel}
       className={className}
     >
       {children}
