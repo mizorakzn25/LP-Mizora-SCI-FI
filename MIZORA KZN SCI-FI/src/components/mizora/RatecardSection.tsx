@@ -17,7 +17,12 @@ import {
   Package,
   CalendarDays,
   Code2,
-  Sparkles,
+  Shield,
+  MessageCircle,
+  FileCheck,
+  Star,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Language, TranslationSet, RatecardService, RatecardCategory } from '@/lib/mizora-types';
 import ScrollReveal from './ScrollReveal';
@@ -94,6 +99,7 @@ function SpecPill({
       className={`rc-spec-pill inline-flex items-center gap-1.5 font-mono text-[9px] font-bold px-3 py-1 rounded-full border border-white/[0.06] ${className}`}
       style={{
         background: 'rgba(255,255,255,0.04)',
+        color: accent || 'rgba(255,255,255,0.65)',
         ...style,
       }}
     >
@@ -133,15 +139,15 @@ const CollapsedCardContent = React.memo(function CollapsedCardContent({
 
   return (
     <>
-      {/* Holo shimmer */}
+      {/* Holo shimmer — visible on card surface */}
       <div className="rc-holo-shimmer" />
 
-      {/* Top accent glow line */}
+      {/* Top accent glow line — now visible */}
       <div
-        className="absolute top-0 left-0 right-0 h-px z-20 pointer-events-none"
+        className="absolute top-0 left-0 right-0 h-[2px] z-20 pointer-events-none"
         style={{
-          background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
-          opacity: 0,
+          background: `linear-gradient(90deg, transparent 5%, ${accent}80 30%, ${accent} 50%, ${accent}80 70%, transparent 95%)`,
+          opacity: 0.5,
         }}
       />
 
@@ -162,13 +168,28 @@ const CollapsedCardContent = React.memo(function CollapsedCardContent({
           </div>
         </div>
 
-        {/* Service name */}
-        <h3
-          className="font-sans text-white tracking-tight leading-tight mb-2"
-          style={{ fontWeight: 600, fontSize: '0.9375rem' }}
-        >
-          {service.name}
-        </h3>
+        {/* Service name + popularity badge */}
+        <div className="flex items-start gap-2 mb-2">
+          <h3
+            className="font-sans text-white tracking-tight leading-tight flex-1"
+            style={{ fontWeight: 600, fontSize: '0.9375rem' }}
+          >
+            {service.name}
+          </h3>
+          {/* Popularity badge — show for first 2 services per category */}
+          {category.services.indexOf(service) < 2 && (
+            <span
+              className="shrink-0 inline-flex items-center gap-1 font-mono text-[7px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+              style={{ background: `${accent}18`, color: accent }}
+            >
+              <Star className="w-2.5 h-2.5" />
+              {category.services.indexOf(service) === 0
+                ? (lang === 'id' ? 'Populer' : 'Popular')
+                : (lang === 'id' ? 'Pilihan' : 'Choice')
+              }
+            </span>
+          )}
+        </div>
 
         {/* Description */}
         <p
@@ -186,10 +207,18 @@ const CollapsedCardContent = React.memo(function CollapsedCardContent({
           {service.desc[lang]}
         </p>
 
-        {/* Spec pills */}
+        {/* Spec pills — all use accent color for consistency */}
         <div className="flex items-center gap-1.5 mb-4 flex-wrap">
-          <SpecPill accent={accent}>{service.tags.timeline}</SpecPill>
-          <SpecPill accent={accent}>
+          <SpecPill
+            accent={accent}
+            style={{ background: `${accent}10`, color: accent }}
+          >
+            {service.tags.timeline}
+          </SpecPill>
+          <SpecPill
+            accent={accent}
+            style={{ background: `${accent}10`, color: accent }}
+          >
             {service.tags.scope} {lang === 'id' ? 'hal' : 'pgs'}
           </SpecPill>
           <SpecPill
@@ -200,37 +229,28 @@ const CollapsedCardContent = React.memo(function CollapsedCardContent({
           </SpecPill>
         </div>
 
-        {/* Price display */}
+        {/* Price display — enhanced visual hierarchy */}
         <div className="mb-4 pb-4 border-b border-white/[0.04]">
-          <span className="font-mono text-[8px] font-bold tracking-[0.12em] uppercase text-neutral-500 block mb-0.5">
+          <span className="font-mono text-[8px] font-bold tracking-[0.12em] uppercase text-neutral-500 block mb-1">
             {startingFromLabel}
           </span>
-          <span
-            className="font-mono text-[1.25rem] font-bold tracking-tight block leading-none mb-0.5"
-            style={{ color: accent, fontFamily: '"JetBrains Mono", monospace' }}
-          >
-            {service.price[lang]}
-          </span>
-          <span className="font-mono text-[7px] font-bold tracking-[0.1em] uppercase text-neutral-500 block">
+          <div className="flex items-baseline gap-2">
+            <span
+              className="font-mono text-[1.5rem] font-bold tracking-tight block leading-none"
+              style={{ color: accent, fontFamily: '"JetBrains Mono", monospace' }}
+            >
+              {service.price[lang]}
+            </span>
+          </div>
+          <span className="font-mono text-[7px] font-bold tracking-[0.1em] uppercase text-neutral-500 block mt-0.5">
             {lang === 'id' ? 'INVESTASI DIGITAL' : 'DIGITAL INVESTMENT'}
           </span>
         </div>
 
-        {/* CTA: Lihat Detail */}
+        {/* CTA: Lihat Detail — CSS-only hover, no inline DOM manipulation */}
         <button
           onClick={onToggle}
-          className="rc-ghost-btn inline-flex items-center gap-1.5 text-[12px] font-semibold text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer group/btn"
-          style={{
-            transition: 'color 0.2s, filter 0.2s, transform 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.filter = 'brightness(110%)';
-            (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.filter = 'brightness(100%)';
-            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-          }}
+          className="rc-cta-detail inline-flex items-center gap-1.5 text-[12px] font-semibold text-neutral-400 hover:text-white cursor-pointer group/btn"
         >
           <span>{lang === 'id' ? '→ Lihat Detail' : '→ View Details'}</span>
           <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:translate-x-[2px]" />
@@ -252,6 +272,10 @@ interface ExpandedCardContentProps {
   startingFromLabel: string;
   onToggle: () => void;
   onOrder: () => void;
+  onPrev: (() => void) | null;
+  onNext: (() => void) | null;
+  currentIndex: number;
+  totalCount: number;
 }
 
 const ExpandedCardContent = React.memo(function ExpandedCardContent({
@@ -261,6 +285,10 @@ const ExpandedCardContent = React.memo(function ExpandedCardContent({
   startingFromLabel,
   onToggle,
   onOrder,
+  onPrev,
+  onNext,
+  currentIndex,
+  totalCount,
 }: ExpandedCardContentProps) {
   const accent = category.color;
   const featureList = service.features?.[lang] ?? [];
@@ -299,14 +327,33 @@ const ExpandedCardContent = React.memo(function ExpandedCardContent({
             </span>
           </div>
 
-          {/* Close button */}
-          <button
-            onClick={onToggle}
-            className="w-8 h-8 rounded-md flex items-center justify-center text-neutral-500 hover:text-white hover:bg-white/10 cursor-pointer shrink-0 transition-colors duration-150"
-            aria-label={lang === 'id' ? 'Tutup' : 'Close'}
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            {/* Mobile prev/next navigation — only visible on small screens */}
+            <button
+              onClick={onPrev ?? undefined}
+              disabled={!onPrev}
+              className={`sm:hidden w-9 h-9 rounded-md flex items-center justify-center cursor-pointer shrink-0 transition-colors duration-150 ${onPrev ? 'text-neutral-400 hover:text-white hover:bg-white/10' : 'text-neutral-700 cursor-not-allowed'}`}
+              aria-label={lang === 'id' ? 'Sebelumnya' : 'Previous'}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onNext ?? undefined}
+              disabled={!onNext}
+              className={`sm:hidden w-9 h-9 rounded-md flex items-center justify-center cursor-pointer shrink-0 transition-colors duration-150 ${onNext ? 'text-neutral-400 hover:text-white hover:bg-white/10' : 'text-neutral-700 cursor-not-allowed'}`}
+              aria-label={lang === 'id' ? 'Selanjutnya' : 'Next'}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            {/* Close button — 44px touch target for mobile accessibility */}
+            <button
+              onClick={onToggle}
+              className="w-11 h-11 rounded-lg flex items-center justify-center text-neutral-500 hover:text-white hover:bg-white/10 cursor-pointer shrink-0 transition-colors duration-150"
+              aria-label={lang === 'id' ? 'Tutup' : 'Close'}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Service name */}
@@ -317,7 +364,7 @@ const ExpandedCardContent = React.memo(function ExpandedCardContent({
           {service.name}
         </h3>
 
-        {/* Description */}
+        {/* Description — single instance, no duplicate with Overview */}
         <p
           className="font-sans leading-relaxed mb-6"
           style={{
@@ -331,22 +378,8 @@ const ExpandedCardContent = React.memo(function ExpandedCardContent({
 
         {/* 2-column layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {/* ─── Left column: Overview + Features + Deliverables ─── */}
+          {/* ─── Left column: Features + Deliverables ─── */}
           <div className="space-y-6">
-            {/* Overview section */}
-            <div>
-              <h4
-                className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2"
-                style={{ color: accent }}
-              >
-                <Sparkles className="w-3 h-3" />
-                {lang === 'id' ? 'Ikhtisar' : 'Overview'}
-              </h4>
-              <p className="font-sans text-sm text-neutral-400 leading-relaxed">
-                {service.fullDesc[lang]}
-              </p>
-            </div>
-
             {/* Feature checklist */}
             {featureList.length > 0 && (
               <div>
@@ -484,6 +517,22 @@ const ExpandedCardContent = React.memo(function ExpandedCardContent({
               <ArrowRight className="w-4 h-4" />
               <span>{lang === 'id' ? 'PESAN SEKARANG' : 'ORDER NOW'}</span>
             </motion.button>
+
+            {/* Trust elements — confidence boosters below CTA */}
+            <div className="flex items-center justify-center gap-4 pt-1">
+              <span className="flex items-center gap-1.5 text-[10px] text-neutral-500 font-medium">
+                <Shield className="w-3 h-3" style={{ color: accent, opacity: 0.6 }} />
+                {lang === 'id' ? 'Garansi Revisi' : 'Revision Guarantee'}
+              </span>
+              <span className="flex items-center gap-1.5 text-[10px] text-neutral-500 font-medium">
+                <MessageCircle className="w-3 h-3" style={{ color: accent, opacity: 0.6 }} />
+                {lang === 'id' ? 'Konsultasi Gratis' : 'Free Consultation'}
+              </span>
+              <span className="flex items-center gap-1.5 text-[10px] text-neutral-500 font-medium">
+                <FileCheck className="w-3 h-3" style={{ color: accent, opacity: 0.6 }} />
+                {lang === 'id' ? 'NDA Tersedia' : 'NDA Available'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -508,6 +557,10 @@ interface OverlayDialogProps {
   startingFromLabel: string;
   onClose: () => void;
   onOrder: () => void;
+  onPrev: (() => void) | null;
+  onNext: (() => void) | null;
+  currentIndex: number;
+  totalCount: number;
   isMounted: boolean;
 }
 
@@ -520,8 +573,14 @@ function OverlayDialog({
   startingFromLabel,
   onClose,
   onOrder,
+  onPrev,
+  onNext,
+  currentIndex,
+  totalCount,
   isMounted,
 }: OverlayDialogProps) {
+  const scroll = useRef<HTMLDivElement>(null);
+
   if (!isMounted || !expandedCode || !expandedService) return null;
 
   return createPortal(
@@ -549,10 +608,23 @@ function OverlayDialog({
         />
 
         {/* Centered expanded card — scale+opacity animation (no layoutId FLIP) */}
-        <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-4 pointer-events-none">
+          {/* Prev navigation button — hidden on mobile, visible on sm+ */}
+          {onPrev && (
+            <button
+              onClick={onPrev}
+              className="hidden sm:flex absolute left-2 md:left-4 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full items-center justify-center pointer-events-auto cursor-pointer transition-all duration-200 hover:scale-110"
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
+              aria-label={lang === 'id' ? 'Sebelumnya' : 'Previous'}
+            >
+              <ChevronLeft className="w-5 h-5 text-white/70" />
+            </button>
+          )}
+
           <motion.div
             key={`expanded-${expandedCode}`}
-            className="relative rounded-[12px] overflow-y-auto pointer-events-auto"
+            ref={scroll}
+            className="relative rounded-[12px] overflow-y-auto pointer-events-auto rc-detail-scrollbar"
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 6 }}
@@ -561,9 +633,10 @@ function OverlayDialog({
               background: '#080808',
               border: `1px solid ${activeCatStyles.borderColorExpanded}`,
               boxShadow: activeCatStyles.boxShadowExpanded,
-              width: '90vw',
+              width: 'min(95vw, 1000px)',
               maxWidth: '1000px',
-              maxHeight: '85vh',
+              maxHeight: '90vh',
+              overscrollBehavior: 'contain',
             }}
           >
             <ExpandedCardContent
@@ -573,8 +646,36 @@ function OverlayDialog({
               startingFromLabel={startingFromLabel}
               onToggle={onClose}
               onOrder={onOrder}
+              onPrev={onPrev}
+              onNext={onNext}
+              currentIndex={currentIndex}
+              totalCount={totalCount}
             />
           </motion.div>
+
+          {/* Next navigation button — hidden on mobile, visible on sm+ */}
+          {onNext && (
+            <button
+              onClick={onNext}
+              className="hidden sm:flex absolute right-2 md:right-4 z-10 w-10 h-10 md:w-12 md:h-12 rounded-full items-center justify-center pointer-events-auto cursor-pointer transition-all duration-200 hover:scale-110"
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
+              aria-label={lang === 'id' ? 'Selanjutnya' : 'Next'}
+            >
+              <ChevronRight className="w-5 h-5 text-white/70" />
+            </button>
+          )}
+
+          {/* Service counter indicator */}
+          <div
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+          >
+            <span
+              className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase px-3 py-1 rounded-full"
+              style={{ background: 'rgba(0,0,0,0.6)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              {currentIndex + 1} / {totalCount}
+            </span>
+          </div>
         </div>
       </motion.div>
     </AnimatePresence>,
@@ -589,11 +690,9 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
   const [activeCategory, setActiveCategory] = useState<string>('umkm');
   const [expandedCode, setExpandedCode] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  const gridRef = useRef<HTMLDivElement>(null);
-  const cursorPosRef = useRef({ x: 0, y: 0 });
   const spotlightRef = useRef<HTMLDivElement>(null);
-  // Perf: Use ref instead of state to avoid re-renders on mouseEnter/mouseLeave
-  const isGridHoveredRef = useRef(false);
+  const scroll = useRef<HTMLDivElement>(null);
+  // Perf: Use ref instead of state for spotlight visibility — avoids re-renders
   const spotlightVisibleRef = useRef(false);
 
   // ─── Fix #1: SSR-safe portal mount via useSyncExternalStore ───
@@ -611,6 +710,10 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
   const categories = rc.categories;
   const activeCat = categories.find((c) => c.id === activeCategory) || categories[0];
 
+  // ─── Dynamic stats — derived from actual data, not hardcoded ───
+  const totalServices = useMemo(() => categories.reduce((sum, c) => sum + c.services.length, 0), [categories]);
+  const totalCategories = categories.length;
+
   // ─── Fix #8: Memoize computed style values ───
   const activeCatStyles = useMemo(() => ({
     borderColor: hexToRgba(activeCat.color, 0.1),
@@ -625,28 +728,65 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
     return activeCat.services.find((s) => s.code === expandedCode) || null;
   }, [expandedCode, activeCat.services]);
 
-  // ─── Fix #2: Robust scroll lock with stack pattern ───
+  // All services in active category (declared early for keyboard navigation)
+  const allServices = activeCat.services;
+
+  // ─── Fix #2: Robust scroll lock with wheel/touch block ───
+  // When Detail View is open, NOTHING should scroll except the detail view itself.
+  // body overflow:hidden alone isn't enough — wheel events on backdrop can still
+  // propagate and scroll the page. We add a passive:false wheel listener on window
+  // that blocks scrolling unless the target is inside the detail card.
   useEffect(() => {
-    if (expandedCode) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = prev;
-      };
-    }
+    if (!expandedCode) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Block wheel events that aren't inside the detail card
+    const blockScroll = (e: WheelEvent) => {
+      const target = e.target as HTMLElement;
+      const detailCard = document.querySelector('.rc-detail-scrollbar');
+      if (detailCard && !detailCard.contains(target)) {
+        e.preventDefault();
+      }
+    };
+    // Block touchmove events that aren't inside the detail card
+    const blockTouch = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      const detailCard = document.querySelector('.rc-detail-scrollbar');
+      if (detailCard && !detailCard.contains(target)) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('wheel', blockScroll, { passive: false });
+    window.addEventListener('touchmove', blockTouch, { passive: false });
+
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('wheel', blockScroll);
+      window.removeEventListener('touchmove', blockTouch);
+    };
   }, [expandedCode]);
 
-  // ─── Keyboard escape: close on Escape ───
+  // ─── Keyboard escape: close on Escape, navigate on ←/→ ───
   useEffect(() => {
     if (!expandedCode) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setExpandedCode(null);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const idx = allServices.findIndex((s) => s.code === expandedCode);
+        if (idx === -1) return;
+        if (e.key === 'ArrowLeft' && idx > 0) {
+          setExpandedCode(allServices[idx - 1].code);
+        } else if (e.key === 'ArrowRight' && idx < allServices.length - 1) {
+          setExpandedCode(allServices[idx + 1].code);
+        }
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [expandedCode]);
+  }, [expandedCode, allServices]);
 
   // ─── Cursor spotlight via ref — NO setState on mousemove ───
   const handleGridMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -654,7 +794,6 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    cursorPosRef.current = { x, y };
     // Direct DOM update — bypasses React render cycle
     if (spotlightRef.current) {
       spotlightRef.current.style.background = `radial-gradient(350px circle at ${x}px ${y}px, ${activeCat.color}05, transparent)`;
@@ -663,7 +802,6 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
 
   // Perf: Ref-based grid hover (no re-render) — pure DOM, zero React state
   const handleGridMouseEnter = useCallback(() => {
-    isGridHoveredRef.current = true;
     if (!prefersReducedMotion && !expandedCode) {
       spotlightVisibleRef.current = true;
       if (spotlightRef.current) spotlightRef.current.style.display = 'block';
@@ -671,7 +809,6 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
   }, [prefersReducedMotion, expandedCode]);
 
   const handleGridMouseLeave = useCallback(() => {
-    isGridHoveredRef.current = false;
     spotlightVisibleRef.current = false;
     if (spotlightRef.current) spotlightRef.current.style.display = 'none';
   }, []);
@@ -729,11 +866,6 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
     [lang]
   );
 
-  // ─── Toggle expand (used by overlay close) ───
-  const toggleExpand = useCallback((code: string) => {
-    setExpandedCode((prev) => (prev === code ? null : code));
-  }, []);
-
   // ─── Close expanded card ───
   const closeExpanded = useCallback(() => {
     setExpandedCode(null);
@@ -785,21 +917,21 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      const services = Math.floor(eased * 28);
-      const categories = Math.floor(eased * 6);
+      const services = Math.floor(eased * totalServices);
+      const cats = Math.floor(eased * totalCategories);
 
       // Direct DOM update — no React re-render
       if (statTerminalRef.current) statTerminalRef.current.textContent = String(services);
       if (statServicesRef.current) statServicesRef.current.textContent = String(services);
-      if (statCatsRef.current) statCatsRef.current.textContent = String(categories);
+      if (statCatsRef.current) statCatsRef.current.textContent = String(cats);
       if (statFeeRef.current) statFeeRef.current.textContent = '0';
 
       if (progress < 1) {
         rafId = requestAnimationFrame(animate);
       } else {
-        if (statTerminalRef.current) statTerminalRef.current.textContent = '28';
-        if (statServicesRef.current) statServicesRef.current.textContent = '28';
-        if (statCatsRef.current) statCatsRef.current.textContent = '6';
+        if (statTerminalRef.current) statTerminalRef.current.textContent = String(totalServices);
+        if (statServicesRef.current) statServicesRef.current.textContent = String(totalServices);
+        if (statCatsRef.current) statCatsRef.current.textContent = String(totalCategories);
         if (statFeeRef.current) statFeeRef.current.textContent = '0';
         // Flash effect
         if (feeFlashRef.current) {
@@ -813,10 +945,7 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
 
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, [statsVisible]);
-
-  // All services in active category
-  const allServices = activeCat.services;
+  }, [statsVisible, totalServices, totalCategories]);
 
   // Perf: Stable callback map to avoid inline arrow functions breaking React.memo
   const toggleCallbacks = useMemo(() => {
@@ -933,14 +1062,34 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════
-            CATEGORY NAV — Pill Rail
+            CATEGORY NAV — SCI-FI Segmented Terminal Rail
         ═══════════════════════════════════════════ */}
         <ScrollReveal yOffset={12} className="mb-8 md:mb-12">
+          {/* Terminal label bar */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="font-mono text-[8px] font-bold tracking-[0.2em] uppercase text-neutral-400">
+              {lang === 'id' ? 'FILTER_KATEGORI' : 'CATEGORY_FILTER'}
+            </span>
+            <span className="flex-1 h-px bg-neutral-300/40" />
+            <span className="font-mono text-[7px] font-bold tracking-[0.15em] uppercase text-neutral-400">
+              {activeCat.services.length} {lang === 'id' ? 'LAYANAN' : 'SERVICES'}
+            </span>
+          </div>
+
+          {/* SCI-FI Segmented pill rail */}
           <div
             ref={pillContainerRef}
-            className="flex items-center gap-0 overflow-x-auto rc-pill-scrollbar pb-1"
+            className="rc-cat-rail flex items-stretch gap-0 overflow-x-auto rc-pill-scrollbar"
             onMouseMove={handlePillContainerMouseMove}
             onMouseLeave={handlePillContainerMouseLeave}
+            style={{
+              background: 'rgba(0,0,0,0.03)',
+              border: '1px solid rgba(0,0,0,0.08)',
+              borderRadius: '10px',
+              padding: '3px',
+              '--rc-accent': hexToRgba(activeCat.color, 0.22),
+              '--rc-accent-hover': hexToRgba(activeCat.color, 0.35),
+            } as React.CSSProperties}
           >
             {categories.map((cat, catIdx) => {
               const isActive = activeCategory === cat.id;
@@ -948,42 +1097,79 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
                 <React.Fragment key={cat.id}>
                   {catIdx > 0 && (
                     <span
-                      className="w-3 h-px shrink-0 mx-1.5"
-                      style={{ background: 'rgba(0,0,0,0.12)' }}
+                      className="w-px self-stretch shrink-0 my-1.5"
+                      style={{ background: isActive ? 'transparent' : 'rgba(0,0,0,0.08)' }}
                     />
                   )}
-                  <div className="relative">
-                    <button
-                      ref={(el) => { if (el) pillRefs.current.set(cat.id, el); }}
-                      onClick={() => handleCategoryChange(cat.id)}
-                      className={`
-                        rc-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                        text-[11px] whitespace-nowrap transition-all duration-200 cursor-pointer
-                        ${isActive
-                          ? 'text-white font-bold'
-                          : 'text-neutral-400 font-semibold hover:text-neutral-600 hover:bg-neutral-200/60'
-                        }
-                      `}
-                      style={isActive ? { background: cat.color, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)' } : { background: 'transparent' }}
+                  <button
+                    ref={(el) => { if (el) pillRefs.current.set(cat.id, el); }}
+                    onClick={() => handleCategoryChange(cat.id)}
+                    className={`
+                      rc-cat-pill relative flex items-center gap-2 px-3.5 py-2
+                      text-[11px] whitespace-nowrap transition-all duration-250 cursor-pointer
+                      rounded-[8px] shrink-0
+                      ${isActive
+                        ? 'text-white font-bold'
+                        : 'text-neutral-500 font-semibold hover:text-neutral-700 hover:bg-black/[0.04]'
+                      }
+                    `}
+                    style={isActive ? {
+                      background: cat.color,
+                      boxShadow: `0 2px 8px ${cat.color}30, 0 0 0 1px ${cat.color}40, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                    } : { background: 'transparent' }}
+                  >
+                    {/* Status indicator dot */}
+                    <span
+                      className="shrink-0 rounded-sm transition-all duration-250"
+                      style={{
+                        width: isActive ? '6px' : '4px',
+                        height: isActive ? '6px' : '4px',
+                        background: isActive ? 'white' : cat.color,
+                        boxShadow: isActive ? '0 0 6px rgba(255,255,255,0.4)' : 'none',
+                      }}
+                    />
+                    <span className="tracking-wide">{cat.label[lang]}</span>
+                    {/* Service count badge */}
+                    <span
+                      className={`font-mono text-[9px] font-bold tracking-wider ${isActive ? 'text-white/60' : ''}`}
+                      style={!isActive ? { color: cat.color, opacity: 0.5 } : {}}
                     >
-                      <span
-                        className="w-1.5 h-1.5 shrink-0 rounded-full"
-                        style={{ background: isActive ? 'white' : cat.color }}
-                      />
-                      <span>{cat.name}</span>
-                    </button>
+                      {cat.services.length}
+                    </span>
+                    {/* Active scan-line effect */}
                     {isActive && (
                       <motion.div
-                        layoutId="rc-pill-indicator"
-                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-[2px] w-4 rounded-full"
-                        style={{ background: cat.color }}
+                        layoutId="rc-pill-scanline"
+                        className="absolute inset-0 rounded-[8px] pointer-events-none overflow-hidden"
                         transition={SPRING_SNAPPY}
-                      />
+                      >
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            background: `linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.06) 100%)`,
+                          }}
+                        />
+                      </motion.div>
                     )}
-                  </div>
+                  </button>
                 </React.Fragment>
               );
             })}
+          </div>
+
+          {/* Active category detail line */}
+          <div className="flex items-center gap-2 mt-2">
+            <span
+              className="w-2 h-2 rounded-full rc-active-blink"
+              style={{ background: activeCat.color, boxShadow: `0 0 6px ${activeCat.color}60` }}
+            />
+            <span className="font-mono text-[8px] font-bold tracking-[0.15em] uppercase" style={{ color: activeCat.color }}>
+              SECTOR_{activeCat.prefix}
+            </span>
+            <span className="flex-1 h-px" style={{ background: `${activeCat.color}20` }} />
+            <span className="font-mono text-[7px] text-neutral-400 tracking-[0.15em] uppercase">
+              {activeCat.services.length} {lang === 'id' ? 'ENTRI AKTIF' : 'ACTIVE ENTRIES'}
+            </span>
           </div>
         </ScrollReveal>
 
@@ -991,7 +1177,6 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
             SERVICE CONTENT AREA — GRID LAYER (always stable)
         ═══════════════════════════════════════════ */}
         <div
-          ref={gridRef}
           className="relative min-h-[200px] mb-12 md:mb-16"
           onMouseMove={handleGridMouseMove}
           onMouseEnter={handleGridMouseEnter}
@@ -1111,6 +1296,22 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
           startingFromLabel={rc.startingFromLabel}
           onClose={closeExpanded}
           onOrder={() => handleApplyClick(expandedService?.name ?? '', activeCat.name)}
+          onPrev={expandedCode && allServices.findIndex((s) => s.code === expandedCode) > 0
+            ? () => {
+                const idx = allServices.findIndex((s) => s.code === expandedCode);
+                setExpandedCode(allServices[idx - 1].code);
+              }
+            : null
+          }
+          onNext={expandedCode && allServices.findIndex((s) => s.code === expandedCode) < allServices.length - 1
+            ? () => {
+                const idx = allServices.findIndex((s) => s.code === expandedCode);
+                setExpandedCode(allServices[idx + 1].code);
+              }
+            : null
+          }
+          currentIndex={expandedCode ? allServices.findIndex((s) => s.code === expandedCode) : 0}
+          totalCount={allServices.length}
           isMounted={isMounted}
         />
 
