@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -9,9 +10,14 @@ import {
   Clock,
   TrendingUp,
   Users,
-  ChevronDown,
-  AlertTriangle,
   Layers,
+  Zap,
+  MonitorSmartphone,
+  Search,
+  Package,
+  CalendarDays,
+  Code2,
+  Sparkles,
 } from 'lucide-react';
 import { Language, TranslationSet, RatecardService, RatecardCategory } from '@/lib/mizora-types';
 import ScrollReveal from './ScrollReveal';
@@ -28,6 +34,13 @@ const COMMITMENT_ICONS: Record<string, React.ElementType> = {
   TrendingUp,
   Users,
 };
+
+// ─── Animation configs — Optimized for 60fps ───
+// CRITICAL: Replaced spring with tween for overlay — spring causes oscillation = perceived lag
+const TWEEN_OVERLAY = { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const };
+const SPRING_SNAPPY = { type: 'spring' as const, stiffness: 500, damping: 40 };
+const EASE_PREMIUM = [0.16, 1, 0.3, 1] as const;
+const EASE_FAST = [0.25, 0.46, 0.45, 0.94] as const;
 
 // ─── Mono helper — JetBrains Mono ───
 function Mono({
@@ -49,25 +62,38 @@ function Mono({
   );
 }
 
-// ─── Spec Pill with accent dot ───
+// ─── Hex to rgba helper — memoized via cache ───
+const _rgbaCache = new Map<string, string>();
+function hexToRgba(hex: string, alpha: number): string {
+  const key = `${hex}-${alpha}`;
+  const cached = _rgbaCache.get(key);
+  if (cached) return cached;
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  const result = `rgba(${r},${g},${b},${alpha})`;
+  _rgbaCache.set(key, result);
+  return result;
+}
+
+// ─── Spec Pill ───
 function SpecPill({
   children,
   accent,
-  isHovered = false,
   className = '',
   style,
 }: {
   children: React.ReactNode;
   accent?: string;
-  isHovered?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }) {
   return (
     <span
-      className={`rc-spec-pill inline-flex items-center gap-1.5 font-mono text-[9px] font-bold px-3 py-1 rounded-full border border-white/[0.06] transition-colors duration-200 ${className}`}
+      className={`rc-spec-pill inline-flex items-center gap-1.5 font-mono text-[9px] font-bold px-3 py-1 rounded-full border border-white/[0.06] ${className}`}
       style={{
-        background: isHovered ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.04)',
+        background: 'rgba(255,255,255,0.04)',
         ...style,
       }}
     >
@@ -85,65 +111,638 @@ function SpecPill({
 }
 
 // ═══════════════════════════════════════════════════════════════
+//  COLLAPSED CARD CONTENT — Memoized for performance
+//  Rendered inside the grid card when NOT expanded
+// ═══════════════════════════════════════════════════════════════
+interface CollapsedCardContentProps {
+  service: RatecardService;
+  category: RatecardCategory;
+  lang: Language;
+  startingFromLabel: string;
+  onToggle: () => void;
+}
+
+const CollapsedCardContent = React.memo(function CollapsedCardContent({
+  service,
+  category,
+  lang,
+  startingFromLabel,
+  onToggle,
+}: CollapsedCardContentProps) {
+  const accent = category.color;
+
+  return (
+    <>
+      {/* Holo shimmer */}
+      <div className="rc-holo-shimmer" />
+
+      {/* Top accent glow line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px z-20 pointer-events-none"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+          opacity: 0,
+        }}
+      />
+
+      {/* Card inner content */}
+      <div className="relative z-10 p-6">
+        {/* Header row */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span
+              className="font-mono text-[9px] font-bold px-2.5 py-1 rounded uppercase tracking-wider"
+              style={{ background: `${accent}12`, color: accent }}
+            >
+              MZ-{category.prefix}
+            </span>
+            <span className="font-mono text-[11px] text-neutral-500 font-bold tracking-wider">
+              {service.code}
+            </span>
+          </div>
+        </div>
+
+        {/* Service name */}
+        <h3
+          className="font-sans text-white tracking-tight leading-tight mb-2"
+          style={{ fontWeight: 600, fontSize: '0.9375rem' }}
+        >
+          {service.name}
+        </h3>
+
+        {/* Description */}
+        <p
+          className="font-sans leading-relaxed mb-4"
+          style={{
+            fontSize: '0.8125rem',
+            color: '#737373',
+            marginBottom: '1rem',
+            WebkitLineClamp: 2,
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {service.desc[lang]}
+        </p>
+
+        {/* Spec pills */}
+        <div className="flex items-center gap-1.5 mb-4 flex-wrap">
+          <SpecPill accent={accent}>{service.tags.timeline}</SpecPill>
+          <SpecPill accent={accent}>
+            {service.tags.scope} {lang === 'id' ? 'hal' : 'pgs'}
+          </SpecPill>
+          <SpecPill
+            accent={accent}
+            style={{ background: `${accent}10`, color: accent }}
+          >
+            {service.tags.tech}
+          </SpecPill>
+        </div>
+
+        {/* Price display */}
+        <div className="mb-4 pb-4 border-b border-white/[0.04]">
+          <span className="font-mono text-[8px] font-bold tracking-[0.12em] uppercase text-neutral-500 block mb-0.5">
+            {startingFromLabel}
+          </span>
+          <span
+            className="font-mono text-[1.25rem] font-bold tracking-tight block leading-none mb-0.5"
+            style={{ color: accent, fontFamily: '"JetBrains Mono", monospace' }}
+          >
+            {service.price[lang]}
+          </span>
+          <span className="font-mono text-[7px] font-bold tracking-[0.1em] uppercase text-neutral-500 block">
+            {lang === 'id' ? 'INVESTASI DIGITAL' : 'DIGITAL INVESTMENT'}
+          </span>
+        </div>
+
+        {/* CTA: Lihat Detail */}
+        <button
+          onClick={onToggle}
+          className="rc-ghost-btn inline-flex items-center gap-1.5 text-[12px] font-semibold text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer group/btn"
+          style={{
+            transition: 'color 0.2s, filter 0.2s, transform 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.filter = 'brightness(110%)';
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.filter = 'brightness(100%)';
+            (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+          }}
+        >
+          <span>{lang === 'id' ? '→ Lihat Detail' : '→ View Details'}</span>
+          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:translate-x-[2px]" />
+        </button>
+      </div>
+    </>
+  );
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  EXPANDED CARD CONTENT — Memoized for performance
+//  Rendered inside the overlay card when expanded
+//  All content pre-rendered, revealed via opacity
+// ═══════════════════════════════════════════════════════════════
+interface ExpandedCardContentProps {
+  service: RatecardService;
+  category: RatecardCategory;
+  lang: Language;
+  startingFromLabel: string;
+  onToggle: () => void;
+  onOrder: () => void;
+}
+
+const ExpandedCardContent = React.memo(function ExpandedCardContent({
+  service,
+  category,
+  lang,
+  startingFromLabel,
+  onToggle,
+  onOrder,
+}: ExpandedCardContentProps) {
+  const accent = category.color;
+  const featureList = service.features?.[lang] ?? [];
+
+  const specRows = useMemo(() => [
+    { icon: Clock, label: lang === 'id' ? 'Waktu Kerja' : 'Working Time', value: service.specs.timeline[lang] },
+    { icon: CalendarDays, label: lang === 'id' ? 'Halaman' : 'Pages', value: service.specs.pages[lang] },
+    { icon: Code2, label: 'Tech Stack', value: service.specs.techStack },
+    { icon: Zap, label: lang === 'id' ? 'Revisi' : 'Revisions', value: service.specs.revisions },
+  ], [lang, service.specs]);
+
+  return (
+    <>
+      {/* Top accent glow line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px z-20 pointer-events-none"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
+          opacity: 0.6,
+        }}
+      />
+
+      {/* Card inner content */}
+      <div className="relative z-10 p-6 md:p-8">
+        {/* Header row with close button */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span
+              className="font-mono text-[9px] font-bold px-2.5 py-1 rounded uppercase tracking-wider"
+              style={{ background: `${accent}12`, color: accent }}
+            >
+              MZ-{category.prefix}
+            </span>
+            <span className="font-mono text-[11px] text-neutral-500 font-bold tracking-wider">
+              {service.code}
+            </span>
+          </div>
+
+          {/* Close button */}
+          <button
+            onClick={onToggle}
+            className="w-8 h-8 rounded-md flex items-center justify-center text-neutral-500 hover:text-white hover:bg-white/10 cursor-pointer shrink-0 transition-colors duration-150"
+            aria-label={lang === 'id' ? 'Tutup' : 'Close'}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Service name */}
+        <h3
+          className="font-sans text-white tracking-tight leading-tight mb-2"
+          style={{ fontWeight: 800, fontSize: '1.25rem' }}
+        >
+          {service.name}
+        </h3>
+
+        {/* Description */}
+        <p
+          className="font-sans leading-relaxed mb-6"
+          style={{
+            fontSize: '0.875rem',
+            color: '#a3a3a3',
+            marginBottom: '1.5rem',
+          }}
+        >
+          {service.fullDesc[lang]}
+        </p>
+
+        {/* 2-column layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {/* ─── Left column: Overview + Features + Deliverables ─── */}
+          <div className="space-y-6">
+            {/* Overview section */}
+            <div>
+              <h4
+                className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2"
+                style={{ color: accent }}
+              >
+                <Sparkles className="w-3 h-3" />
+                {lang === 'id' ? 'Ikhtisar' : 'Overview'}
+              </h4>
+              <p className="font-sans text-sm text-neutral-400 leading-relaxed">
+                {service.fullDesc[lang]}
+              </p>
+            </div>
+
+            {/* Feature checklist */}
+            {featureList.length > 0 && (
+              <div>
+                <h4
+                  className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2"
+                  style={{ color: accent }}
+                >
+                  <MonitorSmartphone className="w-3 h-3" />
+                  {lang === 'id' ? 'Fitur Utama' : 'Key Features'}
+                </h4>
+                <div className="space-y-1.5">
+                  {featureList.map((feat, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 py-2 px-3 bg-white/[0.02] rounded-md hover:bg-white/[0.04] transition-colors duration-200"
+                    >
+                      <Check className="w-4 h-4 shrink-0" style={{ color: accent }} />
+                      <span className="font-sans text-xs text-neutral-300">{feat}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Deliverables list */}
+            <div>
+              <h4
+                className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2"
+                style={{ color: accent }}
+              >
+                <Package className="w-3 h-3" />
+                {lang === 'id' ? 'Deliverables' : 'Deliverables'}
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {service.deliverables[lang].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2.5 py-2 px-3 bg-white/[0.02] rounded-md hover:bg-white/[0.04] transition-colors duration-200"
+                  >
+                    <Check className="w-3.5 h-3.5 shrink-0" style={{ color: accent }} />
+                    <span className="font-sans text-xs text-neutral-300">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ─── Right column: Specs + Price + CTA ─── */}
+          <div className="space-y-6">
+            {/* Timeline & Specs */}
+            <div>
+              <h4
+                className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2"
+                style={{ color: accent }}
+              >
+                <Clock className="w-3 h-3" />
+                {lang === 'id' ? 'Timeline & Spesifikasi' : 'Timeline & Specs'}
+              </h4>
+              <div className="space-y-2">
+                {specRows.map((spec, idx) => {
+                  const IconComp = spec.icon;
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 py-2.5 px-4 bg-white/[0.02] rounded-md"
+                    >
+                      <IconComp className="w-4 h-4 shrink-0" style={{ color: accent, opacity: 0.7 }} />
+                      <div className="flex-1 min-w-0">
+                        <span className="font-mono text-[8px] font-bold text-neutral-500 uppercase tracking-wider block">
+                          {spec.label}
+                        </span>
+                        <span className="font-sans text-sm font-semibold text-white block">
+                          {spec.value}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Responsive & SEO badges */}
+                <div className="flex gap-2 mt-1">
+                  {service.specs.responsive && (
+                    <span
+                      className="inline-flex items-center gap-1.5 font-mono text-[9px] font-bold px-2.5 py-1.5 rounded-full"
+                      style={{ background: `${accent}12`, color: accent }}
+                    >
+                      <MonitorSmartphone className="w-3 h-3" />
+                      Responsive
+                    </span>
+                  )}
+                  {service.specs.seo && (
+                    <span
+                      className="inline-flex items-center gap-1.5 font-mono text-[9px] font-bold px-2.5 py-1.5 rounded-full"
+                      style={{ background: `${accent}12`, color: accent }}
+                    >
+                      <Search className="w-3 h-3" />
+                      SEO Ready
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-white/[0.06]" />
+
+            {/* Hero price */}
+            <div>
+              <span className="font-mono text-[8px] font-bold tracking-[0.15em] uppercase text-neutral-500 block mb-1">
+                {startingFromLabel}
+              </span>
+              <span
+                className="font-mono text-2xl md:text-3xl font-bold tracking-tight block leading-none mb-1"
+                style={{ color: accent, fontFamily: '"Orbitron", "JetBrains Mono", monospace' }}
+              >
+                {service.price[lang]}
+              </span>
+              <span className="font-mono text-[8px] font-bold tracking-[0.12em] uppercase text-neutral-500 block">
+                {lang === 'id' ? 'INVESTASI DIGITAL' : 'DIGITAL INVESTMENT'}
+              </span>
+            </div>
+
+            {/* Strong CTA button */}
+            <motion.button
+              onClick={onOrder}
+              className="w-full py-4 rounded-md text-sm font-extrabold flex items-center justify-center gap-2.5 cursor-pointer text-white transition-all duration-200"
+              style={{
+                background: accent,
+                boxShadow: `0 0 20px ${accent}40`,
+              }}
+              whileHover={{ filter: 'brightness(1.1)', y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.15 }}
+            >
+              <ArrowRight className="w-4 h-4" />
+              <span>{lang === 'id' ? 'PESAN SEKARANG' : 'ORDER NOW'}</span>
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  OVERLAY DIALOG — Portaled expanded card overlay
+//  Extracted as separate component to avoid JSX parsing issues
+//  with createPortal + AnimatePresence nesting
+// ═══════════════════════════════════════════════════════════════
+interface OverlayDialogProps {
+  expandedCode: string | null;
+  expandedService: RatecardService | null;
+  activeCat: RatecardCategory;
+  activeCatStyles: {
+    borderColorExpanded: string;
+    boxShadowExpanded: string;
+  };
+  lang: Language;
+  startingFromLabel: string;
+  onClose: () => void;
+  onOrder: () => void;
+  isMounted: boolean;
+}
+
+function OverlayDialog({
+  expandedCode,
+  expandedService,
+  activeCat,
+  activeCatStyles,
+  lang,
+  startingFromLabel,
+  onClose,
+  onOrder,
+  isMounted,
+}: OverlayDialogProps) {
+  if (!isMounted || !expandedCode || !expandedService) return null;
+
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        key={`dialog-${expandedCode}`}
+        className="fixed inset-0 z-[9999]"
+        role="dialog"
+        aria-modal="true"
+        aria-label={expandedService.name}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {/* Backdrop — reduced blur from 8px to 3px for GPU perf */}
+        <motion.div
+          className="absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: EASE_FAST }}
+          style={{ background: 'rgba(0,0,0,0.65)' }}
+          onClick={onClose}
+        />
+
+        {/* Centered expanded card — scale+opacity animation (no layoutId FLIP) */}
+        <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+          <motion.div
+            key={`expanded-${expandedCode}`}
+            className="relative rounded-[12px] overflow-y-auto pointer-events-auto"
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 6 }}
+            transition={TWEEN_OVERLAY}
+            style={{
+              background: '#080808',
+              border: `1px solid ${activeCatStyles.borderColorExpanded}`,
+              boxShadow: activeCatStyles.boxShadowExpanded,
+              width: '90vw',
+              maxWidth: '1000px',
+              maxHeight: '85vh',
+            }}
+          >
+            <ExpandedCardContent
+              service={expandedService}
+              category={activeCat}
+              lang={lang}
+              startingFromLabel={startingFromLabel}
+              onToggle={onClose}
+              onOrder={onOrder}
+            />
+          </motion.div>
+        </div>
+      </motion.div>
+    </AnimatePresence>,
+    document.body
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
 export default function RatecardSection({ t, lang }: RatecardSectionProps) {
   const [activeCategory, setActiveCategory] = useState<string>('umkm');
-  const [modalService, setModalService] = useState<RatecardService | null>(null);
-  const [modalCategory, setModalCategory] = useState<RatecardCategory | null>(null);
-  const [expandedPricing, setExpandedPricing] = useState<string | null>(null);
+  const [expandedCode, setExpandedCode] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  const sectionRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const [isGridHovered, setIsGridHovered] = useState(false);
+  const cursorPosRef = useRef({ x: 0, y: 0 });
+  const spotlightRef = useRef<HTMLDivElement>(null);
+  // Perf: Use ref instead of state to avoid re-renders on mouseEnter/mouseLeave
+  const isGridHoveredRef = useRef(false);
+  const spotlightVisibleRef = useRef(false);
+
+  // ─── Fix #1: SSR-safe portal mount via useSyncExternalStore ───
+  const isMounted = useSyncExternalStore(
+    () => () => {},   // subscribe (no-op, never changes)
+    () => true,       // client snapshot
+    () => false       // server snapshot
+  );
+
+  // ─── Magnetic pill refs ───
+  const pillContainerRef = useRef<HTMLDivElement>(null);
+  const pillRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   const rc = t.ratecard;
   const categories = rc.categories;
   const activeCat = categories.find((c) => c.id === activeCategory) || categories[0];
 
-  // ─── Cursor spotlight handler ───
+  // ─── Fix #8: Memoize computed style values ───
+  const activeCatStyles = useMemo(() => ({
+    borderColor: hexToRgba(activeCat.color, 0.1),
+    borderColorExpanded: hexToRgba(activeCat.color, 0.3),
+    boxShadow: `0 8px 20px rgba(0,0,0,0.2), 0 0 40px ${hexToRgba(activeCat.color, 0.06)}`,
+    boxShadowExpanded: `0 20px 40px rgba(0,0,0,0.5), 0 0 100px ${hexToRgba(activeCat.color, 0.12)}`,
+  }), [activeCat.color]);
+
+  // ─── Derived: expanded service ───
+  const expandedService = useMemo(() => {
+    if (!expandedCode) return null;
+    return activeCat.services.find((s) => s.code === expandedCode) || null;
+  }, [expandedCode, activeCat.services]);
+
+  // ─── Fix #2: Robust scroll lock with stack pattern ───
+  useEffect(() => {
+    if (expandedCode) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [expandedCode]);
+
+  // ─── Keyboard escape: close on Escape ───
+  useEffect(() => {
+    if (!expandedCode) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setExpandedCode(null);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [expandedCode]);
+
+  // ─── Cursor spotlight via ref — NO setState on mousemove ───
   const handleGridMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || expandedCode) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    setCursorPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    cursorPosRef.current = { x, y };
+    // Direct DOM update — bypasses React render cycle
+    if (spotlightRef.current) {
+      spotlightRef.current.style.background = `radial-gradient(350px circle at ${x}px ${y}px, ${activeCat.color}05, transparent)`;
+    }
+  }, [prefersReducedMotion, activeCat.color, expandedCode]);
+
+  // Perf: Ref-based grid hover (no re-render) — pure DOM, zero React state
+  const handleGridMouseEnter = useCallback(() => {
+    isGridHoveredRef.current = true;
+    if (!prefersReducedMotion && !expandedCode) {
+      spotlightVisibleRef.current = true;
+      if (spotlightRef.current) spotlightRef.current.style.display = 'block';
+    }
+  }, [prefersReducedMotion, expandedCode]);
+
+  const handleGridMouseLeave = useCallback(() => {
+    isGridHoveredRef.current = false;
+    spotlightVisibleRef.current = false;
+    if (spotlightRef.current) spotlightRef.current.style.display = 'none';
+  }, []);
+
+  // ─── Magnetic pill effect ───
+  const handlePillContainerMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
+    const mouseX = e.clientX;
+
+    pillRefs.current.forEach((pillEl) => {
+      const pillRect = pillEl.getBoundingClientRect();
+      const pillCenterX = pillRect.left + pillRect.width / 2;
+      const distX = mouseX - pillCenterX;
+      const distance = Math.abs(distX);
+      const threshold = 80;
+
+      if (distance < threshold) {
+        const factor = 1 - distance / threshold;
+        const shiftX = distX > 0 ? Math.min(factor * 3, 3) : Math.max(factor * -3, -3);
+        pillEl.style.transform = `translateX(${shiftX}px)`;
+      } else {
+        pillEl.style.transform = 'translateX(0px)';
+      }
+    });
   }, [prefersReducedMotion]);
+
+  const handlePillContainerMouseLeave = useCallback(() => {
+    pillRefs.current.forEach((pillEl) => {
+      pillEl.style.transform = 'translateX(0px)';
+    });
+  }, []);
 
   // ─── Scroll to contact ───
   const handleApplyClick = useCallback(
     (serviceName: string, category: string) => {
-      const contactSection = document.getElementById('contact');
-      if (contactSection) {
-        const messageField = document.getElementById('form-message') as HTMLTextAreaElement;
-        if (messageField) {
-          messageField.value =
-            lang === 'id'
-              ? `Halo Mizora Core Team, saya tertarik dengan layanan ${serviceName} (${category}). Silakan jadwalkan konsultasi.`
-              : `Hello Mizora Core Team, I am interested in the ${serviceName} service (${category}). Please schedule a consultation.`;
+      setExpandedCode(null); // Close expanded card first
+      // Defer scroll to next frame so collapse animation starts
+      requestAnimationFrame(() => {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+          const messageField = document.getElementById('form-message') as HTMLTextAreaElement;
+          if (messageField) {
+            messageField.value =
+              lang === 'id'
+                ? `Halo Mizora Core Team, saya tertarik dengan layanan ${serviceName} (${category}). Silakan jadwalkan konsultasi.`
+                : `Hello Mizora Core Team, I am interested in the ${serviceName} service (${category}). Please schedule a consultation.`;
+          }
+          const headerOffset = 85;
+          const elementPosition = contactSection.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
         }
-        const headerOffset = 85;
-        const elementPosition = contactSection.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-      }
+      });
     },
     [lang]
   );
 
-  // ─── Modal open/close ───
-  const openModal = useCallback(
-    (service: RatecardService, category: RatecardCategory) => {
-      setModalService(service);
-      setModalCategory(category);
-      document.body.style.overflow = 'hidden';
-    },
-    []
-  );
+  // ─── Toggle expand (used by overlay close) ───
+  const toggleExpand = useCallback((code: string) => {
+    setExpandedCode((prev) => (prev === code ? null : code));
+  }, []);
 
-  const closeModal = useCallback(() => {
-    setModalService(null);
-    setModalCategory(null);
-    document.body.style.overflow = '';
+  // ─── Close expanded card ───
+  const closeExpanded = useCallback(() => {
+    setExpandedCode(null);
+  }, []);
+
+  // ─── Category change handler ───
+  const handleCategoryChange = useCallback((catId: string) => {
+    setActiveCategory(catId);
+    setExpandedCode(null);
   }, []);
 
   // ─── Animation variants ───
@@ -159,20 +758,22 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
   const cardItemVariants = {
     hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 16 },
     visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
+      opacity: 1, y: 0,
+      transition: { duration: 0.4, ease: EASE_PREMIUM },
     },
     exit: {
-      opacity: 0,
-      y: prefersReducedMotion ? 0 : 8,
+      opacity: 0, y: prefersReducedMotion ? 0 : 8,
       transition: { duration: 0.15 },
     },
   };
 
-  // ─── Stats counter animation ───
+  // ─── Fix #9: Stats counter animation via ref + DOM ───
   const [statsVisible, setStatsVisible] = useState(false);
-  const [statNumbers, setStatNumbers] = useState({ services: 0, categories: 0 });
+  const statTerminalRef = useRef<HTMLSpanElement>(null); // Terminal line counter
+  const statServicesRef = useRef<HTMLSpanElement>(null); // Micro decoration counter
+  const statCatsRef = useRef<HTMLSpanElement>(null);
+  const statFeeRef = useRef<HTMLSpanElement>(null);
+  const feeFlashRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!statsVisible) return;
@@ -184,14 +785,29 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setStatNumbers({
-        services: Math.floor(eased * 28),
-        categories: Math.floor(eased * 6),
-      });
+      const services = Math.floor(eased * 28);
+      const categories = Math.floor(eased * 6);
+
+      // Direct DOM update — no React re-render
+      if (statTerminalRef.current) statTerminalRef.current.textContent = String(services);
+      if (statServicesRef.current) statServicesRef.current.textContent = String(services);
+      if (statCatsRef.current) statCatsRef.current.textContent = String(categories);
+      if (statFeeRef.current) statFeeRef.current.textContent = '0';
+
       if (progress < 1) {
         rafId = requestAnimationFrame(animate);
       } else {
-        setStatNumbers({ services: 28, categories: 6 });
+        if (statTerminalRef.current) statTerminalRef.current.textContent = '28';
+        if (statServicesRef.current) statServicesRef.current.textContent = '28';
+        if (statCatsRef.current) statCatsRef.current.textContent = '6';
+        if (statFeeRef.current) statFeeRef.current.textContent = '0';
+        // Flash effect
+        if (feeFlashRef.current) {
+          feeFlashRef.current.classList.add('rc-fee-flash');
+          setTimeout(() => {
+            if (feeFlashRef.current) feeFlashRef.current.classList.remove('rc-fee-flash');
+          }, 400);
+        }
       }
     };
 
@@ -199,21 +815,29 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
     return () => cancelAnimationFrame(rafId);
   }, [statsVisible]);
 
-  // Separate featured service from the rest
-  const featuredService = activeCat.services[0];
-  const remainingServices = activeCat.services.slice(1);
+  // All services in active category
+  const allServices = activeCat.services;
 
-  // Group project entries by category
-  const projectByCategory = rc.projectEntries.reduce<Record<string, typeof rc.projectEntries>>((acc, entry) => {
-    const catName = entry.category[lang];
-    if (!acc[catName]) acc[catName] = [];
-    acc[catName].push(entry);
-    return acc;
-  }, {});
+  // Perf: Stable callback map to avoid inline arrow functions breaking React.memo
+  const toggleCallbacks = useMemo(() => {
+    const map = new Map<string, () => void>();
+    for (const svc of allServices) {
+      const code = svc.code;
+      map.set(code, () => setExpandedCode((prev) => (prev === code ? null : code)));
+    }
+    return map;
+  }, [allServices]);
+
+  // Hide spotlight when expanded (ref-based, no re-render)
+  useEffect(() => {
+    if (expandedCode) {
+      spotlightVisibleRef.current = false;
+      if (spotlightRef.current) spotlightRef.current.style.display = 'none';
+    }
+  }, [expandedCode]);
 
   return (
     <section
-      ref={sectionRef}
       id="ratecard"
       className="relative py-20 md:py-28 overflow-hidden"
       style={{ background: '#ECECF0' }}
@@ -221,10 +845,10 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
       {/* ─── Atmospheric background: noise texture ─── */}
       <div className="absolute inset-0 rc-noise-bg pointer-events-none" />
 
-      {/* ─── 1. Dot grid background (Stripe/Vercel) ─── */}
+      {/* ─── Dot grid background ─── */}
       <div className="absolute inset-0 rc-dot-grid pointer-events-none" />
 
-      {/* ─── 5. Floating micro-particles ─── */}
+      {/* ─── Floating micro-particles ─── */}
       {!prefersReducedMotion && (
         <>
           <span className="rc-particle rc-particle--1" />
@@ -249,7 +873,7 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
         }}
       />
 
-      {/* ─── Subtle conic gradient — slowly rotating radar sweep ─── */}
+      {/* ─── Subtle conic gradient ─── */}
       <div
         className="absolute inset-0 pointer-events-none rc-conic-sweep"
         style={{
@@ -258,10 +882,10 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
         }}
       />
 
-      <div className="max-w-6xl mx-auto px-6 md:px-8 relative z-20 w-full">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-20 w-full">
 
         {/* ═══════════════════════════════════════════
-            SECTION HEADER — Matching SECTOR_04 Style
+            SECTION HEADER
         ═══════════════════════════════════════════ */}
         <ScrollReveal yOffset={30} delay={0}>
           <div className="mb-14 md:mb-18">
@@ -276,22 +900,17 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
               </Mono>
               <span className="flex-1 h-[2px] bg-gradient-to-r from-black via-black/70 to-black/10" />
               <Mono className="text-[9px] text-emerald-600/70 tracking-[0.2em] uppercase font-bold">
-                {statNumbers.services} {lang === 'id' ? 'LAYANAN' : 'SERVICES'}
+                <span ref={statTerminalRef}>0</span> {lang === 'id' ? 'LAYANAN' : 'SERVICES'}
               </Mono>
               <span className="inline-block w-[6px] h-[14px] bg-emerald-500 ml-1" style={{ animation: 'cmd-cursor-blink 0.8s step-end infinite' }} />
             </div>
 
-            {/* Headline — Orbitron font, black */}
+            {/* Headline */}
             <h2 className="font-display font-black text-[2.8rem] md:text-7xl text-black tracking-tight mb-0 leading-[0.92]">
               <span className="block uppercase">MATRIX</span>
               <span className="block uppercase text-[2rem] md:text-5xl mt-1">PRODUK DIGITAL</span>
             </h2>
             <div className="cmd-headline-line max-w-[200px]" />
-
-            {/* Sub-headline */}
-            <p className="font-sans font-medium text-sm md:text-base text-neutral-500 leading-relaxed max-w-3xl mt-5">
-              {rc.subtitle}
-            </p>
 
             {/* Micro decoration */}
             <div className="flex items-center gap-3 mt-4">
@@ -305,10 +924,10 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
               <span className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400 rc-stat-dot" />
                 <Mono className="text-[7px] text-neutral-500 tracking-[0.15em] uppercase font-bold">
-                  {statNumbers.categories} {lang === 'id' ? 'Kategori' : 'Categories'}
+                  <span ref={statServicesRef}>0</span> {lang === 'id' ? 'LAYANAN' : 'SERVICES'} &middot; <span ref={statCatsRef}>0</span> {lang === 'id' ? 'KATEGORI' : 'CATEGORIES'} &middot; <span ref={feeFlashRef}><span ref={statFeeRef}>0</span> HIDDEN FEE</span>
                 </Mono>
               </span>
-              <Mono className="text-[7px] text-emerald-600/50 tracking-[0.15em] uppercase font-bold">● ACTIVE</Mono>
+              <Mono className="text-[7px] text-emerald-600/50 tracking-[0.15em] uppercase font-bold rc-active-blink">● ACTIVE</Mono>
             </div>
           </div>
         </ScrollReveal>
@@ -317,12 +936,16 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
             CATEGORY NAV — Pill Rail
         ═══════════════════════════════════════════ */}
         <ScrollReveal yOffset={12} className="mb-8 md:mb-12">
-          <div className="flex items-center gap-0 overflow-x-auto rc-pill-scrollbar pb-1">
+          <div
+            ref={pillContainerRef}
+            className="flex items-center gap-0 overflow-x-auto rc-pill-scrollbar pb-1"
+            onMouseMove={handlePillContainerMouseMove}
+            onMouseLeave={handlePillContainerMouseLeave}
+          >
             {categories.map((cat, catIdx) => {
               const isActive = activeCategory === cat.id;
               return (
                 <React.Fragment key={cat.id}>
-                  {/* Separator between pills */}
                   {catIdx > 0 && (
                     <span
                       className="w-3 h-px shrink-0 mx-1.5"
@@ -331,7 +954,8 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
                   )}
                   <div className="relative">
                     <button
-                      onClick={() => setActiveCategory(cat.id)}
+                      ref={(el) => { if (el) pillRefs.current.set(cat.id, el); }}
+                      onClick={() => handleCategoryChange(cat.id)}
                       className={`
                         rc-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full
                         text-[11px] whitespace-nowrap transition-all duration-200 cursor-pointer
@@ -342,28 +966,18 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
                       `}
                       style={isActive ? { background: cat.color, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)' } : { background: 'transparent' }}
                     >
-                      <span className="relative w-1.5 h-1.5 shrink-0">
-                        <span
-                          className="absolute inset-0 rounded-full"
-                          style={{ background: isActive ? 'white' : cat.color }}
-                        />
-                        {/* 6. Pulse ring on active category dot */}
-                        {isActive && !prefersReducedMotion && (
-                          <span
-                            className="rc-pulse-ring"
-                            style={{ background: 'white' }}
-                          />
-                        )}
-                      </span>
+                      <span
+                        className="w-1.5 h-1.5 shrink-0 rounded-full"
+                        style={{ background: isActive ? 'white' : cat.color }}
+                      />
                       <span>{cat.name}</span>
                     </button>
-                    {/* Sliding bottom indicator line */}
                     {isActive && (
                       <motion.div
                         layoutId="rc-pill-indicator"
                         className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-[2px] w-4 rounded-full"
                         style={{ background: cat.color }}
-                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                        transition={SPRING_SNAPPY}
                       />
                     )}
                   </div>
@@ -374,34 +988,43 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
         </ScrollReveal>
 
         {/* ═══════════════════════════════════════════
-            SERVICE CONTENT AREA
+            SERVICE CONTENT AREA — GRID LAYER (always stable)
         ═══════════════════════════════════════════ */}
         <div
           ref={gridRef}
           className="relative min-h-[200px] mb-12 md:mb-16"
           onMouseMove={handleGridMouseMove}
-          onMouseEnter={() => setIsGridHovered(true)}
-          onMouseLeave={() => setIsGridHovered(false)}
+          onMouseEnter={handleGridMouseEnter}
+          onMouseLeave={handleGridMouseLeave}
         >
-          {/* Cursor spotlight — follows mouse */}
-          {isGridHovered && !prefersReducedMotion && (
-            <div
-              className="absolute inset-0 pointer-events-none z-0 transition-opacity duration-300"
-              style={{
-                background: `radial-gradient(350px circle at ${cursorPos.x}px ${cursorPos.y}px, ${activeCat.color}05, transparent)`,
-              }}
-            />
-          )}
+          {/* Perf: Cursor spotlight — always in DOM, visibility controlled via ref */}
+          <div
+            ref={spotlightRef}
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              display: 'none',
+              background: `radial-gradient(350px circle at 0px 0px, ${activeCat.color}05, transparent)`,
+            }}
+          />
+
+          {/* Perf: Grid dim — CSS transition instead of AnimatePresence/motion.div */}
+          <div
+            className="absolute inset-0 rounded-lg pointer-events-none z-20 transition-opacity duration-200"
+            style={{
+              background: 'rgba(236,236,240,0.55)',
+              opacity: expandedCode !== null ? 1 : 0,
+            }}
+          />
 
           <AnimatePresence mode="wait">
-            {activeCat.id === 'tambahan' ? (
+            {allServices.length === 0 ? (
               <motion.div
                 key="coming-soon"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
-                className="flex flex-col items-center justify-center py-20 px-6 bg-[#0A0A0A] rounded-lg"
+                transition={{ duration: 0.3, ease: EASE_PREMIUM }}
+                className="flex flex-col items-center justify-center py-20 px-6 bg-[#080808] rounded-lg"
               >
                 <Layers className="w-8 h-8 mb-4" style={{ color: activeCat.color, opacity: 0.5 }} />
                 <h3 className="font-sans font-semibold text-base text-white tracking-tight mb-2">
@@ -409,8 +1032,8 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
                 </h3>
                 <p className="font-sans text-sm text-neutral-500 text-center max-w-sm leading-relaxed">
                   {lang === 'id'
-                    ? 'Kategori layanan tambahan sedang dalam pengembangan.'
-                    : 'Additional service categories are under development.'}
+                    ? 'Kategori layanan ini sedang dalam pengembangan.'
+                    : 'This service category is under development.'}
                 </p>
               </motion.div>
             ) : (
@@ -420,762 +1043,117 @@ export default function RatecardSection({ t, lang }: RatecardSectionProps) {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="space-y-4 md:space-y-5 relative z-10"
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative"
               >
-                {/* ─── Featured Service Card ─── */}
-                {featuredService && (
-                  <motion.div variants={cardItemVariants}>
-                    <FeaturedCard
-                      service={featuredService}
-                      category={activeCat}
-                      lang={lang}
-                      startingFromLabel={rc.startingFromLabel}
-                      onDetail={() => openModal(featuredService, activeCat)}
-                      onOrder={() => handleApplyClick(featuredService.name, activeCat.name)}
-                    />
-                  </motion.div>
-                )}
+                {allServices.map((service) => {
+                  const isExpanded = expandedCode === service.code;
+                  return (
+                    <motion.div
+                      key={service.code}
+                      variants={cardItemVariants}
+                      className="relative"
+                      style={{ overflow: 'visible' }}
+                    >
+                      {/* When NOT expanded: render the card (no layoutId — uses scale+opacity for overlay instead) */}
+                      {!isExpanded && (
+                        <motion.div
+                          className="relative rounded-[12px] overflow-hidden"
+                          style={{
+                            background: '#080808',
+                            border: `1px solid ${activeCatStyles.borderColor}`,
+                            boxShadow: activeCatStyles.boxShadow,
+                          }}
+                          whileHover={!expandedCode ? { y: -4, scale: 1.008 } : undefined}
+                          transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                        >
+                          <CollapsedCardContent
+                            service={service}
+                            category={activeCat}
+                            lang={lang}
+                            startingFromLabel={rc.startingFromLabel}
+                            onToggle={toggleCallbacks.get(service.code) ?? (() => {})}
+                          />
+                        </motion.div>
+                      )}
 
-                {/* ─── Regular Service Grid ─── */}
-                {remainingServices.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {remainingServices.map((service, idx) => (
-                      <motion.div key={service.code} variants={cardItemVariants}>
-                        <ServiceCard
-                          service={service}
-                          category={activeCat}
-                          index={idx + 1}
-                          lang={lang}
-                          startingFromLabel={rc.startingFromLabel}
-                          onDetail={() => openModal(service, activeCat)}
-                          onOrder={() => handleApplyClick(service.name, activeCat.name)}
-                        />
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
+                      {/* When expanded: invisible placeholder to maintain grid slot */}
+                      {isExpanded && (
+                        <div
+                          className="rounded-[12px]"
+                          style={{ background: '#080808', border: `1px solid ${activeCatStyles.borderColor}`, opacity: 0, pointerEvents: 'none' }}
+                          aria-hidden="true"
+                        >
+                          <div className="p-6">
+                            <div className="h-4 w-24 bg-white/5 rounded mb-3" />
+                            <div className="h-3 w-40 bg-white/5 rounded mb-2" />
+                            <div className="h-3 w-32 bg-white/5 rounded mb-4" />
+                            <div className="h-8 w-full bg-white/5 rounded" />
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* 10. Hash separator between service grid and terminal */}
+        {/* ═══════════════════════════════════════════
+            OVERLAY DIALOG — Extracted component
+        ═══════════════════════════════════════════ */}
+        <OverlayDialog
+          expandedCode={expandedCode}
+          expandedService={expandedService}
+          activeCat={activeCat}
+          activeCatStyles={activeCatStyles}
+          lang={lang}
+          startingFromLabel={rc.startingFromLabel}
+          onClose={closeExpanded}
+          onOrder={() => handleApplyClick(expandedService?.name ?? '', activeCat.name)}
+          isMounted={isMounted}
+        />
+
+        {/* Hash separator */}
         <div className="rc-hash-sep my-8 md:my-12" />
 
         {/* ═══════════════════════════════════════════
-            BOTTOM PANEL — Dark Terminal
+            COMMITMENT SECTION
         ═══════════════════════════════════════════ */}
-        <ScrollReveal yOffset={16}>
-          <div className="rc-terminal-panel rounded-lg overflow-hidden relative">
-            {/* Noise texture overlay */}
-            <div className="absolute inset-0 rc-noise-bg pointer-events-none opacity-30" />
-
-            {/* 7. Data stream lines in terminal */}
-            {!prefersReducedMotion && (
-              <>
-                <div className="rc-data-stream" style={{ top: '25%' }} />
-                <div className="rc-data-stream rc-data-stream--2" style={{ top: '55%' }} />
-                <div className="rc-data-stream rc-data-stream--3" style={{ top: '80%' }} />
-              </>
-            )}
-
-            {/* 8. Crosshair markers on terminal panel */}
-            <span className="rc-crosshair rc-crosshair--tl">+</span>
-            <span className="rc-crosshair rc-crosshair--br">+</span>
-
-            {/* Top accent line */}
-            <div
-              className="absolute top-0 left-0 right-0 h-px z-10"
-              style={{ background: `${activeCat.color}1A` }}
-            />
-
-            {/* Background panel */}
-            <div className="bg-[#0A0A0A] relative z-[1]">
-              {/* ─── Commitment row (merged into top) ─── */}
-              <div className="grid grid-cols-1 md:grid-cols-3 border-b border-white/[0.04]">
-                {rc.commitments.map((commitment, idx) => {
-                  const IconComponent = COMMITMENT_ICONS[commitment.icon] || Clock;
-                  const accentColors = ['#06B6D4', '#F59E0B', '#10B981'];
-                  const accent = accentColors[idx] || '#06B6D4';
-                  return (
-                    <div
-                      key={idx}
-                      className="rc-commitment-item relative flex items-center gap-3 px-5 py-3.5 hover:bg-white/[0.02] transition-colors duration-200 md:border-r last:border-r-0 border-white/[0.04]"
-                    >
-                      {/* Left accent line on hover */}
-                      <div
-                        className="absolute left-0 top-2 bottom-2 w-[2px] rounded-full opacity-0 hover-show-accent transition-opacity duration-200"
-                        style={{ background: `${accent}33` }}
-                      />
-                      <IconComponent className="w-4 h-4 shrink-0" style={{ color: accent, opacity: 0.7 }} />
-                      <div className="min-w-0">
-                        <span className="font-sans font-semibold text-xs text-white block leading-tight">
-                          {commitment.title[lang]}
-                        </span>
-                        <span className="font-sans text-[11px] text-neutral-500 leading-tight block truncate">
-                          {commitment.description[lang]}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* ─── Project List Accordion ─── */}
-              <div className="p-5 md:p-8">
-                <div className="flex items-center gap-2 mb-5">
-                  <h3 className="font-sans font-bold text-base text-white tracking-tight">
-                    {rc.projectListTitle}
-                  </h3>
-                  <span className="w-1 h-1 rounded-full bg-emerald-400" />
-                </div>
-                <p className="font-sans text-xs text-neutral-500 mb-6 leading-relaxed">
-                  {rc.projectListSubtitle}
-                </p>
-
-                <div className="space-y-2">
-                  {Object.entries(projectByCategory).map(([catName, entries]) => {
-                    const entryCat = categories.find((c) => c.name === catName || c.label[lang] === catName);
-                    const accentColor = entryCat?.color || '#64748B';
-                    const isExpanded = expandedPricing === catName;
-
-                    return (
-                      <div key={catName} className="rc-accordion-item rounded-md overflow-hidden relative">
-                        {/* Left accent line that animates in on expand */}
-                        <div
-                          className="absolute left-0 top-0 bottom-0 w-[2px] transition-opacity duration-300"
-                          style={{
-                            background: accentColor,
-                            opacity: isExpanded ? 0.4 : 0,
-                          }}
-                        />
-                        <button
-                          onClick={() => setExpandedPricing(isExpanded ? null : catName)}
-                          className="w-full flex items-center justify-between px-4 py-3 bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: accentColor }} />
-                            <span className="font-sans font-semibold text-xs text-white">{catName}</span>
-                            <Mono className="text-[9px] text-neutral-500">
-                              {String(entries.length).padStart(2, '0')} {lang === 'id' ? 'layanan' : 'svc'}
-                            </Mono>
-                          </div>
-                          <ChevronDown
-                            className="w-3.5 h-3.5 text-neutral-500 transition-transform duration-200"
-                            style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                          />
-                        </button>
-
-                        <AnimatePresence>
-                          {isExpanded && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: 'auto', opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] as const }}
-                              className="overflow-hidden"
-                            >
-                              <div className="px-4 py-1">
-                                {entries.map((entry, idx) => (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center justify-between py-2.5 border-t border-white/[0.04] group"
-                                  >
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                      <span
-                                        className="rc-spec-pill font-mono text-[9px] font-bold px-3 py-1 rounded border border-white/[0.06] shrink-0"
-                                        style={{ background: `${accentColor}12`, color: accentColor }}
-                                      >
-                                        {entry.code}
-                                      </span>
-                                      <span className="font-sans text-xs text-neutral-300 truncate group-hover:text-white transition-colors">
-                                        {entry.service}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center gap-4 shrink-0 ml-4">
-                                      <span className="font-sans text-[11px] text-neutral-500">
-                                        {entry.time[lang]}
-                                      </span>
-                                      <span className="font-mono text-xs text-white font-bold">
-                                        {entry.price[lang]}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* ═══════════════════════════════════════════
-            FOOTER NOTE — Minimal
-        ═══════════════════════════════════════════ */}
-        <ScrollReveal yOffset={12} delay={0.1} className="mt-6">
-          <div className="flex items-center justify-center gap-2 py-3 px-4">
-            <AlertTriangle className="w-3 h-3 text-amber-500/60 shrink-0" />
-            <p className="font-mono text-[8px] md:text-[9px] text-neutral-400 uppercase tracking-widest max-w-3xl leading-relaxed font-medium">
-              {rc.billingNote}
-            </p>
-          </div>
-        </ScrollReveal>
-      </div>
-
-      {/* ═══════════════════════════════════════════
-          DETAIL MODAL — Command Palette Style
-      ═══════════════════════════════════════════ */}
-      <AnimatePresence>
-        {modalService && modalCategory && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            onClick={closeModal}
-          >
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-
-            <motion.div
-              initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.96, y: prefersReducedMotion ? 0 : 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0, transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const } }}
-              exit={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.97, y: prefersReducedMotion ? 0 : 8, transition: { duration: 0.12 } }}
-              onClick={(e) => e.stopPropagation()}
-              className="rc-cmd-palette relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-lg"
-              style={{
-                background: '#0A0A0A',
-                boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
-              }}
-            >
-              {/* Modal header */}
-              <div
-                className="sticky top-0 z-10 flex items-center justify-between px-6 md:px-8 py-4 border-b border-white/[0.06]"
-                style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(8px)' }}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <span
-                    className="font-mono text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shrink-0"
-                    style={{ background: `${modalCategory.color}15`, color: modalCategory.color }}
-                  >
-                    {modalCategory.prefix}
-                  </span>
-                  <span className="font-mono text-[11px] text-neutral-500 font-bold tracking-wider shrink-0">
-                    {modalService.code}
-                  </span>
-                </div>
-                <button
-                  onClick={closeModal}
-                  className="w-7 h-7 rounded flex items-center justify-center text-neutral-500 hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Modal body */}
-              <div className="px-6 md:px-8 py-6 space-y-6 relative z-[1]">
-                {/* Service name + description + price */}
-                <div>
-                  <h3 className="font-sans font-bold text-xl md:text-2xl text-white tracking-tight leading-tight mb-3">
-                    {modalService.name}
-                  </h3>
-                  <p className="font-sans text-sm text-neutral-400 leading-relaxed mb-4">
-                    {modalService.fullDesc[lang]}
-                  </p>
-                  {/* Price readout in modal */}
-                  <div className="flex items-baseline gap-2 pt-3 border-t border-white/[0.06]">
-                    <span className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase text-neutral-500">
-                      {rc.startingFromLabel}
-                    </span>
-                    <span
-                      className="font-mono text-lg font-bold tracking-tight"
-                      style={{ color: modalCategory.color }}
-                    >
-                      {modalService.price[lang]}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Specs grid — 2x3 */}
-                <div>
-                  <h4
-                    className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2"
-                    style={{ color: modalCategory.color }}
-                  >
-                    {rc.specificationsLabel}
-                  </h4>
+        <ScrollReveal yOffset={20} delay={0.1}>
+          <div className="mt-8">
+            <h3 className="font-sans text-sm font-bold text-neutral-500 tracking-wider uppercase mb-6">
+              {lang === 'id' ? 'Komitmen Kami' : 'Our Commitment'}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {rc.commitments.map((commitment, idx) => {
+                const IconComp = COMMITMENT_ICONS[commitment.icon] || Clock;
+                return (
                   <div
-                    className="grid grid-cols-2 md:grid-cols-3 gap-px rounded-md overflow-hidden"
-                    style={{ background: `${modalCategory.color}0D` }}
+                    key={idx}
+                    className="flex items-start gap-3 p-4 bg-white/40 rounded-lg border border-black/[0.04]"
                   >
-                    <SpecItem label={lang === 'id' ? 'Waktu' : 'Timeline'} value={modalService.specs.timeline[lang]} accent={modalCategory.color} />
-                    <SpecItem label={lang === 'id' ? 'Halaman' : 'Pages'} value={modalService.specs.pages[lang]} accent={modalCategory.color} />
-                    <SpecItem label="Tech Stack" value={modalService.specs.techStack} accent={modalCategory.color} />
-                    <SpecItem label={lang === 'id' ? 'Revisi' : 'Revisions'} value={modalService.specs.revisions} accent={modalCategory.color} />
-                    <SpecItem
-                      label="Responsive"
-                      value={modalService.specs.responsive ? '✓' : '✗'}
-                      valueColor={modalService.specs.responsive ? '#10B981' : '#EF4444'}
-                      accent={modalCategory.color}
-                    />
-                    <SpecItem
-                      label="SEO"
-                      value={modalService.specs.seo ? '✓' : '✗'}
-                      valueColor={modalService.specs.seo ? '#10B981' : '#EF4444'}
-                      accent={modalCategory.color}
-                    />
+                    <div
+                      className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
+                      style={{ background: `${activeCat.color}12` }}
+                    >
+                      <IconComp className="w-4 h-4" style={{ color: activeCat.color }} />
+                    </div>
+                    <div>
+                      <h4 className="font-sans text-sm font-semibold text-black mb-1">
+                        {commitment.title[lang]}
+                      </h4>
+                      <p className="font-sans text-xs text-neutral-500 leading-relaxed">
+                        {commitment.description[lang]}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Deliverables list with checkmarks */}
-                <div>
-                  <h4
-                    className="font-mono text-[9px] font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2"
-                    style={{ color: modalCategory.color }}
-                  >
-                    {rc.includesLabel}
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5">
-                    {modalService.deliverables[lang].map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2.5 py-2 px-3 bg-white/[0.02] rounded hover:bg-white/[0.04] transition-colors duration-200"
-                      >
-                        <Check className="w-4 h-4 shrink-0" style={{ color: modalCategory.color }} />
-                        <span className="font-sans text-xs text-neutral-300">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal footer — single CTA */}
-              <div
-                className="sticky bottom-0 z-10 px-6 md:px-8 py-4 border-t border-white/[0.06]"
-                style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(8px)' }}
-              >
-                <button
-                  onClick={() => {
-                    if (modalService && modalCategory) {
-                      handleApplyClick(modalService.name, modalCategory.name);
-                      closeModal();
-                    }
-                  }}
-                  className="rc-ghost-btn w-full py-3 rounded-md text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer text-white transition-all duration-200 group"
-                  style={{
-                    background: `linear-gradient(135deg, ${modalCategory.color}, ${modalCategory.color}CC)`,
-                  }}
-                >
-                  <span>{rc.orderNowBtn}</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                );
+              })}
+            </div>
+          </div>
+        </ScrollReveal>
+      </div>
     </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   FEATURED SERVICE CARD — Hero Banner
-   ═══════════════════════════════════════════════════════════════ */
-interface FeaturedCardProps {
-  service: RatecardService;
-  category: RatecardCategory;
-  lang: Language;
-  startingFromLabel: string;
-  onDetail: () => void;
-  onOrder: () => void;
-}
-
-function FeaturedCard({ service, category, lang, startingFromLabel, onDetail, onOrder }: FeaturedCardProps) {
-  const accent = category.color;
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const prefersReducedMotion = useReducedMotion();
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const deltaX = (e.clientX - centerX) / (rect.width / 2);
-    const deltaY = (e.clientY - centerY) / (rect.height / 2);
-    setTilt({ x: deltaY * -1.5, y: deltaX * 1.5 });
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
-    setTilt({ x: 0, y: 0 });
-  }, []);
-
-  return (
-    <div
-      ref={cardRef}
-      className="rc-featured-card group relative rounded-lg overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #0A0A0A 0%, #0D0D0D 50%, #080808 100%)',
-        borderLeft: `3px solid ${accent}50`,
-        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(0px)`,
-        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease',
-        boxShadow: isHovered
-          ? `0 0 60px ${accent}0A, 0 12px 32px rgba(0,0,0,0.3)`
-          : '0 4px 20px rgba(0,0,0,0.18)',
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {/* 2. Corner brackets — targeting reticle frame */}
-      <div className="rc-corner-bracket rc-corner-bracket--tl" style={{ color: accent }} />
-      <div className="rc-corner-bracket rc-corner-bracket--tr" style={{ color: accent }} />
-      <div className="rc-corner-bracket rc-corner-bracket--bl" style={{ color: accent }} />
-      <div className="rc-corner-bracket rc-corner-bracket--br" style={{ color: accent }} />
-
-      {/* 3. Holo shimmer sweep on hover */}
-      <div className={`rc-holo-shimmer${isHovered ? ' rc-holo-shimmer--active' : ''}`} />
-
-      {/* 4. Scanline sweep — terminal radar */}
-      {!prefersReducedMotion && <div className="rc-scanline" />}
-
-      {/* Large watermark number — Orbitron font */}
-      <span
-        className="absolute top-2 right-4 pointer-events-none select-none transition-opacity duration-500"
-        style={{
-          fontFamily: '"Orbitron", "JetBrains Mono", monospace',
-          fontSize: '120px',
-          lineHeight: 1,
-          color: accent,
-          opacity: isHovered ? 0.12 : 0.06,
-        }}
-      >
-        01
-      </span>
-
-      {/* Top accent edge — barely-there hint */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px pointer-events-none"
-        style={{ background: `${accent}26` }}
-      />
-
-      {/* Subtle gradient overlay on hover */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 50% 50%, ${accent}08, transparent 70%)` }}
-      />
-
-      {/* Bottom border separator */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-white/[0.04]" />
-
-      <div className="flex flex-col md:flex-row relative z-10">
-        {/* Left: 65% — Main content */}
-        <div className="md:w-[65%] p-6 md:p-8">
-          {/* Featured badge + Category prefix */}
-          <div className="flex items-center gap-2 mb-4">
-            <span
-              className="font-mono text-[8px] font-bold px-2.5 py-1 rounded uppercase tracking-wider text-white"
-              style={{ background: accent }}
-            >
-              ★ FEATURED
-            </span>
-            <span
-              className="font-mono text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
-              style={{ background: `${accent}15`, color: accent }}
-            >
-              {category.prefix}
-            </span>
-            <span className="font-mono text-[10px] text-neutral-500 font-medium">
-              {service.code}
-            </span>
-          </div>
-
-          {/* Service name — NOT uppercase */}
-          <h3 className="font-sans font-bold text-lg md:text-xl text-white tracking-tight leading-tight mb-3">
-            {service.name}
-          </h3>
-
-          {/* Description */}
-          <p className="font-sans text-[14px] text-neutral-400 leading-relaxed mb-5 max-w-lg">
-            {service.desc[lang]}
-          </p>
-
-          {/* Key specs — 3 inline pills with accent dots */}
-          <div className="flex items-center gap-2 mb-6">
-            <SpecPill accent={accent}>
-              {service.tags.timeline}
-            </SpecPill>
-            <SpecPill accent={accent}>
-              {service.tags.scope} {lang === 'id' ? 'hal' : 'pgs'}
-            </SpecPill>
-            <SpecPill
-              accent={accent}
-              style={{ background: `${accent}12`, color: accent }}
-            >
-              {service.tags.tech}
-            </SpecPill>
-          </div>
-
-          {/* Ghost CTA button with left accent on hover */}
-          <button
-            onClick={onDetail}
-            className="rc-ghost-btn inline-flex items-center gap-1.5 text-[12px] font-semibold text-neutral-400 hover:text-white transition-all duration-200 cursor-pointer group/btn"
-            style={{
-              borderLeft: isHovered ? `2px solid ${accent}40` : '2px solid transparent',
-              paddingLeft: isHovered ? '10px' : '10px',
-            }}
-          >
-            <span>{lang === 'id' ? 'Lihat Detail' : 'View Details'}</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:translate-x-[2px]" />
-          </button>
-        </div>
-
-        {/* Right: 35% — Badges + CTA */}
-        <div className="md:w-[35%] p-6 md:p-8 flex flex-col justify-between md:border-l border-white/[0.04]">
-          <div className="space-y-4 mb-6">
-            {/* Price display — terminal readout style */}
-            <div className="space-y-1">
-              <span className="font-mono text-[8px] font-bold tracking-[0.15em] uppercase text-neutral-500 block">
-                {startingFromLabel}
-              </span>
-              <span
-                className="font-mono text-2xl font-bold tracking-tight block leading-none"
-                style={{ color: accent }}
-              >
-                {service.price[lang]}
-              </span>
-            </div>
-            {/* Timeline badge */}
-            <div className="flex items-center gap-2.5">
-              <Clock className="w-3.5 h-3.5 text-neutral-500" />
-              <span className="font-sans text-xs text-neutral-400">
-                {service.specs.timeline[lang]}
-              </span>
-            </div>
-            {/* Category badge */}
-            <div className="flex items-center gap-2.5">
-              <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ background: accent }}
-              />
-              <span className="font-sans text-xs text-neutral-400">
-                {category.name}
-              </span>
-            </div>
-          </div>
-
-          {/* Order CTA */}
-          <button
-            onClick={onOrder}
-            className="rc-ghost-btn w-full py-2.5 rounded-md text-[11px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer text-white/80 hover:text-white transition-all duration-200 group/btn"
-            style={{ background: `${accent}18` }}
-          >
-            <span>{lang === 'id' ? 'Pesan Sekarang' : 'Order Now'}</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover/btn:translate-x-[2px]" />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SERVICE CARD — Premium Catalog
-   ═══════════════════════════════════════════════════════════════ */
-interface ServiceCardProps {
-  service: RatecardService;
-  category: RatecardCategory;
-  index: number;
-  lang: Language;
-  startingFromLabel: string;
-  onDetail: () => void;
-  onOrder: () => void;
-}
-
-function ServiceCard({ service, category, index, lang, startingFromLabel, onDetail, onOrder }: ServiceCardProps) {
-  const accent = category.color;
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const prefersReducedMotion = useReducedMotion();
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const deltaX = (e.clientX - centerX) / (rect.width / 2);
-    const deltaY = (e.clientY - centerY) / (rect.height / 2);
-    setTilt({ x: deltaY * -1.5, y: deltaX * 1.5 });
-  }, []);
-
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
-    setTilt({ x: 0, y: 0 });
-  }, []);
-
-  // Zero-padded index for watermark
-  const watermarkNum = String(index + 1).padStart(2, '0');
-
-  return (
-    <div
-      ref={cardRef}
-      className="rc-service-card group relative rounded-lg bg-[#0A0A0A] overflow-hidden cursor-pointer"
-      style={{
-        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? '-2px' : '0px'})`,
-        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        boxShadow: isHovered
-          ? `0 10px 28px rgba(0,0,0,0.24), 0 0 24px ${accent}08`
-          : '0 2px 10px rgba(0,0,0,0.13)',
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={onDetail}
-    >
-      {/* 3. Holo shimmer sweep on hover */}
-      <div className={`rc-holo-shimmer${isHovered ? ' rc-holo-shimmer--active' : ''}`} />
-
-      {/* Noise texture overlay */}
-      <div className="absolute inset-0 rc-noise-bg pointer-events-none opacity-[0.03]" />
-
-      {/* Left accent line — appears on hover */}
-      <div
-        className="absolute left-0 top-0 bottom-0 w-[1.5px] transition-opacity duration-300 z-10"
-        style={{
-          background: accent,
-          opacity: isHovered ? 0.6 : 0,
-        }}
-      />
-
-      {/* Top accent line — appears on hover */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px transition-opacity duration-300 z-10"
-        style={{
-          background: accent,
-          opacity: isHovered ? 0.2 : 0,
-        }}
-      />
-
-      {/* Index watermark number */}
-      <span
-        className="absolute top-3 right-3 pointer-events-none select-none"
-        style={{
-          fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '32px',
-          lineHeight: 1,
-          color: '#262626',
-          opacity: 0.5,
-        }}
-      >
-        {watermarkNum}
-      </span>
-
-      <div className="p-6 md:p-7 relative z-10">
-        {/* Row 1: Category prefix badge + Service code */}
-        <div className="flex items-center justify-between mb-3">
-          <span
-            className="font-mono text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
-            style={{ background: `${accent}12`, color: accent }}
-          >
-            {category.prefix}
-          </span>
-          <span className="font-mono text-[10px] text-neutral-500 font-bold">
-            {service.code}
-          </span>
-        </div>
-
-        {/* Row 2: Service name — NOT uppercase */}
-        <h4 className="font-sans font-semibold text-[15px] text-white tracking-tight leading-snug mb-2">
-          {service.name}
-        </h4>
-
-        {/* Row 3: Description — 2-line clamp */}
-        <p className="font-sans text-[13px] text-neutral-500 leading-relaxed line-clamp-2 mb-4">
-          {service.desc[lang]}
-        </p>
-
-        {/* Row 4: Key specs — 3 inline pills with accent dots */}
-        <div className="flex items-center gap-1.5 mb-4">
-          <SpecPill accent={accent} isHovered={isHovered}>
-            {service.tags.timeline}
-          </SpecPill>
-          <SpecPill accent={accent} isHovered={isHovered}>
-            {service.tags.scope} {lang === 'id' ? 'hal' : 'pgs'}
-          </SpecPill>
-          <SpecPill
-            accent={accent}
-            style={{ background: `${accent}10`, color: accent }}
-          >
-            {service.tags.tech}
-          </SpecPill>
-        </div>
-
-        {/* Row 4.5: Price — terminal readout */}
-        <div className="flex items-baseline gap-1.5 mb-4 pb-4 border-b border-white/[0.04]">
-          <span className="font-mono text-[8px] font-bold tracking-[0.12em] uppercase text-neutral-500">
-            {startingFromLabel}
-          </span>
-          <span
-            className="font-mono text-sm font-bold tracking-tight"
-            style={{ color: accent }}
-          >
-            {service.price[lang]}
-          </span>
-        </div>
-
-        {/* Row 5: Ghost text button — accent on card hover */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onOrder(); }}
-          className="rc-ghost-btn inline-flex items-center gap-1 text-[11px] font-semibold transition-colors duration-200 cursor-pointer group/btn"
-          style={{ color: isHovered ? accent : '#737373' }}
-        >
-          <span>{lang === 'id' ? 'Pesan Sekarang' : 'Order Now'}</span>
-          <ArrowRight className="w-3 h-3 transition-transform duration-200 group-hover/btn:translate-x-[2px]" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   SPEC ITEM — Modal spec display
-   ═══════════════════════════════════════════════════════════════ */
-interface SpecItemProps {
-  label: string;
-  value: string;
-  accent: string;
-  valueColor?: string;
-}
-
-function SpecItem({ label, value, accent, valueColor }: SpecItemProps) {
-  return (
-    <div className="px-3 py-2.5 bg-[#0A0A0A]">
-      <span className="font-mono text-[8px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
-        {label}
-      </span>
-      <span
-        className="font-sans text-sm font-semibold block"
-        style={{ color: valueColor || 'white' }}
-      >
-        {value}
-      </span>
-    </div>
   );
 }
