@@ -50,22 +50,29 @@ export interface PricingPackage {
   badge?: string;
 }
 
+export interface RatecardServiceSpecs {
+  timeline: Record<Language, string>;
+  pages: Record<Language, string>;
+  techStack: string;
+  revisions: string;
+  responsive: boolean;
+  seo: boolean;
+}
+
 export interface RatecardService {
   code: string;
   name: string;
-  desc: { en: string; id: string };
-  fullDesc: { en: string; id: string };
-  tags: { timeline: string; scope: string; tech: string };
-  price: { en: string; id: string };
-  specs: {
-    timeline: { en: string; id: string };
-    pages: { en: string; id: string };
-    techStack: string;
-    revisions: string;
-    responsive: boolean;
-    seo: boolean;
+  desc: Record<Language, string>;
+  fullDesc: Record<Language, string>;
+  price: Record<Language, string>;
+  tags: {
+    timeline: string;
+    scope: string;
+    tech: string;
   };
-  deliverables: { en: string[]; id: string[] };
+  specs: RatecardServiceSpecs;
+  features: Record<Language, string[]>;
+  deliverables: Record<Language, string[]>;
 }
 
 export interface RatecardCategory {
@@ -73,23 +80,21 @@ export interface RatecardCategory {
   name: string;
   prefix: string;
   color: string;
-  count: number;
-  label: { en: string; id: string };
+  label: Record<Language, string>;
   services: RatecardService[];
 }
 
 export interface RatecardCommitment {
   icon: string;
-  title: { en: string; id: string };
-  description: { en: string; id: string };
+  title: Record<Language, string>;
+  description: Record<Language, string>;
 }
 
 export interface RatecardProjectEntry {
-  category: { en: string; id: string };
-  service: string;
-  code: string;
-  price: { en: string; id: string };
-  time: { en: string; id: string };
+  name: Record<Language, string>;
+  category: Record<Language, string>;
+  timeline: Record<Language, string>;
+  price: Record<Language, string>;
 }
 
 export interface CaseStudy {
@@ -180,30 +185,20 @@ export interface TranslationSet {
     }[];
   };
   ratecard: {
-    sectionLabel: string;
     sectionTitle: string;
     subtitle: string;
-    statsLabel: string;
-    detailBtn: string;
-    orderBtn: string;
-    closeBtn: string;
-    orderNowBtn: string;
-    projectListTab: string;
-    commitmentTab: string;
-    projectListTitle: string;
-    projectListSubtitle: string;
-    commitmentTitle: string;
-    commitmentSubtitle: string;
-    specificationsLabel: string;
-    includesLabel: string;
-    billingNote: string;
-    comingSoonLabel: string;
-    startingFromLabel: string;
-    serviceLabel: string;
-    codeLabel: string;
+    packages: PricingPackage[];
+    getStarted: string;
+    currency: string;
+    addonsTitle: string;
+    billingSubtitle: string;
     categories: RatecardCategory[];
     commitments: RatecardCommitment[];
     projectEntries: RatecardProjectEntry[];
+    projectListTitle: string;
+    projectListSubtitle: string;
+    startingFromLabel: string;
+    comingSoonLabel: string;
   };
   portfolio: {
     sectionTitle: string;

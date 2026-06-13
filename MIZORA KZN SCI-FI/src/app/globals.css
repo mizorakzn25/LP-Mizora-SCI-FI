@@ -32,39 +32,15 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
-/* ═══ LOADING SCREEN: Zero scrollbar, zero white line ═══ */
+/* Prevent layout shift from scrollbar — only when not loading */
+html:not(.loading-active) {
+  overflow-y: auto;
+}
 html.loading-active {
   overflow: hidden !important;
-  scrollbar-width: none !important; /* Firefox */
-  -ms-overflow-style: none !important; /* IE/Edge */
 }
 html.loading-active body {
   overflow: hidden !important;
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-html.loading-active::-webkit-scrollbar {
-  display: none !important; /* Chrome/Safari/Opera */
-  width: 0 !important;
-  background: transparent !important;
-}
-html.loading-active body::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  background: transparent !important;
-}
-/* After loading: normal scrollbar */
-html:not(.loading-active) {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  -ms-overflow-style: auto;
-}
-html:not(.loading-active) body {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
-  -ms-overflow-style: auto;
 }
 
 /* Optimize font rendering */
@@ -234,30 +210,16 @@ canvas[aria-hidden="true"] {
     border-color: var(--border);
     outline-color: var(--ring);
   }
+  /* Hide scrollbar on initial load — loading-active class controls this */
+  html {
+    overflow: hidden;
+  }
   body {
     background-color: var(--background);
     color: var(--foreground);
-  }
-  /* Initial load: hide scrollbar completely until JS takes over */
-  html {
     overflow: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  html::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    background: transparent;
-  }
-  html.loading-active body {
-    overflow: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  html.loading-active body::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    background: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -740,7 +702,7 @@ canvas[aria-hidden="true"] {
 
 
 /* ═══════════════════════════════════════════════════════════════
-   MIZORA ECOSYSTEM — SCI-FI DESIGN SYSTEM
+   MIZORA ECOSYSTEM — FUD SCI-FI FUTURISTIC DESIGN SYSTEM
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── KEYFRAME ANIMATIONS ─── */
@@ -3696,413 +3658,254 @@ canvas[aria-hidden="true"] {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RATECARD SECTION — Premium Minimal Design System (10/10+ REDESIGN)
-   References: Linear, Stripe, Vercel Enterprise, Framer
+   RATECARD SECTION — Premium SCI-FI Styles
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── Noise Background — SVG texture like Linear.app ─── */
+/* ─── Noise Background ─── */
 .rc-noise-bg {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
-  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
 }
 
-/* ─── Conic gradient sweep — slowly rotating radar ─── */
-@keyframes rc-conic-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.rc-conic-sweep {
-  animation: rc-conic-rotate 60s linear infinite;
-  will-change: transform;
-}
-
-/* ─── Stat dot pulse ─── */
-@keyframes rc-stat-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-}
-.rc-stat-dot {
-  animation: rc-stat-pulse 2s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* ─── Pill Rail Navigation ─── */
-.rc-pill {
-  border: none;
-  outline: none;
-  letter-spacing: 0.01em;
-  will-change: transform, background-color;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.rc-pill:active {
-  transform: scale(0.97);
-}
-
-/* Hidden scrollbar for pill rail */
-.rc-pill-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.rc-pill-scrollbar::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-/* ─── Featured Card — Hero Banner ─── */
-.rc-featured-card {
-  will-change: transform;
-  contain: content;
-  position: relative;
-  /* Subtle inner top-left glow for depth */
-  background-image:
-    radial-gradient(ellipse at 0% 0%, rgba(255,255,255,0.03) 0%, transparent 50%);
-}
-
-/* Hover glow handled inline for dynamic accent color */
-
-/* ─── Service Card — Premium Catalog ─── */
-.rc-service-card {
-  will-change: transform;
-  contain: content;
-  position: relative;
-  /* Subtle noise texture for depth */
-  background-image:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
-}
-
-/* Hover glow handled inline for dynamic accent color */
-
-/* ─── Spec Pill — Inline spec display ─── */
-.rc-spec-pill {
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.04em;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.rc-spec-pill:hover,
-.rc-service-card:hover .rc-spec-pill {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-/* ─── Ghost Button — Text button with arrow ─── */
-.rc-ghost-btn {
-  border: none;
-  outline: none;
-  letter-spacing: 0.01em;
-  will-change: transform;
-}
-
-.rc-ghost-btn:active {
-  transform: scale(0.98);
-}
-
-/* ─── Commitment item — hover accent ─── */
-.rc-commitment-item:hover .hover-show-accent {
-  opacity: 1 !important;
-}
-
-/* ─── Terminal Panel — Bottom dark panel ─── */
-.rc-terminal-panel {
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    0 16px 48px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-/* ─── Accordion Item — Pricing accordion ─── */
-.rc-accordion-item {
-  transition: background 0.2s ease;
-}
-
-/* ─── Command Palette Modal ─── */
-.rc-cmd-palette {
-  will-change: transform, opacity;
-  contain: content;
-}
-
-/* Subtle noise texture on modal */
-.rc-cmd-palette::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  pointer-events: none;
-  z-index: 0;
-  border-radius: 8px;
-  opacity: 0.7;
-}
-
-/* ─── Reduced Motion ─── */
-@media (prefers-reduced-motion: reduce) {
-  .rc-conic-sweep,
-  .rc-stat-dot {
-    animation: none !important;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   RATECARD DECORATIVE ENHANCEMENTS
-   Premium hiasan — dot grid, corner brackets, holo shimmer,
-   scanline sweep, floating particles, pulse ring, data stream,
-   crosshair markers, breathing diamond, hash separator
-   ═══════════════════════════════════════════════════════════════ */
-
-/* ─── 1. DOT GRID BACKGROUND (Stripe/Vercel style) ─── */
+/* ─── Dot Grid Background ─── */
 .rc-dot-grid {
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px);
   background-size: 24px 24px;
-  opacity: 0.35;
 }
 
-/* ─── 2. CORNER BRACKETS on Featured Card ─── */
-.rc-corner-bracket {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  pointer-events: none;
-  z-index: 5;
-}
-.rc-corner-bracket--tl {
-  top: 6px;
-  left: 6px;
-  border-top: 1.5px solid currentColor;
-  border-left: 1.5px solid currentColor;
-  opacity: 0.18;
-}
-.rc-corner-bracket--tr {
-  top: 6px;
-  right: 6px;
-  border-top: 1.5px solid currentColor;
-  border-right: 1.5px solid currentColor;
-  opacity: 0.18;
-}
-.rc-corner-bracket--bl {
-  bottom: 6px;
-  left: 6px;
-  border-bottom: 1.5px solid currentColor;
-  border-left: 1.5px solid currentColor;
-  opacity: 0.18;
-}
-.rc-corner-bracket--br {
-  bottom: 6px;
-  right: 6px;
-  border-bottom: 1.5px solid currentColor;
-  border-right: 1.5px solid currentColor;
-  opacity: 0.18;
-}
-
-/* ─── 3. HOLO SHIMMER SWEEP on Card Hover ─── */
-@keyframes rc-holo-sweep {
-  0% { transform: translateX(-100%); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateX(200%); opacity: 0; }
-}
-.rc-holo-shimmer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 4;
-}
-.rc-holo-shimmer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.06) 45%,
-    rgba(255, 255, 255, 0.02) 55%,
-    transparent 70%
-  );
-  transform: translateX(-100%);
-  opacity: 0;
-  will-change: transform, opacity;
-}
-.rc-holo-shimmer--active::before {
-  animation: rc-holo-sweep 0.8s ease forwards;
-}
-
-/* ─── 4. SCANLINE SWEEP on Featured Card ─── */
-@keyframes rc-scanline-sweep {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(400%); }
-}
-.rc-scanline {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 30%;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.015) 40%,
-    rgba(255, 255, 255, 0.03) 50%,
-    rgba(255, 255, 255, 0.015) 60%,
-    transparent 100%
-  );
-  animation: rc-scanline-sweep 6s linear infinite;
-  pointer-events: none;
-  z-index: 3;
-  will-change: transform;
-}
-
-/* ─── 5. FLOATING MICRO-PARTICLES ─── */
-@keyframes rc-float-1 {
-  0%, 100% { transform: translate(0, 0); opacity: 0.15; }
-  25% { transform: translate(12px, -18px); opacity: 0.3; }
-  50% { transform: translate(-8px, -30px); opacity: 0.2; }
-  75% { transform: translate(16px, -12px); opacity: 0.35; }
-}
-@keyframes rc-float-2 {
-  0%, 100% { transform: translate(0, 0); opacity: 0.12; }
-  25% { transform: translate(-14px, -20px); opacity: 0.25; }
-  50% { transform: translate(10px, -35px); opacity: 0.18; }
-  75% { transform: translate(-6px, -10px); opacity: 0.28; }
-}
-@keyframes rc-float-3 {
-  0%, 100% { transform: translate(0, 0); opacity: 0.1; }
-  25% { transform: translate(8px, -25px); opacity: 0.22; }
-  50% { transform: translate(-12px, -15px); opacity: 0.15; }
-  75% { transform: translate(18px, -28px); opacity: 0.25; }
-}
+/* ─── Floating Micro-Particles ─── */
 .rc-particle {
   position: absolute;
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(16, 185, 129, 0.3);
   pointer-events: none;
-  z-index: 1;
-  will-change: transform, opacity;
+  animation: rc-float 8s ease-in-out infinite;
 }
-.rc-particle--1 {
-  top: 20%;
-  left: 15%;
-  animation: rc-float-1 18s ease-in-out infinite;
-}
-.rc-particle--2 {
-  top: 45%;
-  right: 20%;
-  animation: rc-float-2 22s ease-in-out infinite;
-  animation-delay: -5s;
-}
-.rc-particle--3 {
-  bottom: 30%;
-  left: 60%;
-  animation: rc-float-3 20s ease-in-out infinite;
-  animation-delay: -10s;
-}
-.rc-particle--4 {
-  top: 70%;
-  left: 35%;
-  animation: rc-float-1 25s ease-in-out infinite;
-  animation-delay: -15s;
-  width: 2px;
-  height: 2px;
-}
-.rc-particle--5 {
-  top: 15%;
-  right: 40%;
-  animation: rc-float-2 23s ease-in-out infinite;
-  animation-delay: -8s;
-  width: 2px;
-  height: 2px;
+.rc-particle--1 { top: 15%; left: 10%; animation-delay: 0s; }
+.rc-particle--2 { top: 40%; left: 85%; animation-delay: -1.5s; background: rgba(245, 158, 11, 0.25); }
+.rc-particle--3 { top: 70%; left: 25%; animation-delay: -3s; }
+.rc-particle--4 { top: 20%; left: 65%; animation-delay: -4.5s; background: rgba(239, 68, 68, 0.2); }
+.rc-particle--5 { top: 85%; left: 75%; animation-delay: -6s; }
+
+@keyframes rc-float {
+  0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+  25% { transform: translateY(-12px) translateX(6px); opacity: 0.8; }
+  50% { transform: translateY(-6px) translateX(-4px); opacity: 0.5; }
+  75% { transform: translateY(-16px) translateX(8px); opacity: 0.7; }
 }
 
-/* ─── 6. PULSE RING on Category Active Dot ─── */
-@keyframes rc-pulse-ring {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(3.5); opacity: 0; }
+/* ─── Conic Sweep ─── */
+.rc-conic-sweep {
+  animation: rc-conic-rotate 20s linear infinite;
 }
-.rc-pulse-ring {
+@keyframes rc-conic-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Cursor Blink ─── */
+@keyframes cmd-cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ─── Headline Line ─── */
+.cmd-headline-line {
+  height: 3px;
+  background: linear-gradient(90deg, #10B981, #10B98140, transparent);
+  margin-top: 12px;
+  animation: cmd-line-expand 0.8s ease-out forwards;
+}
+@keyframes cmd-line-expand {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* ─── Stat Dot ─── */
+.rc-stat-dot {
+  animation: rc-dot-pulse 2s ease-in-out infinite;
+}
+@keyframes rc-dot-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* ─── Fee Flash ─── */
+.rc-fee-flash {
+  animation: rc-flash 0.4s ease-out;
+  color: #10B981 !important;
+}
+@keyframes rc-flash {
+  0% { color: #10B981; text-shadow: 0 0 8px rgba(16,185,129,0.6); }
+  100% { color: inherit; text-shadow: none; }
+}
+
+/* ─── Active Blink ─── */
+.rc-active-blink {
+  animation: rc-blink-active 1.5s ease-in-out infinite;
+}
+@keyframes rc-blink-active {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ─── Pill Scrollbar ─── */
+.rc-pill-scrollbar::-webkit-scrollbar {
+  height: 2px;
+}
+.rc-pill-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.rc-pill-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--rc-accent, rgba(0,0,0,0.1));
+  border-radius: 10px;
+}
+.rc-pill-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--rc-accent-hover, rgba(0,0,0,0.18));
+}
+.rc-pill-scrollbar {
+  scrollbar-color: var(--rc-accent, rgba(0,0,0,0.1)) transparent;
+}
+
+/* ─── Category Rail — SCI-FI Segmented ─── */
+.rc-cat-rail {
+  position: relative;
+}
+.rc-cat-pill {
+  position: relative;
+  z-index: 1;
+}
+.rc-cat-pill:hover:not(:has(.rc-cat-pill[style*="background"])) {
+  background: rgba(0,0,0,0.04) !important;
+}
+
+/* ─── Holo Shimmer ─── */
+.rc-holo-shimmer {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 0;
+  left: -100%;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(1);
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255,255,255,0.05) 45%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.05) 55%,
+    transparent 60%
+  );
+  animation: rc-shimmer 4s ease-in-out infinite;
   pointer-events: none;
-  animation: rc-pulse-ring 2s ease-out infinite;
-  will-change: transform, opacity;
+}
+@keyframes rc-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
 
-/* ─── 7. DATA STREAM LINES in Terminal Panel ─── */
-@keyframes rc-data-stream {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(0%); }
+/* ─── Ghost Button ─── */
+.rc-ghost-btn {
+  position: relative;
 }
+.rc-ghost-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+.rc-ghost-btn:hover::after {
+  width: 100%;
+}
+
+/* ─── CTA Button ─── */
+.rc-cta-btn {
+  position: relative;
+  overflow: hidden;
+}
+.rc-cta-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.5s ease;
+}
+.rc-cta-btn:hover::before {
+  left: 100%;
+}
+.rc-cta-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+/* ─── CTA Detail Button (replaces inline DOM manipulation) ─── */
+.rc-cta-detail {
+  transition: color 0.2s, filter 0.2s, transform 0.2s;
+}
+.rc-cta-detail:hover {
+  filter: brightness(110%);
+  transform: translateY(-2px);
+}
+
+/* ─── Hash Separator ─── */
+.rc-hash-sep {
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0,0,0,0.15) 0px,
+    rgba(0,0,0,0.15) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* ─── Terminal Panel ─── */
+.rc-terminal-panel {
+  background: #0A0A0A;
+  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+}
+
+/* ─── Data Stream ─── */
 .rc-data-stream {
   position: absolute;
   left: 0;
   right: 0;
   height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(16,185,129,0.08), transparent);
+  animation: rc-stream 6s ease-in-out infinite;
   pointer-events: none;
-  z-index: 2;
-  will-change: transform;
 }
-.rc-data-stream::before {
-  content: '';
-  display: block;
-  width: 200%;
-  height: 1px;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 4px,
-    rgba(255, 255, 255, 0.04) 4px,
-    rgba(255, 255, 255, 0.04) 8px
-  );
-  animation: rc-data-stream 30s linear infinite;
+.rc-data-stream--2 {
+  animation-delay: -2s;
+  background: linear-gradient(90deg, transparent, rgba(245,158,11,0.06), transparent);
 }
-.rc-data-stream--2::before {
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 6px,
-    rgba(255, 255, 255, 0.03) 6px,
-    rgba(255, 255, 255, 0.03) 10px
-  );
-  animation-duration: 45s;
-  animation-direction: reverse;
+.rc-data-stream--3 {
+  animation-delay: -4s;
+  background: linear-gradient(90deg, transparent, rgba(239,68,68,0.05), transparent);
 }
-.rc-data-stream--3::before {
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 3px,
-    rgba(255, 255, 255, 0.025) 3px,
-    rgba(255, 255, 255, 0.025) 6px
-  );
-  animation-duration: 38s;
-  animation-delay: -12s;
+@keyframes rc-stream {
+  0%, 100% { opacity: 0; transform: translateX(-30%); }
+  50% { opacity: 1; transform: translateX(30%); }
 }
 
-/* ─── 8. CROSSHAIR MARKERS on Terminal Panel ─── */
+/* ─── Crosshair ─── */
 .rc-crosshair {
   position: absolute;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.06);
+  font-size: 8px;
+  color: rgba(255,255,255,0.08);
+  font-weight: bold;
   pointer-events: none;
-  z-index: 3;
-  line-height: 1;
-  user-select: none;
+  z-index: 5;
 }
 .rc-crosshair--tl {
   top: 8px;
@@ -4113,48 +3916,48 @@ canvas[aria-hidden="true"] {
   right: 10px;
 }
 
-/* ─── 9. BREATHING GLOW on Section Header Diamond ─── */
-@keyframes rc-diamond-breathe {
-  0%, 100% { opacity: 0.15; }
-  50% { opacity: 0.45; }
-}
-.rc-diamond-breathe {
-  animation: rc-diamond-breathe 3s ease-in-out infinite;
-  will-change: opacity;
+/* ─── Commitment Item ─── */
+.rc-commitment-item:hover .hover-show-accent {
+  opacity: 1 !important;
 }
 
-/* ─── 10. HASH SEPARATOR between service grid and terminal ─── */
-.rc-hash-sep {
-  position: relative;
-  text-align: center;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.06);
+/* ─── Accordion Item ─── */
+.rc-accordion-item {
+  transition: all 0.2s ease;
 }
-.rc-hash-sep::before {
-  content: '///';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 2px;
-  color: rgba(0, 0, 0, 0.08);
-  background: #FAFAFA;
-  padding: 0 10px;
+.rc-accordion-item:hover {
+  background: rgba(255,255,255,0.01);
 }
 
-/* ─── Reduced motion for new ratecard decorations ─── */
-@media (prefers-reduced-motion: reduce) {
-  .rc-scanline,
-  .rc-particle,
-  .rc-pulse-ring,
-  .rc-data-stream::before,
-  .rc-diamond-breathe,
-  .rc-holo-shimmer--active::before {
-    animation: none !important;
-  }
-  .rc-holo-shimmer::before {
-    opacity: 0 !important;
-  }
+/* ─── Spec Pill ─── */
+.rc-spec-pill {
+  transition: all 0.2s ease;
+}
+.rc-spec-pill:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+/* ─── Detail View Scrollbar — Accent-colored ─── */
+/* NOTE: Uses CSS custom property --rc-accent set via ref (not inline style)
+   because Framer Motion's motion.div may not forward CSS custom properties
+   in production builds. See OverlayDialog component for the ref-based setter. */
+.rc-detail-scrollbar::-webkit-scrollbar {
+  width: 5px !important;
+}
+.rc-detail-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.02) !important;
+  border-radius: 3px;
+}
+.rc-detail-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--rc-accent, rgba(255,255,255,0.15)) !important;
+  border-radius: 3px;
+  border: none;
+}
+.rc-detail-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--rc-accent, rgba(255,255,255,0.25)) !important;
+}
+/* Firefox scrollbar */
+.rc-detail-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rc-accent, rgba(255,255,255,0.15)) rgba(255,255,255,0.02) !important;
 }
